@@ -24,29 +24,6 @@ uv pip install -e ".[cloud]"
 uv pip install -e ".[all]"
 ```
 
-## � Generated Datasets
-
-### HDF5 Dataset (876 QA pairs)
-- **Location**: `output/hdf5_qa/gemini/`
-- **Sources**: HDF5, parallel I/O research papers + documentation
-- **Model**: Google Gemini 2.0 Flash
-- **Format**: JSON, JSONL
-- **Status**: ✅ Complete
-
-### Jarvis Dataset (300 QA pairs)
-- **Location**: `output/jarvis_qa/claude/`
-- **Sources**: JARVIS I/O framework documentation
-- **Model**: Claude Sonnet 4
-- **Format**: JSON, JSONL
-- **Status**: ✅ Complete
-
-### Jarvis Dataset - Gemini (150 QA pairs)
-- **Location**: `output/jarvis_qa/` (partial, intermediate file)
-- **Sources**: JARVIS I/O framework documentation
-- **Model**: Google Gemini 2.0 Flash
-- **Format**: JSON
-- **Status**: ⚠️ Partial (50% - quota exhausted)
-
 ## 🚀 Quick Start
 
 ### 1. Configure LLM Provider
@@ -115,7 +92,8 @@ uv run generator generate /path/to/lancedb -o output/qa.json --provider gemini -
 uv run generator generate /path/to/lancedb -o output/qa.json --config my_config.yaml
 ```
 
-### curate
+<!--
+### curate (Coming Soon)
 
 Filter QA pairs by quality using LLM-as-Judge.
 
@@ -143,7 +121,7 @@ uv run generator curate output/qa_raw.json -o output/qa_high.json --threshold 8.
 uv run generator curate output/qa_raw.json -o output/qa_curated.json --provider claude
 ```
 
-### export
+### export (Coming Soon)
 
 Export QA pairs to training format.
 
@@ -168,7 +146,7 @@ uv run generator export output/qa_curated.json -o output/training.json -f alpaca
 uv run generator export output/qa_curated.json -o output/training.jsonl -f chatml --system-prompt "You are an HDF5 expert."
 ```
 
-### pipeline
+### pipeline (Coming Soon)
 
 Run full pipeline: generate → curate → export.
 
@@ -194,6 +172,7 @@ uv run generator pipeline /path/to/lancedb -o output/test.jsonl --max-chunks 10
 # High quality training data in Alpaca format
 uv run generator pipeline /path/to/lancedb -o output/training.json -f alpaca --threshold 8.0
 ```
+-->
 
 ## 🎨 LLM Provider Setup
 
@@ -311,7 +290,31 @@ Based on **Instruction Backtranslation** (Meta AI, ICLR 2024):
 - Treat document chunks as "answers"
 - LLM generates relevant "questions"
 - Creates natural instruction-response pairs
+## 🧪 Testing
 
-## 📄 License
+Run the test suite with pytest:
+
+```bash
+# Run all tests
+uv run pytest tests/ -v
+
+# Run specific test file
+uv run pytest tests/test_clients.py -v
+uv run pytest tests/test_qa_generator.py -v
+```
+
+**Test Coverage:**
+- Client naming tests (7 tests): Validates provider names (claude, gemini) and legacy names (claude_sdk, adk)
+- QA generator tests (4 tests): Validates chunk filtering, rate limiting, retry logic, and JSON extraction
+
+All tests use fixtures from [tests/conftest.py](tests/conftest.py) for consistent test data.
+## � QA Output
+
+Generated QA datasets using instruction backtranslation are available in the [output/](output/) directory:
+
+- **[HDF5 Dataset](output/hdf5_qa/gemini/)**: 876 QA pairs generated with Gemini 2.0 Flash from HDF5 and parallel I/O research papers
+- **[Jarvis Dataset](output/jarvis_qa/)**: 300 QA pairs generated with Claude Sonnet 4 from JARVIS I/O framework codebase and documentation (see [README](output/jarvis_qa/README.md) for details)
+
+## �📄 License
 
 MIT
