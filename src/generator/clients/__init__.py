@@ -42,7 +42,7 @@ def get_client(provider: str, config: Dict[str, Any]) -> BaseLLMClient:
         available = ", ".join(sorted(set(clients.keys())))
         raise ValueError(f"Unknown provider '{provider}'. Available: {available}")
 
-    return client_class(config)
+    return client_class(config)  # type: ignore[abstract]
 
 
 __all__ = [

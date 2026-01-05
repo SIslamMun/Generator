@@ -23,7 +23,7 @@ class ClaudeSDKClient(BaseLLMClient):
         super().__init__(config)
         
         try:
-            from claude_agent_sdk import query, ClaudeAgentOptions
+            import claude_agent_sdk  # noqa: F401
             self.model = config.get("model", "claude-code")
         except ImportError:
             raise ImportError(
@@ -52,7 +52,7 @@ class ClaudeSDKClient(BaseLLMClient):
 
             # Check for rate limit or auth issues
             if "exit code 1" in error_msg.lower() or "rate limit" in error_msg.lower():
-                print(f"\n⚠️  Claude CLI rate limit or auth issue.")
+                print("\n⚠️  Claude CLI rate limit or auth issue.")
                 print("    Check with: claude auth status")
 
             # Try fallback to Anthropic API if key available
@@ -92,14 +92,14 @@ class ClaudeSDKClient(BaseLLMClient):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         
-        return loop.run_until_complete(_async_query())
+        return loop.run_until_complete(_async_query())  # type: ignore[no-any-return]
 
     def _generate_anthropic_fallback(
         self,
         prompt: str,
         temperature: Optional[float] = None,
         max_tokens: Optional[int] = None,
-        api_key: str = None,
+        api_key: Optional[str] = None,
     ) -> str:
         """Fallback to Anthropic API."""
         from anthropic import Anthropic

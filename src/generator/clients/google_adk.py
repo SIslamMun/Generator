@@ -58,7 +58,7 @@ class GoogleADKClient(BaseLLMClient):
             Generated text response
         """
         response = self.client.models.generate_content(
-            model=self.model,
+            model=self.model,  # type: ignore[arg-type]
             contents=prompt,
             config=self.types.GenerateContentConfig(
                 temperature=temperature or self.temperature,
@@ -66,4 +66,4 @@ class GoogleADKClient(BaseLLMClient):
             ),
         )
 
-        return response.text
+        return response.text or ""

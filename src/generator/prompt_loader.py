@@ -5,7 +5,7 @@ Loads prompts from individual YAML files in configs/prompts/ directory.
 Each prompt file has a 'prompt' key containing the template.
 """
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 from pathlib import Path
 from typing import Dict
 

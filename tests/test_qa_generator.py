@@ -1,7 +1,5 @@
 """Unit tests for QA generator module."""
 
-import pytest
-from pathlib import Path
 
 
 class TestQAGenerator:

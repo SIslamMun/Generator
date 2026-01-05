@@ -271,7 +271,7 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks):
         input_path=str(qa_curated), output_path=str(output_path), format_type=format
     )
 
-    console.print(f"\n[bold green]✨ Pipeline Complete![/bold green]")
+    console.print("\n[bold green]✨ Pipeline Complete![/bold green]")
     console.print(f"[bold green]📁 Training data: {output_path}[/bold green]\n")
 
 

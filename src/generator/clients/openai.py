@@ -53,10 +53,10 @@ class OpenAIClient(BaseLLMClient):
             Generated text response
         """
         response = self.client.chat.completions.create(
-            model=self.model,
+            model=self.model,  # type: ignore[arg-type]
             messages=[{"role": "user", "content": prompt}],
             temperature=temperature or self.temperature,
             max_tokens=max_tokens or self.max_tokens,
         )
 
-        return response.choices[0].message.content
+        return response.choices[0].message.content or ""

@@ -53,7 +53,7 @@ class AnthropicClient(BaseLLMClient):
             Generated text response
         """
         message = self.client.messages.create(
-            model=self.model,
+            model=self.model,  # type: ignore[arg-type]
             max_tokens=max_tokens or self.max_tokens,
             temperature=temperature or self.temperature,
             messages=[{"role": "user", "content": prompt}],

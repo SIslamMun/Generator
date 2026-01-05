@@ -13,7 +13,7 @@ import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-import lancedb
+import lancedb  # type: ignore[import-untyped]
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from .clients import get_client, BaseLLMClient
@@ -71,8 +71,8 @@ def generate_qa_from_lancedb(
         raise ValueError("qa_generation prompt not found in prompts config")
 
     all_qa_pairs = []
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_file = Path(output_path)
+    output_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Process chunks in batches
     with Progress(
@@ -119,7 +119,7 @@ def generate_qa_from_lancedb(
 
                     # Save intermediate results every 10 chunks
                     if len(all_qa_pairs) % 50 == 0:
-                        _save_intermediate(all_qa_pairs, output_path)
+                        _save_intermediate(all_qa_pairs, output_file)
 
                 except Exception as e:
                     console.print(f"[yellow]⚠ Error on chunk {chunk_id}: {e}[/yellow]")
@@ -129,10 +129,10 @@ def generate_qa_from_lancedb(
             offset += limit
 
     # Final save
-    _save_results(all_qa_pairs, output_path)
+    _save_results(all_qa_pairs, output_file)
 
     console.print(f"\n[bold green]✓ Generated {len(all_qa_pairs)} QA pairs[/bold green]")
-    console.print(f"[bold green]✓ Saved to: {output_path}[/bold green]\n")
+    console.print(f"[bold green]✓ Saved to: {output_file}[/bold green]\n")
 
     return all_qa_pairs
 
@@ -151,7 +151,7 @@ def _generate_pairs_for_chunk(
     prompt = prompt_template.format(text=content, n_pairs=n_pairs)
 
     # Generate response with exponential backoff retry
-    last_error = None
+    last_error: Exception = ValueError("Max retries exhausted")
     for attempt in range(max_retries):
         try:
             response = llm.generate(prompt)
@@ -171,7 +171,7 @@ def _generate_pairs_for_chunk(
             
             # Check for daily quota exhaustion (stop immediately, don't retry)
             if 'per_day' in error_msg or 'daily' in error_msg or 'generate_requests_per_model_per_day' in str(e):
-                raise ValueError(f"Daily quota exceeded. Try again tomorrow or switch to gemini-1.5-flash or gemini-2.5-flash-image")
+                raise ValueError("Daily quota exceeded. Try again tomorrow or switch to gemini-1.5-flash or gemini-2.5-flash-image")
             
             # Check if it's a per-minute rate limit error (429) - these can be retried
             elif '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
@@ -218,7 +218,7 @@ def _generate_pairs_for_chunk(
         pair["generated_at"] = datetime.now().isoformat()
         pair["model"] = llm.model
 
-    return pairs
+    return pairs  # type: ignore[no-any-return]
 
 
 def _save_intermediate(qa_pairs: List[Dict], output_path: Path):

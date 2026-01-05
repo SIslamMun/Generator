@@ -57,7 +57,7 @@ class OllamaClient(BaseLLMClient):
         response.raise_for_status()
         result = response.json()
 
-        return result["response"]
+        return result["response"]  # type: ignore[no-any-return]
 
     def __del__(self):
         """Cleanup HTTP client."""
