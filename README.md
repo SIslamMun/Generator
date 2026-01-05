@@ -27,16 +27,25 @@ uv pip install -e ".[all]"
 ## � Generated Datasets
 
 ### HDF5 Dataset (876 QA pairs)
-- Location: `output/hdf_qa/`
-- Sources: HDF5, parallel I/O research papers + documentation
-- Model: Google Gemini 2.0 Flash
-- Format: JSON, JSONL
+- **Location**: `output/hdf5_qa/gemini/`
+- **Sources**: HDF5, parallel I/O research papers + documentation
+- **Model**: Google Gemini 2.0 Flash
+- **Format**: JSON, JSONL
+- **Status**: ✅ Complete
 
-### Jarvis Dataset (~300 QA pairs)
-- Location: `output/jarvis_qa/`
-- Sources: JARVIS I/O framework documentation
-- Model: Google Gemini 2.0 Flash
-- Format: JSON, JSONL
+### Jarvis Dataset (300 QA pairs)
+- **Location**: `output/jarvis_qa/claude/`
+- **Sources**: JARVIS I/O framework documentation
+- **Model**: Claude Sonnet 4
+- **Format**: JSON, JSONL
+- **Status**: ✅ Complete
+
+### Jarvis Dataset - Gemini (150 QA pairs)
+- **Location**: `output/jarvis_qa/` (partial, intermediate file)
+- **Sources**: JARVIS I/O framework documentation
+- **Model**: Google Gemini 2.0 Flash
+- **Format**: JSON
+- **Status**: ⚠️ Partial (50% - quota exhausted)
 
 ## 🚀 Quick Start
 
@@ -56,7 +65,7 @@ llm:
 
 ```bash
 # Generate from LanceDB
-uv run python -m generator.cli generate \
+uv run generator generate \
   /path/to/lancedb \
   -o output/qa_raw.json \
   --n-pairs 3 \
@@ -65,12 +74,20 @@ uv run python -m generator.cli generate \
 
 ## 📝 CLI Commands
 
+### list-providers
+
+List all available LLM providers and their setup instructions.
+
+```bash
+uv run generator list-providers
+```
+
 ### generate
 
 Generate QA pairs from LanceDB chunks.
 
 ```bash
-generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
+uv run generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 
 Options:
   --config PATH         Config YAML file (default: configs/config.yaml)
@@ -86,16 +103,96 @@ Options:
 
 ```bash
 # Basic usage
-uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json
+uv run generator generate /path/to/lancedb -o output/qa.json
 
 # Test with limited chunks
-uv run python -m generator.cli generate /path/to/lancedb -o output/test.json --max-chunks 10
+uv run generator generate /path/to/lancedb -o output/test.json --max-chunks 10
 
 # Override provider
-uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --provider gemini --model gemini-2.0-flash-exp
+uv run generator generate /path/to/lancedb -o output/qa.json --provider gemini --model gemini-2.0-flash-exp
 
 # Custom configuration
-uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --config my_config.yaml
+uv run generator generate /path/to/lancedb -o output/qa.json --config my_config.yaml
+```
+
+### curate
+
+Filter QA pairs by quality using LLM-as-Judge.
+
+```bash
+uv run generator curate INPUT.json -o OUTPUT.json [OPTIONS]
+
+Options:
+  --config PATH         Config YAML file (default: configs/config.yaml)
+  --threshold FLOAT     Minimum rating (1-10, default: 7.0)
+  --batch-size INT      Pairs rated per LLM call (default: 5)
+  --provider TEXT       Override LLM provider from config
+  --model TEXT          Override LLM model from config
+```
+
+**Examples:**
+
+```bash
+# Basic curation
+uv run generator curate output/qa_raw.json -o output/qa_curated.json
+
+# High quality threshold
+uv run generator curate output/qa_raw.json -o output/qa_high.json --threshold 8.5
+
+# Use specific provider for rating
+uv run generator curate output/qa_raw.json -o output/qa_curated.json --provider claude
+```
+
+### export
+
+Export QA pairs to training format.
+
+```bash
+uv run generator export INPUT.json -o OUTPUT [OPTIONS]
+
+Options:
+  -f, --format CHOICE   Output format: chatml, alpaca, sharegpt, jsonl (default: chatml)
+  --system-prompt TEXT  System prompt for conversation formats
+```
+
+**Examples:**
+
+```bash
+# Export to ChatML format
+uv run generator export output/qa_curated.json -o output/training.jsonl -f chatml
+
+# Export to Alpaca format
+uv run generator export output/qa_curated.json -o output/training.json -f alpaca
+
+# Export with custom system prompt
+uv run generator export output/qa_curated.json -o output/training.jsonl -f chatml --system-prompt "You are an HDF5 expert."
+```
+
+### pipeline
+
+Run full pipeline: generate → curate → export.
+
+```bash
+uv run generator pipeline LANCEDB_PATH -o OUTPUT [OPTIONS]
+
+Options:
+  --config PATH         Config YAML file (default: configs/config.yaml)
+  --threshold FLOAT     Curation threshold (1-10, default: 7.0)
+  -f, --format CHOICE   Output format: chatml, alpaca, sharegpt, jsonl (default: chatml)
+  --max-chunks INT      Max chunks to process (for testing)
+```
+
+**Examples:**
+
+```bash
+# Full pipeline with defaults
+uv run generator pipeline /path/to/lancedb -o output/training.jsonl
+
+# Test pipeline with limited chunks
+uv run generator pipeline /path/to/lancedb -o output/test.jsonl --max-chunks 10
+
+# High quality training data in Alpaca format
+uv run generator pipeline /path/to/lancedb -o output/training.json -f alpaca --threshold 8.0
 ```
 
 ## 🎨 LLM Provider Setup

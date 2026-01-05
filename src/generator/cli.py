@@ -83,11 +83,11 @@ def list_providers():
     
     console.print("[bold]Usage Examples:[/bold]")
     console.print("  # Use Ollama (default)")
-    console.print("  uv run python -m generator.cli generate lancedb/ -o output.json --provider ollama")
-    console.print("\n  # Use Claude SDK")
-    console.print("  uv run python -m generator.cli generate lancedb/ -o output.json --provider claude-sdk")
-    console.print("\n  # Use Google ADK/Gemini")
-    console.print("  uv run python -m generator.cli generate lancedb/ -o output.json --provider adk --model gemini-2.0-flash-exp\n")
+    console.print("  uv run generator generate lancedb/ -o output.json --provider ollama")
+    console.print("\n  # Use Claude")
+    console.print("  uv run generator generate lancedb/ -o output.json --provider claude")
+    console.print("\n  # Use Google Gemini")
+    console.print("  uv run generator generate lancedb/ -o output.json --provider gemini --model gemini-2.0-flash-exp\n")
 
 
 @main.command()
