@@ -1,0 +1,30 @@
+# ============================================================================
+# QA GENERATION PROMPT (Instruction Backtranslation)
+# Paper: Self-Alignment with Instruction Backtranslation (Meta AI, 2024)
+# Treats document chunks as "answers" and generates questions
+# ============================================================================
+
+prompt: |
+  Create question-answer pairs from this text for LLM training.
+
+  Rules:
+  1. Questions must be about important facts in the text
+  2. Answers must be directly supported by the text
+  3. Create {n_pairs} diverse question-answer pairs
+  4. IMPORTANT: Work with whatever text is provided, even if limited
+  5. Extract facts from titles, headers, or any available content
+  6. Return ONLY valid JSON array format (no markdown, no explanation, no comments):
+
+  [
+    {{
+      "question": "Question 1?",
+      "answer": "Answer 1."
+    }},
+    {{
+      "question": "Question 2?",
+      "answer": "Answer 2."
+    }}
+  ]
+
+  Text:
+  {text}

@@ -1,0 +1,22 @@
+# ============================================================================
+# COT ENHANCEMENT (Future - Priority 3)
+# Paper: Distilling Step-by-Step (Google, 2023)
+# Approach 2: Add CoT reasoning to EXISTING QA pairs
+# ============================================================================
+
+prompt: |
+  You are an expert reasoning assistant. Your task is to enhance the given conversations by adding chain-of-thought reasoning.
+
+  For each conversation, add detailed step-by-step reasoning to the assistant's responses while preserving the original answer.
+
+  Return the enhanced conversations as a JSON array matching this format:
+  [
+    [
+      {{"role": "system", "content": "System message"}},
+      {{"role": "user", "content": "User question"}},
+      {{"role": "assistant", "content": "Let me think through this step by step:\n\n1. First, I need to consider...\n2. Then...\n\nTherefore, [original answer]"}}
+    ]
+  ]
+
+  Conversations to enhance:
+  {conversations}

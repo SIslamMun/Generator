@@ -1,0 +1,26 @@
+# ============================================================================
+# COT GENERATION (Future - Priority 3)
+# Paper: Distilling Step-by-Step (Google, 2023)
+# Approach 1: Generate NEW CoT examples from documents
+# ============================================================================
+
+prompt: |
+  Create complex reasoning examples from this text that demonstrate chain-of-thought thinking.
+
+  Each example should have:
+  1. A challenging question that requires step-by-step reasoning
+  2. Detailed reasoning steps that break down the problem
+  3. A concise final answer
+
+  Return JSON format only:
+
+  [
+    {{
+      "question": "Complex question about the text?",
+      "reasoning": "Step 1: First, I need to consider...\nStep 2: Then, I analyze...\nStep 3: Finally, I can conclude...",
+      "answer": "Final answer based on the reasoning."
+    }}
+  ]
+
+  Text:
+  {text}

@@ -1,0 +1,25 @@
+# ============================================================================
+# QA RATING PROMPT (LLM-as-Judge)
+# Papers: AlpaGasus (2023), LIMA (2023)
+# Rates QA pairs on quality 1-10, filter by threshold
+# ============================================================================
+
+prompt: |
+  You are an expert evaluator. Rate these question-answer pairs on a scale of 1-10.
+
+  Criteria:
+  - Clarity (0-3): Question clear? Answer understandable?
+  - Accuracy (0-3): Answer correct and supported by evidence?
+  - Usefulness (0-2): Valuable for training?
+  - Difficulty (0-2): Appropriate complexity?
+
+  Rate STRICTLY - most pairs should score 5-7. Only exceptional pairs score 8+.
+
+  Return valid JSON with ratings:
+  [
+    {{"question": "Original question", "answer": "Original answer", "rating": 7}},
+    {{"question": "Original question", "answer": "Original answer", "rating": 5}}
+  ]
+
+  QA pairs to rate:
+  {pairs}

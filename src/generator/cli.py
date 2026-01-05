@@ -14,6 +14,7 @@ from rich.console import Console
 from .qa_generator import generate_qa_from_lancedb
 from .curate import curate_qa_pairs
 from .formatters import export_to_format
+from .prompt_loader import load_prompts
 
 console = Console()
 
@@ -109,10 +110,8 @@ def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunk
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Load prompts
-    prompts_path = Path(config_path).parent / cfg.get("prompts_file", "prompts.yaml")
-    with open(prompts_path, "r") as f:
-        prompts = yaml.safe_load(f)
+    # Load prompts from individual files
+    prompts = load_prompts(Path(config_path).parent)
 
     # Override LLM settings if provided
     llm_config = cfg["llm"]
@@ -165,10 +164,8 @@ def curate(input_file, output, config, threshold, batch_size, provider, model):
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Load prompts
-    prompts_path = Path(config_path).parent / cfg.get("prompts_file", "prompts.yaml")
-    with open(prompts_path, "r") as f:
-        prompts = yaml.safe_load(f)
+    # Load prompts from individual files
+    prompts = load_prompts(Path(config_path).parent)
 
     # Override LLM settings if provided
     llm_config = cfg["llm"]
@@ -244,9 +241,8 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks):
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
     
-    prompts_path = Path(config_path).parent / cfg.get("prompts_file", "prompts.yaml")
-    with open(prompts_path, "r") as f:
-        prompts = yaml.safe_load(f)
+    # Load prompts from individual files
+    prompts = load_prompts(Path(config_path).parent)
     
     generate_qa_from_lancedb(
         db_path=lancedb_path,
