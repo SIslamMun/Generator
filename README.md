@@ -49,6 +49,41 @@ uv run python -m generator.cli generate \
   --batch-size 50
 ```
 
+## 📝 CLI Commands
+
+### generate
+
+Generate QA pairs from LanceDB chunks.
+
+```bash
+generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
+
+Options:
+  --config PATH         Config YAML file (default: configs/config.yaml)
+  --table TEXT          LanceDB table name (default: text_chunks)
+  --n-pairs INT         QA pairs per chunk (default: 5)
+  --batch-size INT      Chunks per batch (default: 50)
+  --max-chunks INT      Max chunks to process (for testing)
+  --provider TEXT       Override LLM provider from config
+  --model TEXT          Override LLM model from config
+```
+
+**Examples:**
+
+```bash
+# Basic usage
+uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json
+
+# Test with limited chunks
+uv run python -m generator.cli generate /path/to/lancedb -o output/test.json --max-chunks 10
+
+# Override provider
+uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --provider adk --model gemini-2.0-flash-exp
+
+# Custom configuration
+uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --config my_config.yaml
+```
+
 ## 🎨 LLM Provider Setup
 
 ### Ollama (Local)
@@ -96,6 +131,37 @@ uv pip install ".[cloud]"
 # Set API keys
 export OPENAI_API_KEY="sk-..."
 export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+## ⚙️ Configuration Files
+
+### configs/config.yaml
+
+```yaml
+llm:
+  provider: ollama
+  model: mistral:latest
+  temperature: 0.7
+  max_tokens: 4096
+
+generation:
+  n_pairs_per_chunk: 5
+  batch_size: 50
+  max_retries: 3
+```
+
+### configs/prompts.yaml
+
+Customize prompts for QA generation:
+
+```yaml
+qa_generation: |
+  Given the following text, generate {n_pairs} diverse question-answer pairs.
+  The text serves as the answer, generate relevant questions.
+  
+  Text: {text}
+  
+  Return a JSON array of objects with "question" and "answer" fields.
 ```
 
 ## 🏗️ Architecture
