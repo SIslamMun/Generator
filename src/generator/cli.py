@@ -118,6 +118,10 @@ def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunk
     llm_config = cfg["llm"]
     if provider:
         llm_config["provider"] = provider
+        # Get provider-specific config if overriding
+        if provider in llm_config:
+            provider_config = llm_config[provider]
+            llm_config.update(provider_config)
     if model:
         llm_config["model"] = model
 

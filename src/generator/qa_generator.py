@@ -9,6 +9,7 @@ Uses Instruction Backtranslation methodology:
 
 import json
 import json5
+import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
@@ -95,11 +96,12 @@ def generate_qa_from_lancedb(
                 content = row.get("content", "")
                 source_file = row.get("source_file", "unknown")
 
-                if not content or len(content.strip()) < 50:
+                # Skip very short chunks (headers, citations, etc.)
+                if not content or len(content.strip()) < 200:
                     progress.advance(task)
                     continue
 
-                # Generate QA pairs for this chunk
+                # Generate QA pairs for this chunk with retry logic
                 try:
                     pairs = _generate_pairs_for_chunk(
                         content=content,
@@ -111,6 +113,9 @@ def generate_qa_from_lancedb(
                     )
 
                     all_qa_pairs.extend(pairs)
+                    
+                    # Rate limiting: 6 seconds between requests (max 10/min for Gemini free tier)
+                    time.sleep(6)
 
                     # Save intermediate results every 10 chunks
                     if len(all_qa_pairs) % 50 == 0:
@@ -139,13 +144,34 @@ def _generate_pairs_for_chunk(
     llm: BaseLLMClient,
     prompt_template: str,
     n_pairs: int,
+    max_retries: int = 3,
 ) -> List[Dict]:
-    """Generate QA pairs for a single chunk."""
+    """Generate QA pairs for a single chunk with retry logic."""
     # Fill in prompt template
     prompt = prompt_template.format(text=content, n_pairs=n_pairs)
 
-    # Generate response
-    response = llm.generate(prompt)
+    # Generate response with exponential backoff retry
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            response = llm.generate(prompt)
+            break  # Success, exit retry loop
+        except Exception as e:
+            last_error = e
+            error_msg = str(e).lower()
+            
+            # Check if it's a rate limit error (429)
+            if '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
+                # Exponential backoff: 60s, 120s, 240s
+                wait_time = 60 * (2 ** attempt)
+                console.print(f"[yellow]⚠ Rate limit hit, waiting {wait_time}s (attempt {attempt+1}/{max_retries})...[/yellow]")
+                time.sleep(wait_time)
+            else:
+                # Non-rate-limit error, don't retry
+                raise
+    else:
+        # All retries exhausted
+        raise last_error
 
     # Parse JSON response (lenient with json5)
     try:
@@ -159,7 +185,18 @@ def _generate_pairs_for_chunk(
             json_str = response.split("```")[1].split("```")[0].strip()
             pairs = json5.loads(json_str)
         else:
-            raise ValueError(f"Failed to parse JSON response: {e}")
+            # Try to extract JSON array from response with extra text
+            # Find first [ and last ]
+            start_idx = response.find('[')
+            end_idx = response.rfind(']')
+            if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                json_str = response[start_idx:end_idx+1]
+                try:
+                    pairs = json5.loads(json_str)
+                except Exception as e2:
+                    raise ValueError(f"Failed to parse JSON response: {e}\nExtraction also failed: {e2}\nResponse: {response[:200]}")
+            else:
+                raise ValueError(f"Failed to parse JSON response: {e}\nResponse: {response[:200]}")
 
     # Add metadata to each pair
     for pair in pairs:
