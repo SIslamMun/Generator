@@ -1,0 +1,170 @@
+[
+  {
+    "question": "What was the final retrieval status of the paper with DOI 10.1007/s11390-020-9822-9?",
+    "answer": "SUCCESS via semantic_scholar",
+    "chunk_id": "10_1007_s11390-020-9822-9_log.md:0:a912c464",
+    "source_file": "papers/10_1007_s11390-020-9822-9_log.md",
+    "generated_at": "2026-01-05T13:30:47.842508",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "Which repository successfully provided a PDF URL for the paper?",
+    "answer": "SEMANTIC_SCHOLAR",
+    "chunk_id": "10_1007_s11390-020-9822-9_log.md:0:a912c464",
+    "source_file": "papers/10_1007_s11390-020-9822-9_log.md",
+    "generated_at": "2026-01-05T13:30:47.842530",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What was the result from searching arXiv by title?",
+    "answer": "not found - not found on arXiv",
+    "chunk_id": "10_1007_s11390-020-9822-9_log.md:0:a912c464",
+    "source_file": "papers/10_1007_s11390-020-9822-9_log.md",
+    "generated_at": "2026-01-05T13:30:47.842534",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What DOI was the paper retrieval log searching for?",
+    "answer": "10.1109/IPDPSW59300.2023.00107",
+    "chunk_id": "10_1109_IPDPSW59300_2023_00107_log.md:0:c494e221",
+    "source_file": "papers/10_1109_IPDPSW59300_2023_00107_log.md",
+    "generated_at": "2026-01-05T13:30:49.298717",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "Which source resulted in the successful download of the paper?",
+    "answer": "semantic_scholar",
+    "chunk_id": "10_1109_IPDPSW59300_2023_00107_log.md:0:c494e221",
+    "source_file": "papers/10_1109_IPDPSW59300_2023_00107_log.md",
+    "generated_at": "2026-01-05T13:30:49.298741",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What was the filename of the successfully downloaded paper?",
+    "answer": "../pipeline_output/phase2_parser/step4_acquisition/papers/Chowdhury_2023_Efficient_Asynchronous_IO_with_Request_Merging.pdf",
+    "chunk_id": "10_1109_IPDPSW59300_2023_00107_log.md:0:c494e221",
+    "source_file": "papers/10_1109_IPDPSW59300_2023_00107_log.md",
+    "generated_at": "2026-01-05T13:30:49.298743",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What DOI was the paper retrieval log searching for?",
+    "answer": "10.1109/PDSW49588.2019.00006",
+    "chunk_id": "10_1109_PDSW49588_2019_00006_log.md:0:66383c28",
+    "source_file": "papers/10_1109_PDSW49588_2019_00006_log.md",
+    "generated_at": "2026-01-05T13:30:50.811972",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "Which source successfully retrieved the paper?",
+    "answer": "SCIHUB",
+    "chunk_id": "10_1109_PDSW49588_2019_00006_log.md:0:66383c28",
+    "source_file": "papers/10_1109_PDSW49588_2019_00006_log.md",
+    "generated_at": "2026-01-05T13:30:50.811989",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What was the final status of the paper retrieval?",
+    "answer": "SUCCESS via scihub",
+    "chunk_id": "10_1109_PDSW49588_2019_00006_log.md:0:66383c28",
+    "source_file": "papers/10_1109_PDSW49588_2019_00006_log.md",
+    "generated_at": "2026-01-05T13:30:50.811991",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What DOI was the paper retrieval log searching for?",
+    "answer": "10.1109/TPDS.2021.3090322",
+    "chunk_id": "10_1109_TPDS_2021_3090322_log.md:0:d5e56995",
+    "source_file": "papers/10_1109_TPDS_2021_3090322_log.md",
+    "generated_at": "2026-01-05T13:30:52.154094",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "Which source was successful in downloading the paper?",
+    "answer": "SCIHUB",
+    "chunk_id": "10_1109_TPDS_2021_3090322_log.md:0:d5e56995",
+    "source_file": "papers/10_1109_TPDS_2021_3090322_log.md",
+    "generated_at": "2026-01-05T13:30:52.154113",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What title was used when searching arXiv?",
+    "answer": "Transparent Asynchronous Parallel I/O Using Backgr...",
+    "chunk_id": "10_1109_TPDS_2021_3090322_log.md:0:d5e56995",
+    "source_file": "papers/10_1109_TPDS_2021_3090322_log.md",
+    "generated_at": "2026-01-05T13:30:52.154116",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What is the name of the technology discussed in the text?",
+    "answer": "ExaHDF5",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:91fbfc66",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:53.166489",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What type of performance does ExaHDF5 deliver?",
+    "answer": "Efficient Parallel I/O",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:91fbfc66",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:53.166505",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "On what type of computing systems does ExaHDF5 operate?",
+    "answer": "Exascale Computing Systems",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:91fbfc66",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:53.166508",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What is the URL?",
+    "answer": "https://escholarship.org/uc/item/9x80d9n2",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:3a2fcb45",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:54.496550",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What type of link is provided?",
+    "answer": "Permalink",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:3a2fcb45",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:54.496565",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "Where does the provided URL lead?",
+    "answer": "escholarship.org",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:3a2fcb45",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:54.496568",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What is the name of the journal?",
+    "answer": "Journal of Computer Science and Technology",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:5d4684b2",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:55.420282",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What volume is the journal?",
+    "answer": "35",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:5d4684b2",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:55.420302",
+    "model": "gemini-2.0-flash-exp"
+  },
+  {
+    "question": "What issue number is the journal?",
+    "answer": "1",
+    "chunk_id": "Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md:0:5d4684b2",
+    "source_file": "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "generated_at": "2026-01-05T13:30:55.420304",
+    "model": "gemini-2.0-flash-exp"
+  }
+]

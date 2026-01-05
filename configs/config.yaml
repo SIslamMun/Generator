@@ -14,7 +14,7 @@ llm:
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ CURRENT ACTIVE PROVIDER - Change this line to switch providers     │
   # └─────────────────────────────────────────────────────────────────────┘
-  provider: ollama            # Options: ollama, claude-sdk, adk, vllm, openai, anthropic
+  provider: ollama            # Options: ollama, claude, gemini, vllm, openai, anthropic
   
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ 1. OLLAMA - Local LLM (RECOMMENDED for unlimited free usage) ⭐     │
@@ -26,21 +26,23 @@ llm:
     model: mistral:latest       # Available: mistral, llama3.3, qwen2.5, etc.
   
   # ┌─────────────────────────────────────────────────────────────────────┐
-  # │ 2. CLAUDE SDK - Claude Code Agent (FREE, best quality) ⭐           │
-  # │    Setup: pip install claude-agent-sdk && claude auth login         │
-  # │    Rate Limit: 50 requests/min (free tier)                          │
+  # │ 2. CLAUDE - Claude API (PAID, requires API key)                     │
+  # │    Setup: export ANTHROPIC_API_KEY="sk-ant-..."                     │
+  # │    Get Key: https://console.anthropic.com/                          │
+  # │    Rate Limit: Varies by tier                                       │
   # └─────────────────────────────────────────────────────────────────────┘
-  claude-sdk:
-    model: claude-code
-    use_agent_sdk: true
+  claude:
+    model: claude-sonnet-4-20250514
+    api_key: ${ANTHROPIC_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐
-  # │ 3. GOOGLE ADK - Gemini API (FREE tier: 1500 req/day) ⭐             │
-  # │    Setup: pip install google-adk                                    │
+  # │ 3. GEMINI - Google Gemini API (FREE tier: 10 req/min) ⭐            │
+  # │    Setup: pip install google-generativeai                           │
   # │    Get Key: https://aistudio.google.com/apikey (FREE)               │
   # │    Set Key: export GOOGLE_API_KEY="your-key"                        │
+  # │    Note: Rate limited to 10 requests/minute on free tier            │
   # └─────────────────────────────────────────────────────────────────────┘
-  adk:
+  gemini:
     model: gemini-2.0-flash-exp  # Options: gemini-2.0-flash-exp, gemini-1.5-pro-002
     api_key: ${GOOGLE_API_KEY}
   

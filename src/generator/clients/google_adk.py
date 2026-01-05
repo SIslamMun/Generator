@@ -1,4 +1,4 @@
-"""Google Gemini ADK client."""
+"""Google Gemini API client."""
 
 import os
 from typing import Optional, Dict, Any
@@ -7,7 +7,7 @@ from .base import BaseLLMClient
 
 
 class GoogleADKClient(BaseLLMClient):
-    """Google Gemini ADK client (free with API key)."""
+    """Google Gemini API client (free tier: 10 requests/minute)."""
 
     def __init__(self, config: Dict[str, Any]):
         """
@@ -33,7 +33,7 @@ class GoogleADKClient(BaseLLMClient):
         # Get API key from config
         api_key = config.get("api_key")
         if not api_key:
-            raise ValueError("Google ADK requires api_key in config")
+            raise ValueError("Google Gemini requires api_key in config")
 
         # Expand environment variables (e.g., ${GOOGLE_API_KEY})
         api_key = os.path.expandvars(api_key)
@@ -47,7 +47,7 @@ class GoogleADKClient(BaseLLMClient):
         self, prompt: str, temperature: Optional[float] = None, max_tokens: Optional[int] = None
     ) -> str:
         """
-        Generate using Google Gemini ADK.
+        Generate using Google Gemini API.
 
         Args:
             prompt: Input prompt

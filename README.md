@@ -4,10 +4,10 @@ Generate high-quality question-answer pairs from LanceDB chunks for LLM fine-tun
 
 ## 🎯 Features
 
-- **Multi-provider LLM support**: Ollama, Claude SDK, Google ADK, vLLM, OpenAI, Anthropic
+- **Multi-provider LLM support**: Ollama, Claude, Google Gemini, vLLM, OpenAI, Anthropic
 - **Modular client architecture**: Each LLM provider in separate, maintainable modules
 - **Instruction Backtranslation**: Treat documents as "answers", generate "questions"
-- **Multiple export formats**: ChatML, Alpaca, ShareGPT, JSONL
+- **Rate limiting & retry logic**: Automatic handling of API quotas with exponential backoff
 - **Progress tracking**: Rich progress bars and status messages
 - **Batch processing**: Efficient chunked processing with intermediate saves
 
@@ -23,6 +23,20 @@ uv pip install -e ".[cloud]"
 # With all providers
 uv pip install -e ".[all]"
 ```
+
+## � Generated Datasets
+
+### HDF5 Dataset (876 QA pairs)
+- Location: `output/hdf_qa/`
+- Sources: HDF5, parallel I/O research papers + documentation
+- Model: Google Gemini 2.0 Flash
+- Format: JSON, JSONL
+
+### Jarvis Dataset (~300 QA pairs)
+- Location: `output/jarvis_qa/`
+- Sources: JARVIS I/O framework documentation
+- Model: Google Gemini 2.0 Flash
+- Format: JSON, JSONL
 
 ## 🚀 Quick Start
 
@@ -45,7 +59,7 @@ llm:
 uv run python -m generator.cli generate \
   /path/to/lancedb \
   -o output/qa_raw.json \
-  --n-pairs 5 \
+  --n-pairs 3 \
   --batch-size 50
 ```
 
@@ -78,7 +92,7 @@ uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json
 uv run python -m generator.cli generate /path/to/lancedb -o output/test.json --max-chunks 10
 
 # Override provider
-uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --provider adk --model gemini-2.0-flash-exp
+uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --provider gemini --model gemini-2.0-flash-exp
 
 # Custom configuration
 uv run python -m generator.cli generate /path/to/lancedb -o output/qa.json --config my_config.yaml
@@ -99,38 +113,34 @@ ollama pull mistral:latest
 ollama list
 ```
 
-### Claude SDK (CLI-based)
+### Claude (API)
 
 ```bash
-# Install SDK
+# Install packages
 uv pip install ".[cloud]"
 
-# Login to Claude
-claude auth login
-
-# Verify
-claude auth status
+# Get API key at: https://console.anthropic.com/
+export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
-### Google ADK (API)
+### Google Gemini (API)
 
 ```bash
-# Install ADK
+# Install packages
 uv pip install ".[cloud]"
 
 # Get API key at: https://aistudio.google.com/apikey
 export GOOGLE_API_KEY="your-key-here"
 ```
 
-### OpenAI/Anthropic APIs
+### OpenAI (API)
 
 ```bash
 # Install packages
 uv pip install ".[cloud]"
 
-# Set API keys
+# Set API key
 export OPENAI_API_KEY="sk-..."
-export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
 ## ⚙️ Configuration Files
@@ -171,12 +181,13 @@ src/generator/
 ├── clients/          # Modular LLM clients
 │   ├── base.py      # Abstract base class
 │   ├── ollama.py    # Ollama implementation
-│   ├── claude.py    # Claude SDK
-│   ├── google_adk.py # Google Gemini
+│   ├── claude.py    # Claude API
+│   ├── google_adk.py # Google Gemini API
 │   ├── vllm.py      # vLLM
-│   ├── openai.py    # OpenAI
-│   └── anthropic.py # Anthropic
-├── qa_generator.py  # QA generation logic
+│   ├── openai.py    # OpenAI API
+│   └── anthropic.py # Anthropic API
+├── qa_generator.py  # QA generation with rate limiting
+├── cli.py           # Command-line interface
 └── __init__.py      # Package exports
 ```
 

@@ -117,10 +117,18 @@ def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunk
     # Override LLM settings if provided
     llm_config = cfg["llm"]
     if provider:
-        llm_config["provider"] = provider
-        # Get provider-specific config if overriding
-        if provider in llm_config:
-            provider_config = llm_config[provider]
+        # Normalize provider names (backward compatibility)
+        provider_map = {
+            "adk": "gemini",          # Old name -> new name
+            "claude-sdk": "claude",   # Old name -> new name  
+            "claude_sdk": "claude",   # Old name -> new name
+        }
+        normalized_provider = provider_map.get(provider, provider)
+        llm_config["provider"] = normalized_provider
+        
+        # Try both old and new names for config lookup
+        provider_config = llm_config.get(normalized_provider) or llm_config.get(provider)
+        if provider_config:
             llm_config.update(provider_config)
     if model:
         llm_config["model"] = model

@@ -1,4 +1,4 @@
-"""Claude Agent SDK client."""
+"""Claude API client using Agent SDK."""
 
 import os
 import asyncio
@@ -8,7 +8,7 @@ from .base import BaseLLMClient
 
 
 class ClaudeSDKClient(BaseLLMClient):
-    """Claude Agent SDK client (free, no API key required)."""
+    """Claude API client (uses Agent SDK for free access, or API with key)."""
 
     def __init__(self, config: Dict[str, Any]):
         """

@@ -16,7 +16,7 @@ def get_client(provider: str, config: Dict[str, Any]) -> BaseLLMClient:
     Factory function to get the appropriate LLM client.
 
     Args:
-        provider: Provider name (ollama, claude_sdk, adk, vllm, openai, anthropic)
+        provider: Provider name (ollama, claude, gemini, vllm, openai, anthropic)
         config: Configuration dictionary for the provider
 
     Returns:
@@ -25,10 +25,13 @@ def get_client(provider: str, config: Dict[str, Any]) -> BaseLLMClient:
     Raises:
         ValueError: If provider is unknown
     """
+    # Map provider names to client classes
     clients = {
         "ollama": OllamaClient,
-        "claude_sdk": ClaudeSDKClient,
-        "adk": GoogleADKClient,
+        "claude": ClaudeSDKClient,           # New name
+        "claude_sdk": ClaudeSDKClient,       # Legacy support
+        "gemini": GoogleADKClient,           # New name
+        "adk": GoogleADKClient,              # Legacy support
         "vllm": VLLMClient,
         "openai": OpenAIClient,
         "anthropic": AnthropicClient,
@@ -36,7 +39,7 @@ def get_client(provider: str, config: Dict[str, Any]) -> BaseLLMClient:
 
     client_class = clients.get(provider)
     if not client_class:
-        available = ", ".join(clients.keys())
+        available = ", ".join(sorted(set(clients.keys())))
         raise ValueError(f"Unknown provider '{provider}'. Available: {available}")
 
     return client_class(config)

@@ -1,0 +1,14 @@
+{
+  "total_pairs": 18,
+  "generated_at": "2026-01-05T12:11:12.739810",
+  "sources": [
+    "papers/10_1109_IPDPSW59300_2023_00107_log.md",
+    "papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca_pdf.md",
+    "papers/10_1007_s11390-020-9822-9_log.md",
+    "papers/10_1109_TPDS_2021_3090322_log.md",
+    "papers/10_1109_PDSW49588_2019_00006_log.md"
+  ],
+  "models_used": [
+    "mistral:latest"
+  ]
+}

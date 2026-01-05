@@ -155,13 +155,26 @@ def _generate_pairs_for_chunk(
     for attempt in range(max_retries):
         try:
             response = llm.generate(prompt)
+            
+            # Check for empty response before proceeding
+            if not response or not response.strip():
+                raise ValueError("LLM returned empty response")
+            
             break  # Success, exit retry loop
         except Exception as e:
             last_error = e
             error_msg = str(e).lower()
             
-            # Check if it's a rate limit error (429)
-            if '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
+            # Don't retry empty responses or JSON parsing errors
+            if 'empty' in error_msg or 'json' in error_msg:
+                raise ValueError(f"Invalid response (won't retry): {str(e)[:100]}")
+            
+            # Check for daily quota exhaustion (stop immediately, don't retry)
+            if 'per_day' in error_msg or 'daily' in error_msg or 'generate_requests_per_model_per_day' in str(e):
+                raise ValueError(f"Daily quota exceeded. Try again tomorrow or switch to gemini-1.5-flash or gemini-2.5-flash-image")
+            
+            # Check if it's a per-minute rate limit error (429) - these can be retried
+            elif '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
                 # Exponential backoff: 60s, 120s, 240s
                 wait_time = 60 * (2 ** attempt)
                 console.print(f"[yellow]⚠ Rate limit hit, waiting {wait_time}s (attempt {attempt+1}/{max_retries})...[/yellow]")
