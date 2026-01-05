@@ -1,0 +1,2402 @@
+[
+  {
+    "question": "What command is used to ingest a PDF file using phagocyte?",
+    "answer": "uv run phagocyte ingest file followed by the file path and -o flag with the output directory.",
+    "chunk_id": "README.md:0:d974e521",
+    "source_file": "README.md",
+    "generated_at": "2026-01-05T16:13:47.076572",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the GitHub repository URL that can be cloned and ingested in the examples?",
+    "answer": "https://github.com/iowarp/runtime-deployment",
+    "chunk_id": "README.md:0:d974e521",
+    "source_file": "README.md",
+    "generated_at": "2026-01-05T16:13:47.076596",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What flags are used when cloning and ingesting the GitHub repository in the example?",
+    "answer": "The --shallow flag and --max-files 50 flag are used when cloning and ingesting the GitHub repository.",
+    "chunk_id": "README.md:0:d974e521",
+    "source_file": "README.md",
+    "generated_at": "2026-01-05T16:13:47.076601",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What programming language is the runtime-deployment repository written in?",
+    "answer": "Python",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1a0d15cd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:13:57.799771",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How many stars does the iowarp/runtime-deployment repository have on GitHub?",
+    "answer": "11",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1a0d15cd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:13:57.799786",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What topic is associated with the runtime-deployment repository?",
+    "answer": "ai4hpc",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1a0d15cd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:13:57.799787",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the five agent files located in the .claude/agents/ directory?",
+    "answer": "The five agent files are code-documenter.md, docker-python-test-expert.md, git-expert.md, jarvis-pipeline-builder.md, and python-code-updater.md.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:faf8034d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:12.636007",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which GitHub workflow files are present in the .github/workflows/ directory?",
+    "answer": "The GitHub workflow files are build-containers.yaml and main.yml.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:faf8034d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:12.636028",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the four executable files located in the bin/ directory?",
+    "answer": "The four files in the bin/ directory are example.slurm, jarvis, jarvis-imports, and jarvis_resource_graph.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:faf8034d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:12.636030",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Jarvis-CD?",
+    "answer": "Jarvis-CD is a unified platform for deploying various applications, including storage systems and benchmarks.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:7ae14a91",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:23.918711",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of applications does Jarvis-CD deploy?",
+    "answer": "Jarvis-CD deploys various applications, including storage systems and benchmarks.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:7ae14a91",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:23.918733",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Why are many applications difficult to deploy according to the Jarvis-CD description?",
+    "answer": "Many applications have complex configuration spaces and are difficult to deploy across different machines.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:7ae14a91",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:23.918737",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to initialize a Jarvis setup?",
+    "answer": "jarvis init [CONFIG_DIR] [PRIVATE_DIR] [SHARED_DIR]",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:85c6de45",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:35.662028",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of data does PRIVATE_DIR store in Jarvis configuration?",
+    "answer": "PRIVATE_DIR stores per-machine local data, such as OrangeFS state.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:85c6de45",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:35.662047",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Can CONFIG_DIR, PRIVATE_DIR, and SHARED_DIR point to the same directory in Jarvis?",
+    "answer": "Yes, on a personal machine, these can point to the same directory.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:85c6de45",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:35.662049",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What format does the hostfile use for listing nodes in multi-node pipelines?",
+    "answer": "The hostfile uses MPI-style format for listing nodes in multi-node pipelines.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:43a73896",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:48.428973",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to set the active hostfile in Jarvis?",
+    "answer": "The command to set the active hostfile is 'jarvis hostfile set /path/to/hostfile'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:43a73896",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:48.428992",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What should you do after changing the hostfile?",
+    "answer": "After changing the hostfile, you should update the active pipeline using the command 'jarvis ppl update'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:43a73896",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:14:48.428995",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Xcompact3d and what type of flows is it dedicated to studying?",
+    "answer": "Xcompact3d is a Fortran-based framework of high-order finite-difference flow solvers dedicated to the study of turbulent flows. It is dedicated to Direct and Large Eddy Simulations (DNS/LES) for which the largest turbulent scales are simulated.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:4b215364",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:07.441728",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What order of accuracy do the finite-difference schemes in XCompact3d use, and what type of mesh does it operate on?",
+    "answer": "XCompact3d uses sixth-order compact finite-difference schemes with a spectral-like accuracy on a monobloc Cartesian mesh to solve the incompressible and low-Mach number variable density Navier-Stokes equations.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:4b215364",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:07.441746",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are some of the benchmark CFD test cases that Xcompact3D can generate data for?",
+    "answer": "Xcompact3D generates data for several well-known CFD test cases including: Taylor–Green vortex (transition from laminar to turbulent states), turbulent channel flow (wall-bounded turbulence), flow past a cylinder (wake dynamics and vortex shedding), lock-exchange flow (variable-density gravity currents), fractal-generated turbulence (turbulence control and mixing studies), and wind farm simulations (turbine wake interactions).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:4b215364",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:07.441748",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What executable file is generated when installing the coeus-adapter?",
+    "answer": "Installing the coeus-adapter generates an executable file named inCompact3D_analysis.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6934aeec",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:20.957705",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the command to create a new pipeline in Jarvis for InCompact3D post-processing?",
+    "answer": "The command is 'jarvis ppl create incompact3D_post' for ADIOS2 or 'jarvis ppl create incompact3d' for Hermes.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6934aeec",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:20.957725",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which I/O engines are supported for InCompact3D post-processing according to the documentation?",
+    "answer": "The documentation describes support for two I/O engines: ADIOS2 (using bp5 format) and Hermes.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6934aeec",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:20.957727",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What chemical reaction does the Gray-Scott system model?",
+    "answer": "The Gray-Scott system models the chemical reaction U + 2V -> 3V, which consumes U and produces V.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5b06c2c6",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:39.172164",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two chemical species modeled in the Gray-Scott system and their roles?",
+    "answer": "The two chemical species are U, the feed chemical that is continuously added to the system, and V, the activator chemical that is produced during the reaction and also removed.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5b06c2c6",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:39.172186",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What do the F and k parameters control in the Gray-Scott model?",
+    "answer": "F controls the feed rate of U (how quickly U is replenished in the system), with typical values ranging from 0.01 to 0.08. The parameter k controls the kill rate of V (how quickly V is removed from the system), with typical values ranging from 0.03 to 0.07.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5b06c2c6",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:39.172190",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does AR-LDM stand for?",
+    "answer": "AR-LDM stands for Auto-Regressive Latent Diffusion Models.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:85a6ad06",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:51.650005",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the minimum required version of HDF5 for Hermes and h5py==3.8.0?",
+    "answer": "HDF5 version 1.14.0 or higher is required by Hermes and h5py==3.8.0.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:85a6ad06",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:51.650180",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which MPI implementations are compatible with the AR-LDM setup?",
+    "answer": "Either OpenMPI or MPICH works and is required by Hermes and mpi4py.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:85a6ad06",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:15:51.650183",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the size of the pretrain model that needs to be downloaded for ARLDM?",
+    "answer": "The pretrain model is approximately 3.63 GB.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8782afbe",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:03.802923",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which Git branch should be used when setting up the ARLDM installation?",
+    "answer": "The ares branch should be used.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8782afbe",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:03.802942",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the four available datasets for download that can be used to run the ARLDM script?",
+    "answer": "The four available datasets are vistsis, vistdii, pororo, and flintstones.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8782afbe",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:03.802944",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the file size of the original VIST-DII dataset?",
+    "answer": "The original VIST-DII dataset is approximately 18MB.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d3a95b26",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:16.962016",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the URL to download the DII-with-labels.tar.gz file?",
+    "answer": "The URL is https://visionandlanguage.net/VIST/json_files/description-in-isolation/DII-with-labels.tar.gz",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d3a95b26",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:16.962041",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "After extracting DII-with-labels.tar.gz, what should the 'dii' directory be renamed to?",
+    "answer": "The 'dii' directory should be renamed to 'vistdii'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d3a95b26",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:16.962043",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How long does it take to download VIST images on Ares according to the documentation?",
+    "answer": "Downloading VIST images takes over 2 hours on Ares.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:569eba0e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:30.993823",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What must the ppn value be in relation to num_workers when running ARLDM with Slurm on a local cluster?",
+    "answer": "The ppn must equal or be greater than num_workers, which defaults to 1.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:569eba0e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:30.993842",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two adaptor options mentioned for building Hermes with scspkg?",
+    "answer": "The two adaptor options are building with POSIX adaptor (Option 1) and building with VFD adaptor (Option 2).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:569eba0e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:30.993845",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default value of the RUN_SCRIPT variable in the setup environment?",
+    "answer": "The default value of RUN_SCRIPT is vistsis, though it can be changed to other datasets.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6470ad11",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:46.382411",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the EXPERIMENT_PATH set to in this configuration?",
+    "answer": "The EXPERIMENT_PATH is set to ~/experiments/arldm_run, which is located on NFS (Network File System).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6470ad11",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:46.382433",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where is the LOCAL_EXPERIMENT_PATH configured to be stored?",
+    "answer": "The LOCAL_EXPERIMENT_PATH is configured to be stored at /mnt/nvme/$USER/arldm_run.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6470ad11",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:16:46.382436",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What tool is used to append stages to the pipeline in the ARLDM configuration?",
+    "answer": "The jarvis pipeline append command is used to append stages to the pipeline.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:991e5fad",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:01.643072",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Is multinodes ARLDM currently supported with Hermes and Slurm?",
+    "answer": "No, multinodes ARLDM is not supported yet.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:991e5fad",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:01.643091",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What parameter is set to true when running ARLDM with Hermes?",
+    "answer": "The with_hermes parameter is set to true when running ARLDM with Hermes.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:991e5fad",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:01.643093",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Hermes?",
+    "answer": "Hermes is a multi-tiered I/O buffering platform.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:71f30625",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:12.781957",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What interceptors are provided in Hermes?",
+    "answer": "The interceptors provided in Hermes are MPI-IO, STDIO, POSIX, and VFD.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:71f30625",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:12.781979",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the spack command to install Hermes?",
+    "answer": "spack install hermes@master",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:71f30625",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:12.781982",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is CM1?",
+    "answer": "CM1 is a simulation code.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:f94e02bd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:24.524746",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What compiler package needs to be installed as a dependency for CM1?",
+    "answer": "intel-oneapi-compilers needs to be installed using spack.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:f94e02bd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:24.524768",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the GitHub repository URL for the CM1 code?",
+    "answer": "git@github.com:lukemartinlogan/cm1r19.8-LOFS.git",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:f94e02bd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:24.524771",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the default values for COREX and COREY in the buildCM1-spack.sh script?",
+    "answer": "Both COREX and COREY are set to 2.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6b859019",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:37.084237",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a CM1 pipeline in Jarvis?",
+    "answer": "jarvis pipeline create cm1",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6b859019",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:37.084259",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which environment variable is set to point to the current working directory for CM1?",
+    "answer": "CM1_PATH is set to ${PWD}, which points to the current working directory.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6b859019",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:37.084262",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the purpose of Cosmic Tagger?",
+    "answer": "Cosmic Tagger trains a CNN to separate cosmic pixels.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d5e98b63",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:50.456409",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What Python version should be used when creating the conda environment for Cosmic Tagger?",
+    "answer": "Python 3.7 should be used when creating the conda environment for Cosmic Tagger.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d5e98b63",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:50.456431",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to download the Miniconda3 installation script for Linux?",
+    "answer": "wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d5e98b63",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:17:50.456434",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Darshan?",
+    "answer": "Darshan is an I/O profiling tool that intercepts application I/O and dumps them into a log that can be parsed to collect metrics such as I/O time.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d25d7db1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:03.341239",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which version of Darshan is being installed according to the instructions?",
+    "answer": "darshan-3.4.4",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d25d7db1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:03.341260",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What compiler is specified in the configure command for Darshan?",
+    "answer": "mpicc",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d25d7db1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:03.341263",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to build the darshan environment after loading the module?",
+    "answer": "jarvis env build darshan",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:40fa3bca",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:16.685659",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the tool used to analyze Darshan output logs?",
+    "answer": "darshan-job-summary.pl",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:40fa3bca",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:16.685686",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which two components are appended to the pipeline in the usage example?",
+    "answer": "darshan with log_dir=${HOME}/darshan_logs and ior",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:40fa3bca",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:16.685689",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is DeepDriveMD-F (DDMD)?",
+    "answer": "DeepDriveMD-F (DDMD) is Deep-Learning Driven Adaptive Molecular Simulations with a file-based continual learning loop.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a836a767",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:31.644027",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which version of HDF5 is required by Hermes and h5py==3.8.0?",
+    "answer": "HDF5 version 1.14.0 or higher is required by Hermes and h5py==3.8.0.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a836a767",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:31.644044",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two conda environments used in the DDMD installation?",
+    "answer": "The two conda environments are hermes_openmm7_ddmd (CONDA_OPENMM) and hm_ddmd_pytorch (CONDA_PYTORCH).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a836a767",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:31.644047",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default value of the RUN_SCRIPT variable in this setup?",
+    "answer": "The default value of RUN_SCRIPT is 'vistsis', though it can be changed to other datasets.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8f120d9e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:44.308624",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where is the EXPERIMENT_PATH configured to point to in this environment setup?",
+    "answer": "The EXPERIMENT_PATH is configured to point to ~/experiments/ddmd_run, which is on NFS (Network File System).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8f120d9e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:44.308645",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What file is the PRETRAIN_MODEL_PATH set to reference in this configuration?",
+    "answer": "The PRETRAIN_MODEL_PATH is set to reference 'model_large.pth' using the realpath command to get its absolute path.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8f120d9e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:18:44.308647",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to add data staging to the Jarvis pipeline?",
+    "answer": "jarvis pipeline append data_stagein dest_data_path=$LOCAL_INPUT_PATH user_data_paths=$INPUT_PATH/vistdii,$INPUT_PATH/vistsis,$INPUT_PATH/visit_img,$PRETRAIN_MODEL_PATH mkdir_datapaths=$LOCAL_INPUT_PATH,$LOCAL_OUTPUT_PATH",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:14dcab9c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:00.744450",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the runscript parameter value when appending ddmd to the Jarvis pipeline?",
+    "answer": "vistsis",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:14dcab9c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:00.744473",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Is multinodes DDMD with Hermes currently supported on Slurm?",
+    "answer": "No, multinodes DDMD is not supported yet.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:14dcab9c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:00.744477",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the purpose of DLIO?",
+    "answer": "DLIO is an I/O benchmark for Deep Learning, aiming at emulating the I/O behavior of various deep learning applications.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:80b939e1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:12.549019",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How do you install DLIO benchmark?",
+    "answer": "Clone the repository from https://github.com/argonne-lcf/dlio_benchmark, navigate to the dlio_benchmark directory, and run pip install.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:80b939e1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:12.549041",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to run a DLIO experiment in Jarvis?",
+    "answer": "jarvis pipeline run",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:80b939e1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:12.549045",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What algorithm does GADGET use to compute gravitational forces?",
+    "answer": "GADGET computes gravitational forces with a hierarchical tree algorithm, optionally in combination with a particle-mesh scheme for long-range gravitational forces.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d7791e80",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:26.735847",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What method does GADGET use to represent fluids in simulations?",
+    "answer": "GADGET represents fluids by means of smoothed particle hydrodynamics (SPH).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d7791e80",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:26.735869",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What communication interface does GADGET use for its explicit communication model?",
+    "answer": "GADGET uses the standardized MPI communication interface for its explicit communication model.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d7791e80",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:26.735872",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What communication interface does GADGET use for its explicit communication model?",
+    "answer": "GADGET uses the standardized MPI communication interface for its explicit communication model.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:7873464a",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:40.332646",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What two methods does GADGET use to compute gravitational forces and represent fluids?",
+    "answer": "GADGET computes gravitational forces with a hierarchical tree algorithm (optionally in combination with a particle-mesh scheme for long-range gravitational forces) and represents fluids by means of smoothed particle hydrodynamics (SPH).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:7873464a",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:40.332665",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of systems and simulations can GADGET be used for?",
+    "answer": "GADGET can be used for studies of isolated systems, or for simulations that include the cosmological expansion of space, both with or without periodic boundary conditions.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:7873464a",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:40.332668",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of stencil code is Gray-Scott?",
+    "answer": "Gray-Scott is a 3D 7-Point stencil code.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:67682519",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:52.926413",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a Jarvis pipeline for Gray Scott?",
+    "answer": "jarvis pipeline create gray-scott-test",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:67682519",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:52.926435",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which dependencies need to be loaded using spack for Gray Scott?",
+    "answer": "mpi and adios2 need to be loaded using spack for Gray Scott.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:67682519",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:19:52.926437",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a Jarvis pipeline for the Gray-Scott and Hermes experiment?",
+    "answer": "jarvis pipeline create gs-hermes",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:65a1075b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:05.131053",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How many times does the resource graph need to be created throughout the lifetime of Jarvis?",
+    "answer": "The resource graph only needs to be done once throughout the lifetime of Jarvis.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:65a1075b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:05.131072",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command should be used to clean data produced by Hermes and Gray-Scott?",
+    "answer": "jarvis pipeline clean",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:65a1075b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:05.131075",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is LabStor?",
+    "answer": "LabStor is a distributed semi-microkernel for building data processing services.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:aaf95ae4",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:16.154706",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to install IOR with MPI using spack?",
+    "answer": "spack install ior mpi",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:aaf95ae4",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:16.154729",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a Jarvis pipeline for IOR?",
+    "answer": "jarvis pipeline create ior",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:aaf95ae4",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:16.154732",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is LAMMPS?",
+    "answer": "LAMMPS is a classical molecular dynamics simulation code designed to run efficiently on parallel computers. It was developed at Sandia National Laboratories, a US Department of Energy facility, with funding from the DOE.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8ed22793",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:34.003126",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Under what license is LAMMPS distributed?",
+    "answer": "LAMMPS is distributed freely under the terms of the GNU Public License (GPL) version 2.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8ed22793",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:34.003148",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of output files does LAMMPS produce?",
+    "answer": "LAMMPS produces log files of thermodynamic info, text dump files of atom coordinates and velocities, binary restart files, and atom snapshots in various formats including native, XYZ, XTC, DCD, CFG, NetCDF, HDF5, ADIOS2, and YAML formats.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8ed22793",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:34.003151",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Nyx?",
+    "answer": "Nyx is an adaptive mesh, massively-parallel, cosmological simulation code.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:64f0ff0e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:46.171607",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the compiler requirements for compiling the Nyx code?",
+    "answer": "The code requires C++11 compliant compilers that support MPI-2 or higher implementation. If threads or accelerators are used, it requires OpenMP 4.5 or higher, Cuda 9 or higher, or HIP-Clang.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:64f0ff0e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:46.171634",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a Jarvis pipeline for Nyx LyA?",
+    "answer": "The command is 'jarvis pipeline create nyx-lya-test'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:64f0ff0e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:46.171638",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three deployment methods (ofs_mode options) available for OrangeFS?",
+    "answer": "The three deployment methods for OrangeFS are fuse, kern, and ares.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a3ccbadb",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:58.298617",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default stripe size in bytes for OrangeFS?",
+    "answer": "The default stripe size is 65536 bytes (64KB).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a3ccbadb",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:58.298635",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where is the official OrangeFS GitHub repository located?",
+    "answer": "The official OrangeFS GitHub repository is at https://github.com/waltligon/orangefs/releases/tag/v.2.9.8.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a3ccbadb",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:20:58.298638",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is ParaView?",
+    "answer": "ParaView is an open-source data analysis and visualization application designed to handle large-scale scientific datasets.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:759cacd0",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:09.889711",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of processing does ParaView support?",
+    "answer": "ParaView supports interactive and batch processing for visualizing complex simulations and performing quantitative analysis.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:759cacd0",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:09.889731",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What kind of datasets is ParaView designed to handle?",
+    "answer": "ParaView is designed to handle large-scale scientific datasets.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:759cacd0",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:09.889734",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is PyFLEXTRKR?",
+    "answer": "PyFLEXTRKR (Python FLEXible object TRacKeR) is a flexible atmospheric feature tracking software package.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a6bbf704",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:22.016770",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What version of HDF5 is required by Hermes and h5py==3.8.0?",
+    "answer": "HDF5 version 1.14.0 or higher is required by Hermes and h5py==3.8.0.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a6bbf704",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:22.016792",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which MPI implementations are compatible with PyFLEXTRKR?",
+    "answer": "Either OpenMPI or MPICH works with PyFLEXTRKR, as they are required by Hermes and mpi4py.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a6bbf704",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:22.016796",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a pyflextrkr scs package?",
+    "answer": "scspkg create pyflextrkr",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:eb84f833",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:33.381005",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which Git branch should be used for the PyFLEXTRKR installation?",
+    "answer": "The ares branch should be used.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:eb84f833",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:33.381025",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the URL for downloading the sample input data for the wrf_tbradar test?",
+    "answer": "https://portal.nersc.gov/project/m1867/PyFLEXTRKR/sample_data/tb_radar/wrf_tbradar.tar.gz",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:eb84f833",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:33.381027",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default runscript currently supported by Jarvis for Pyflextrkr?",
+    "answer": "Currently only support running `runscript=run_mcs_tbpfradar3d_wrf`.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d5540c4b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:47.195762",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three parallel run modes available for Pyflextrkr configuration?",
+    "answer": "The parallel run modes are: 0 for serial, 1 for Dask one-node cluster, and 2 for Dask multinode cluster.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d5540c4b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:47.195776",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What flush mode must be used with Pyflextrkr to prevent errors when using the Hermes VFD interceptor?",
+    "answer": "Must use `flush_mode=sync` to prevent errors when using the Hermes VFD interceptor with Pyflextrkr.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d5540c4b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:21:47.195777",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the TEST_NAME variable set to in this setup script?",
+    "answer": "The TEST_NAME variable is set to run_mcs_tbpfradar3d_wrf.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1c5bd9b2",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:01.476400",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where is the LOCAL_EXPERIMENT_PATH directory located?",
+    "answer": "The LOCAL_EXPERIMENT_PATH directory is located at /mnt/nvme/$USER/pyflex_run.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1c5bd9b2",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:01.476417",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of storage system is used for the EXPERIMENT_PATH according to the comments?",
+    "answer": "NFS (Network File System) is used for the EXPERIMENT_PATH.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1c5bd9b2",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:01.476420",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to append the Hermes API with VFD to the Jarvis pipeline?",
+    "answer": "jarvis pipeline append hermes_api +vfd",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:0c6e556b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:17.386860",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the OSError encountered when running Pyflextrkr with Hermes on multinodes Slurm?",
+    "answer": "OSError: Unable to synchronously open file (file signature not found)",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:0c6e556b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:17.386882",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What parameters are specified when appending the data_stagein step to the Jarvis pipeline?",
+    "answer": "dest_data_path=$LOCAL_INPUT_PATH, user_data_paths=$EXPERIMENT_INPUT_PATH/$TEST_NAME, and mkdir_datapaths=$LOCAL_INPUT_PATH",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:0c6e556b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:17.386885",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How long did the manual Spark build take in Ares?",
+    "answer": "The manual Spark build took 30 minutes in Ares.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b2d25a94",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:30.020102",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What version of Apache Spark is downloaded in the manual installation instructions?",
+    "answer": "Apache Spark version 3.5.1 is downloaded in the manual installation instructions.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b2d25a94",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:30.020123",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to create a Jarvis pipeline for Spark?",
+    "answer": "The command 'jarvis pipeline create spark' is used to create a Jarvis pipeline for Spark.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b2d25a94",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:30.020125",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is WRF and what is it designed for?",
+    "answer": "WRF is a state-of-the-art atmospheric modeling system designed for both meteorological research and numerical weather prediction. It offers a host of options for atmospheric processes and can run on a variety of computing platforms.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b686ad59",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:46.386982",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three main functions of the WRF Preprocessing System (WPS)?",
+    "answer": "The WPS functions are to 1) define simulation domains; 2) interpolate terrestrial data (e.g., terrain, landuse, and soil types) to the simulation domain; and 3) degrib and interpolate meteorological input data from an outside model to the simulation domain.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b686ad59",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:46.387002",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default value for the 'history_interval' parameter in the WRF namelist configuration, and what does it control?",
+    "answer": "The default value for 'history_interval' is 60 minutes. It controls the frequency for writing to history files.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b686ad59",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:46.387004",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two main utility classes in the jarvis_cd.util package?",
+    "answer": "The two main utility classes are ArgParse (a custom command-line argument parser with advanced features) and Hostfile (host management with pattern expansion and IP resolution).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:56a4335d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:58.665096",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the purpose of the ArgParse class in the Jarvis CD project?",
+    "answer": "ArgParse is a custom command-line argument parser with advanced features designed to provide functionality for command-line argument parsing.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:56a4335d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:58.665120",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What functionality does the Hostfile class provide?",
+    "answer": "The Hostfile class provides host management with pattern expansion and IP resolution for distributed computing environments.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:56a4335d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:22:58.665123",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the four main types of arguments supported by the ArgParse class?",
+    "answer": "The ArgParse class supports positional, keyword, list, and remainder arguments.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:637a854b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:11.362930",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What notation does the Hostfile class use for host range expansion?",
+    "answer": "The Hostfile class uses bracket notation for host ranges, such as `node-[01-10]`.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:637a854b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:11.362950",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the four key use cases mentioned for the Hostfile class?",
+    "answer": "The four use cases for the Hostfile class are cluster job submission, distributed computing node management, network administration tools, and load balancing configuration.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:637a854b",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:11.362952",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the command-line usage syntax for the app.py deploy command?",
+    "answer": "python app.py deploy /etc/hostfile.txt /path/to/app --nodes=5 --dry_run=true",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c8a53944",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:24.406855",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What class does BatchProcessor inherit from?",
+    "answer": "BatchProcessor inherits from ArgParse.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c8a53944",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:24.406878",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two arguments that the 'nodes' parameter accepts in the BatchProcessor?",
+    "answer": "The 'nodes' parameter accepts 'pattern' (of type str) and 'count' (of type int).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c8a53944",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:24.406881",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How many test cases are included in the ArgParse test suite?",
+    "answer": "The ArgParse test suite includes 13 test cases in test/unit/test_argparse.py.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:15794860",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:38.079127",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the five design principles of the architecture?",
+    "answer": "The five design principles are: Flexibility (support multiple input/output formats and use cases), Performance (efficient parsing and processing for large datasets), Extensibility (easy to subclass and extend for specific needs), Robustness (comprehensive error handling and edge case management), and Testability (well-tested with extensive unit test coverage).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:15794860",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:38.079148",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What external dependencies do the ArgParse and Hostfile classes require?",
+    "answer": "Both classes have no external dependencies and use only the Python standard library, including socket, re, os, ast, and typing for implementation, and unittest and tempfile for testing.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:15794860",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:38.079151",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three main categories of tests in the Jarvis CD Test Suite?",
+    "answer": "The three main categories are: core (tests for CLI commands and core functionality), shell (tests for execution modules like LocalExec and SshExec), and util (tests for utility modules like argparse and hostfile).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3e3df4fd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:50.044080",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the recommended method for running the Jarvis CD tests?",
+    "answer": "Using Docker is the recommended method for running tests, as it provides an isolated environment that won't affect your host system.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3e3df4fd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:50.044102",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command would you use to run all tests in the Jarvis CD Test Suite using the test runner script?",
+    "answer": "./test/run_tests.sh all",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3e3df4fd",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:23:50.044105",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to run pytest tests in parallel with automatic worker detection?",
+    "answer": "python -m pytest test/unit/ -n auto",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1b411778",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:02.488590",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the four main execution modules tested in the Shell Tests category?",
+    "answer": "The four main execution modules tested are LocalExec (local execution), SSH/PSSH (remote execution), SCP/PSCP (file transfer), and MPI (parallel execution).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1b411778",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:02.488612",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which test file covers the 'jarvis init' command functionality?",
+    "answer": "test_cli_init.py covers the 'jarvis init' command functionality.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1b411778",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:02.488615",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the current coverage targets for shell modules?",
+    "answer": "Shell modules have a coverage target of 70-100%.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a64a884c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:14.441622",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What class should you inherit from when adding CLI command tests?",
+    "answer": "You should inherit from CLITestBase for common utilities when adding CLI command tests.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a64a884c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:14.441648",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where should new shell tests be created?",
+    "answer": "New shell tests should be created in test/unit/shell/.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a64a884c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:14.441652",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to run tests in Docker according to the GitHub Actions workflow?",
+    "answer": "./test/run_tests.sh all",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:70708cf0",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:27.878726",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which action is used to upload coverage in the GitHub Actions workflow?",
+    "answer": "codecov/codecov-action@v3",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:70708cf0",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:27.878742",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What file path is specified for the coverage files in the codecov action?",
+    "answer": "./htmlcov/coverage.xml",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:70708cf0",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:27.878744",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command should be used to make run_tests.sh executable?",
+    "answer": "chmod +x test/run_tests.sh",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:62f4facc",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:39.627013",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Why do SSH/SCP tests fail in isolated environments?",
+    "answer": "SSH/SCP tests fail because they use mock hostnames that won't resolve, and these failures are normal in isolated environments.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:62f4facc",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:39.627037",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "When do MPI tests get skipped?",
+    "answer": "MPI tests skip when OpenMPI is not installed.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:62f4facc",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:39.627040",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to explicitly generate coverage for the jarvis_cd project?",
+    "answer": "python -m pytest test/unit/ --cov=jarvis_cd --cov-report=html",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:32255b64",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:52.522987",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the recommended coverage percentage for new code when contributing to Jarvis CD?",
+    "answer": "80%+ coverage on new code",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:32255b64",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:52.523007",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the five best practices listed for testing in Jarvis CD?",
+    "answer": "The five best practices are: 1) Isolation - tests should not depend on external state, 2) Cleanup - use setUp/tearDown to manage test resources, 3) Assertions - be specific with assertions (assertEqual vs assertTrue), 4) Documentation - add docstrings to test methods, and 5) Naming - use descriptive test names (test_feature_scenario).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:32255b64",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:24:52.523010",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What directories and files related to Python bytecode are ignored in this .gitignore file?",
+    "answer": "The .gitignore file ignores __pycache__/ directories, *.py[cod] files, and *$py.class files, which are byte-compiled, optimized, and DLL files.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8337e96e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:07.256210",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which virtual environment directories and files does this .gitignore configuration exclude from version control?",
+    "answer": "The .gitignore excludes .env, .venv, env/, venv/, ENV/, env.bak/, venv.bak/, .jarvis_env, and jarvis_envs directories and files related to Python virtual environments.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8337e96e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:07.256232",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What testing and coverage-related files are specified to be ignored according to this .gitignore file?",
+    "answer": "The .gitignore specifies ignoring htmlcov/, .tox/, .nox/, .coverage, .coverage.*, .cache, nosetests.xml, coverage.xml, *.cover, *.py,cover, .hypothesis/, and .pytest_cache/ for unit test and coverage reports.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:8337e96e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:07.256236",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of license is used for the software from Gnosis Research Center?",
+    "answer": "BSD 3-Clause License",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:aa34fcc9",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:19.663002",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which organization holds the copyright for this software as of 2024?",
+    "answer": "Gnosis Research Center, Illinois Institute of Technology",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:aa34fcc9",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:19.663023",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the contact email for the Gnosis Research Center at Illinois Institute of Technology?",
+    "answer": "grc@illinoistech.edu",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:aa34fcc9",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:19.663026",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What version of OrangeFS is installed in the Dockerfile?",
+    "answer": "Version 2.10.0 of OrangeFS is installed.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:2abd9c3f",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:31.494359",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What base image does the OrangeFS Dockerfile use?",
+    "answer": "The Dockerfile uses iowarp/iowarp-build:latest as the base image.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:2abd9c3f",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:31.494381",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What configure flags are used when building OrangeFS?",
+    "answer": "OrangeFS is configured with --prefix=$(scspkg pkg root orangefs) --enable-shared --enable-fuse flags.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:2abd9c3f",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:31.494384",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the minimum Python version required for the jarvis_cd project?",
+    "answer": "Python 3.7 or higher is required, as specified by 'requires-python = \">=3.7\"'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3879143d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:43.437944",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three main dependencies listed for the jarvis_cd project?",
+    "answer": "The three main dependencies are pyyaml, pandas, and podman-compose.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3879143d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:43.437967",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the purpose of the jarvis_cd project according to its description?",
+    "answer": "Jarvis-CD is a unified platform for deploying applications and benchmarks.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3879143d",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:43.437971",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What scripts are included in the setuptools.setup() configuration?",
+    "answer": "The scripts included are 'bin/jarvis' and 'bin/jarvis_resource_graph'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:ef1d315a",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:57.022315",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What function is called immediately after the setup() call to install packages?",
+    "answer": "The install_builtin_packages() function from jarvis_cd.post_install is called to install builtin packages.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:ef1d315a",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:57.022333",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where does setup.py specify that most metadata is handled?",
+    "answer": "The comment indicates that most metadata is handled in pyproject.toml.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:ef1d315a",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:25:57.022335",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What base Docker image is used in the test/Dockerfile?",
+    "answer": "ubuntu:22.04",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:898bf7f1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:09.490101",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the username and password created for the test user in the Dockerfile?",
+    "answer": "The username is 'testuser' and the password is 'testpass'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:898bf7f1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:09.490121",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default command that runs when the container starts?",
+    "answer": "python3 -m pytest test/unit/ -v --cov=jarvis_cd --cov-report=term-missing --cov-report=html:/app/htmlcov",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:898bf7f1",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:09.490123",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the default command executed by the main test service in the docker-compose.yml file?",
+    "answer": "The main test service executes 'python3 -m pytest test/unit/ -v --cov=jarvis_cd --cov-report=term-missing --cov-report=html:/app/htmlcov ${PYTEST_ARGS}'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c071a775",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:23.004120",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which Docker Compose service is designed to run tests in parallel?",
+    "answer": "The test-parallel service is designed to run tests in parallel, using the '-n auto' flag with pytest.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c071a775",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:23.004141",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What environment variable is set to '/app' across all test services in the docker-compose.yml configuration?",
+    "answer": "The PYTHONPATH environment variable is set to '/app' across all test services.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c071a775",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:23.004143",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What model does the code-documenter agent use?",
+    "answer": "The code-documenter agent uses the opus model.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1780ad74",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:37.005366",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the core responsibilities of the code-documenter agent?",
+    "answer": "The core responsibilities include: analyzing code structure, functionality, and dependencies; creating detailed documentation covering purpose, usage, parameters, return values, and examples; documenting APIs with endpoint descriptions, request/response formats, and authentication requirements; explaining complex algorithms and business logic; identifying and documenting edge cases, error conditions, and troubleshooting guidance; and ensuring documentation follows established standards and best practices for the technology stack.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1780ad74",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:37.005390",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the first step in the code-documenter agent's documentation approach?",
+    "answer": "The first step is 'Analysis First', which means thoroughly examining the code to understand its purpose, dependencies, and integration points.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:1780ad74",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:37.005393",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three example scenarios where the docker-python-test-expert agent should be used?",
+    "answer": "The three example scenarios are: (1) Writing unit tests for a Flask API that runs in Docker, (2) Diagnosing and fixing pytest suite failures that occur in Docker but work locally, and (3) Setting up a test database container for Python tests.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:fa75cc45",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:51.899764",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What testing pattern and principles does the docker-python-test-expert agent follow when writing Python unit tests?",
+    "answer": "The agent follows the AAA pattern (Arrange-Act-Assert), uses clear test naming, implements single responsibility principle, creates parameterized tests for edge cases and boundary conditions, and ensures high code coverage while focusing on meaningful test scenarios.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:fa75cc45",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:51.899784",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What should the docker-python-test-expert agent's output include when delivering testing solutions?",
+    "answer": "The output should include well-structured, maintainable test code with clear documentation, Docker configuration files (Dockerfile, docker-compose.yml) when needed, setup instructions for running tests locally and in CI/CD, and explanations of testing strategies and architectural decisions.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:fa75cc45",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:26:51.899786",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What tools are available to the git-expert agent?",
+    "answer": "The git-expert agent has access to the following tools: Bash, Glob, Grep, Read, WebFetch, TodoWrite, WebSearch, BashOutput, and KillShell.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a5b4b5d9",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:04.731297",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the recommended command for updating submodules in the git-expert agent?",
+    "answer": "The git-expert agent should always use `git submodule update --init --recursive` to ensure all nested submodules are properly initialized and updated.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a5b4b5d9",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:04.731319",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What model does the git-expert agent use?",
+    "answer": "The git-expert agent uses the haiku model.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:a5b4b5d9",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:04.731322",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the core responsibilities of the jarvis-pipeline-builder agent?",
+    "answer": "The jarvis-pipeline-builder agent is responsible for: designing and constructing well-structured Jarvis pipeline YAML files that follow best practices, analyzing package source code to extract accurate parameter specifications, types, defaults, and constraints, validating pipeline configurations for correctness, completeness, and efficiency, troubleshooting pipeline configuration issues and suggesting optimizations, and documenting parameter requirements clearly and comprehensively.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b9930368",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:19.908850",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the six key steps to follow when building pipeline YAML files according to the jarvis-pipeline-builder agent guidelines?",
+    "answer": "When building pipeline YAML files, the six key steps are: 1) Structure First - ensure proper YAML syntax and hierarchical organization, 2) Parameter Accuracy - cross-reference package implementations to verify all required parameters are included with correct types and formats, 3) Defaults and Optionals - clearly distinguish between required parameters and those with defaults, 4) Validation - include appropriate validation rules and constraints where applicable, 5) Documentation - add inline comments explaining non-obvious configuration choices, and 6) Dependencies - ensure proper ordering and dependency management between pipeline stages.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b9930368",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:19.908868",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What model does the jarvis-pipeline-builder agent use, and when should it be invoked?",
+    "answer": "The jarvis-pipeline-builder agent uses the 'sonnet' model. It should be invoked when the user needs to create, modify, or understand Jarvis pipeline YAML files, or when they need to extract and document parameters from pipeline packages. Examples include creating pipeline YAML configurations, analyzing packages to extract parameters, and reviewing existing pipeline YAML configurations to validate parameters.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b9930368",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:19.908870",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the primary purpose of the python-code-updater agent?",
+    "answer": "The python-code-updater agent is used to modify, refactor, or enhance existing Python code. This includes updating deprecated syntax, improving performance, adding new features to existing functions/classes, fixing bugs, modernizing code to newer Python versions, or restructuring code for better maintainability.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:cacdf63c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:34.070831",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the core principles the python-code-updater agent follows when updating code?",
+    "answer": "The agent follows several key principles: always preserve the original functionality unless explicitly asked to change behavior, use modern Python features appropriately (f-strings, type hints, dataclasses, etc.), optimize for readability and maintainability over clever solutions, consider performance implications of changes, follow established project patterns and conventions when evident, and be explicit about any assumptions made about the code's usage.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:cacdf63c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:34.070854",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the recommended approach the python-code-updater agent takes when updating Python code?",
+    "answer": "The agent's approach is: 1) First, thoroughly understand the existing code's purpose and current implementation, 2) Identify specific areas for improvement (performance bottlenecks, deprecated syntax, code smells, etc.), 3) Plan updates that maintain functionality while improving code quality, 4) Implement changes incrementally, testing logic as you go, 5) Provide clear explanations of what was changed and why, and 6) Highlight any potential impacts or considerations for the updates.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:cacdf63c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:34.070857",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the timeout duration configured for the build job in the build-containers.yaml workflow?",
+    "answer": "The build job has a timeout of 800 minutes.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6789112e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:49.342546",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which platforms does the workflow build Docker images for?",
+    "answer": "The workflow builds Docker images for linux/amd64 and linux/arm64 platforms.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6789112e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:49.342568",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two Docker image tags that get pushed in the build-containers.yaml workflow?",
+    "answer": "The two Docker image tags are iowarp/ppi-jarvis-cd-build:latest and iowarp/ppi-jarvis-cd:latest.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6789112e",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:27:49.342571",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the name of the GitHub workflow defined in the main.yml file?",
+    "answer": "main",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5c5ffb7c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:01.883570",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What operating system does the build job run on in this workflow?",
+    "answer": "ubuntu-24.04",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5c5ffb7c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:01.883589",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the four main steps executed after getting sources in this CI workflow?",
+    "answer": "Install Apt Dependencies, Install Jarvis, Run pylint, and Test",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5c5ffb7c",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:01.883591",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the file path of the Python interpreter used in the VSCode launch configurations?",
+    "answer": "/home/llogan/.venv/bin/python",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:9a30a5aa",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:17.337709",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the arguments used in the 'Debug jarvis ppl run with file' configuration?",
+    "answer": "The arguments are 'ppl', 'run', 'builtin/pipelines/simple_test.yaml', and 'yaml'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:9a30a5aa",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:17.337731",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which configuration uses a Python module instead of a program path for launching?",
+    "answer": "The 'Debug jarvis ppl run (Python module)' configuration uses the module 'jarvis_cd.core.cli' instead of a program path.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:9a30a5aa",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:17.337733",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What should you do when adding new menus?",
+    "answer": "When adding new menus, you should create a new documentation file for describing the menu.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:62513c33",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:30.327413",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where should documentation for new commands be placed?",
+    "answer": "Documentation for new commands should be placed under the docs directory in the doc file that is most relevant.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:62513c33",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:30.327437",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What should you make sure to do when adding new commands?",
+    "answer": "When adding new commands, you should make sure to document them under the docs directory.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:62513c33",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:30.327440",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two Dockerfiles that need to be created in the docker directory?",
+    "answer": "The two Dockerfiles are build.Dockerfile and deploy.Dockerfile.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6e091733",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:42.987785",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How should the build and deploy Dockerfiles be built according to the instructions?",
+    "answer": "They should be built in GitHub Actions manually only, through a new action called build_dockerfiles.yml.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6e091733",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:42.987807",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What base image should the build.Dockerfile use and what is the maintainer email?",
+    "answer": "The build.Dockerfile should use iowarp/iowarp-deps:latest as the base image, and the maintainer email is llogan@hawk.iit.edu.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:6e091733",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:42.987810",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What package is being added to the Spack configuration?",
+    "answer": "py-ppi-jarvis-cd",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:2de295da",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:58.274289",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the prefix path set for py-ppi-jarvis-cd in the Spack configuration?",
+    "answer": "/usr/local",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:2de295da",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:58.274315",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Is py-ppi-jarvis-cd set as buildable in the Spack configuration?",
+    "answer": "No, it is set to buildable: false.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:2de295da",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:28:58.274317",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does the SCRIPT_DIR variable store in this bash script?",
+    "answer": "The SCRIPT_DIR variable stores the directory path where the script itself is located, obtained by changing to the directory containing the script and getting the present working directory.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:64d77a99",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:10.987476",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How is the PROJECT_ROOT directory determined relative to SCRIPT_DIR?",
+    "answer": "The PROJECT_ROOT directory is determined by going one level up from SCRIPT_DIR (using '..' to access the parent directory) and then getting that directory's absolute path.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:64d77a99",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:10.987493",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the relationship between the docker folder and the project root according to the comment?",
+    "answer": "According to the comment, the project root directory is the parent of the docker folder, meaning the docker folder is one level below the project root.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:64d77a99",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:10.987495",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the name of the Docker image being built in the build step?",
+    "answer": "iowarp/ppi-jarvis-cd-build:latest",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:90280264",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:23.714441",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What flag is used in the docker build command to prevent caching?",
+    "answer": "--no-cache",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:90280264",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:23.714456",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What Docker image does deploy.Dockerfile use as its base image?",
+    "answer": "iowarp/ppi-jarvis-cd-build:latest",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:90280264",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:23.714458",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What new key is being added to the pipeline script format?",
+    "answer": "The 'interceptors' key is being added to the pipeline script format. It can be specified both at the package level (as a list of strings) and at the top level (as a list of package configurations).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d6d19346",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:37.911948",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What new function should be added to the Package class and what should it modify?",
+    "answer": "A new function called add_interceptor should be added to the Package class. This function should modify a new self.config key called 'interceptors', which will store interceptors in a dictionary mapping pkg_name to a constructed package, similar to the sub_pkgs key.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d6d19346",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:37.911959",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How should the mod_env parameter be changed in the update_env function?",
+    "answer": "The ability to pass mod_env to the update_env function should be removed. Instead, mod_env should be a copy (not a pointer) to env, so that each package gets its own isolated module environment.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:d6d19346",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:37.911960",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the status of the Phase 14 recovery?",
+    "answer": "The status is RECOVERED - All lost commits have been saved to branch `recovery-phase-14`.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5bdea2ce",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:51.804797",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "When was the Phase 14 recovery performed?",
+    "answer": "The recovery was performed on 2025-10-01.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5bdea2ce",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:51.804818",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which lost commits were found during the Phase 14 recovery?",
+    "answer": "Two lost commits were found: commit `5775416` titled 'Init jarvis repos' from 2025-09-30 16:53:03, and commit `f8b3d6a` titled 'Refactor resource graph and enhance module management' from 2025-10-01 11:34:50.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:5bdea2ce",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:29:51.804821",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What was the total net change in lines of code across both commits in recovery-phase-14?",
+    "answer": "+790 insertions and -264 deletions across 20 files total.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b88288e4",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:05.558830",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What major architectural change was made to the Resource Graph System in commit f8b3d6a?",
+    "answer": "The StorageDevice class was removed and replaced with a simplified approach using plain Python dictionaries instead of class-based objects.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b88288e4",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:05.558841",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What method renaming changes were made to the ResourceGraphManager for clarity?",
+    "answer": "Methods were renamed as follows: build_resource_graph() became build(), load_resource_graph() became load(), show_resource_graph() became show(), and show_resource_graph_path() became show_path().",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:b88288e4",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:05.558842",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three new CLI commands added to the Module Management System?",
+    "answer": "The three new CLI commands are: 1) 'jarvis mod clear' which cleans module directories while preserving the src/ folder, 2) 'jarvis mod dep add <module> <dependency>' which adds dependencies to module configuration, and 3) 'jarvis mod dep remove <module> <dependency>' which removes dependencies from module configuration.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c8d09d70",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:19.163648",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the breaking change in the ResourceGraphManager API?",
+    "answer": "The ResourceGraphManager API changed from 'manager.build_resource_graph()' to 'manager.build()'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c8d09d70",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:19.163672",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How has the storage device data model changed in this update?",
+    "answer": "The storage device model moved from class-based to dictionary-based storage devices. Device access changed from using dot notation like 'device.capacity' and 'device.available' to dictionary notation like 'device['capacity']' and 'device['available']'.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:c8d09d70",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:19.163675",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How many total commits were made in this development phase?",
+    "answer": "2 total commits were made in this development phase.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3bcd8b23",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:32.547879",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the net growth in lines of code after the changes?",
+    "answer": "The net growth is +526 lines (790+ lines added and 264 lines removed).",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3bcd8b23",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:32.547901",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three new CLI commands that were added to the jarvis mod system?",
+    "answer": "The three new CLI commands are: 'jarvis mod clear <module>' to clear module directory, 'jarvis mod dep add <mod> <dep>' to add a dependency to a module, and 'jarvis mod dep remove <mod> <dep>' to remove a dependency from a module.",
+    "chunk_id": "github_com_iowarp_runtime-deployment.md:0:3bcd8b23",
+    "source_file": "github_com_iowarp_runtime-deployment.md",
+    "generated_at": "2026-01-05T16:30:32.547904",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the core architectural component of Jarvis-CD that enables portable and hardware-aware deployment pipelines?",
+    "answer": "The core architectural component is the 'Resource Graph,' a machine-readable snapshot of a cluster's hardware (storage, network, accelerators) that allows deployment pipelines to be portable and hardware-aware.",
+    "chunk_id": "research_report.md:0:d06fb2bd",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:30:46.545755",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What programming language is Jarvis-CD built with and what type of systems does it primarily deploy?",
+    "answer": "Jarvis-CD is a Python-based infrastructure designed to automate the deployment of complex software stacks, particularly storage systems and benchmarks, on heterogeneous High-Performance Computing (HPC) clusters.",
+    "chunk_id": "research_report.md:0:d06fb2bd",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:30:46.545779",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How are deployments organized in Jarvis-CD's workflow?",
+    "answer": "Deployments are organized into 'pipelines,' which are ordered sets of configured 'packages' (services, applications, or interceptors) that execute in a defined sequence.",
+    "chunk_id": "research_report.md:0:d06fb2bd",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:30:46.545782",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Jarvis-CD and what challenge does it address in HPC environments?",
+    "answer": "Jarvis-CD (Continuous Delivery) is a unified, extensible framework for defining, deploying, and managing HPC applications and storage systems. It addresses the challenge of deploying complex software stacks optimized for specific hardware configurations in increasingly heterogeneous HPC environments that incorporate diverse storage technologies, accelerators, and interconnects.",
+    "chunk_id": "research_report.md:0:d14af97a",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:30:59.195337",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which research institution primarily developed Jarvis-CD?",
+    "answer": "Jarvis-CD was developed primarily by the Gnosis Research Center at the Illinois Institute of Technology.",
+    "chunk_id": "research_report.md:0:d14af97a",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:30:59.195358",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does Jarvis-CD achieve reproducibility and portability across different clusters?",
+    "answer": "Jarvis-CD utilizes a Resource Graph to map software requirements to available hardware dynamically, allowing the same pipeline to run optimally across different clusters without manual reconfiguration.",
+    "chunk_id": "research_report.md:0:d14af97a",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:30:59.195361",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What concept is the architecture of Jarvis-CD built around?",
+    "answer": "The architecture of Jarvis-CD is built around the concept of modularity and hardware abstraction.",
+    "chunk_id": "research_report.md:0:08835f45",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:13.767348",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How is Jarvis-CD implemented?",
+    "answer": "Jarvis-CD is implemented as an extensible Python framework that interacts with the underlying system through a set of utilities and abstractions.",
+    "chunk_id": "research_report.md:0:08835f45",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:13.767369",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What programming language is used to implement the Jarvis-CD framework?",
+    "answer": "Python is used to implement the Jarvis-CD framework.",
+    "chunk_id": "research_report.md:0:08835f45",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:13.767372",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three distinct types of packages in Jarvis-CD?",
+    "answer": "The three distinct types of packages in Jarvis-CD are: Service (a long-running program that executes indefinitely until forcibly stopped), Application (a program that runs to a definite completion), and Interceptor (a library or tool used to intercept function calls, typically for monitoring or redirecting I/O).",
+    "chunk_id": "research_report.md:0:e86059e8",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:26.713464",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is a package (pkg) in Jarvis-CD?",
+    "answer": "In Jarvis-CD, a package (or pkg) is a Python class that inherits from a base Pkg class, defining how an application or service should be configured, started, stopped, and monitored.",
+    "chunk_id": "research_report.md:0:e86059e8",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:26.713485",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What standardized methods and attributes does the Pkg base class provide?",
+    "answer": "The Pkg base class provides standardized methods and attributes such as self.config for package-specific settings and self.env for environment variables, ensuring a consistent interface for all software.",
+    "chunk_id": "research_report.md:0:e86059e8",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:26.713488",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the Resource Graph in Jarvis-CD?",
+    "answer": "The Resource Graph is a YAML-based schema that acts as a snapshot of a cluster's specific hardware configuration, including storage devices, mount points, network interfaces, and memory hierarchy.",
+    "chunk_id": "research_report.md:0:fc856d00",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:39.911995",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does the Resource Graph enable portability in Jarvis-CD?",
+    "answer": "By relying on the Resource Graph rather than hardcoded paths, pipelines become portable. A pipeline defined on one machine can be moved to another; Jarvis-CD will regenerate the necessary configurations based on the new machine's Resource Graph.",
+    "chunk_id": "research_report.md:0:fc856d00",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:39.912018",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of information does the Resource Graph typically include about file systems?",
+    "answer": "The Resource Graph typically includes a list of file systems detailing availability, device types (SSD, HDD), mount points, and whether the storage is shared or local.",
+    "chunk_id": "research_report.md:0:fc856d00",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:39.912020",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is jarvis-util?",
+    "answer": "jarvis-util is a support library that handles low-level execution details and underpins the deployment logic.",
+    "chunk_id": "research_report.md:0:c8b45023",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:51.679667",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of HPC operations does jarvis-util provide Python wrappers for?",
+    "answer": "jarvis-util provides Python wrappers for executing commands via MPI (Message Passing Interface) or PSSH (Parallel SSH), managing hostfiles, and handling shell command execution.",
+    "chunk_id": "research_report.md:0:c8b45023",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:51.679811",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does the separation of concerns between Jarvis-CD and jarvis-util benefit the system architecture?",
+    "answer": "The separation allows the core Jarvis-CD logic to focus on orchestration while jarvis-util handles the mechanics of distributed execution.",
+    "chunk_id": "research_report.md:0:c8b45023",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:31:51.679814",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which HPC job schedulers does Jarvis-CD integrate with?",
+    "answer": "Jarvis-CD integrates with SLURM and PBS.",
+    "chunk_id": "research_report.md:0:c7acd71a",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:03.145435",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does Jarvis-CD's integration with job schedulers allow it to manage?",
+    "answer": "It allows Jarvis-CD to manage job allocations and execute pipelines within reserved compute nodes.",
+    "chunk_id": "research_report.md:0:c7acd71a",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:03.145459",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of processing can Jarvis-CD be used for through its scheduler integration?",
+    "answer": "Jarvis-CD can be used for both interactive development and large-scale batch processing.",
+    "chunk_id": "research_report.md:0:c7acd71a",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:03.145462",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does configuring Jarvis-CD involve?",
+    "answer": "Configuring Jarvis-CD involves setting up the environment to recognize the specific machine's layout and defining where metadata and persistent data should be stored.",
+    "chunk_id": "research_report.md:0:40315d50",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:15.008826",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the two main aspects of Jarvis-CD configuration?",
+    "answer": "The two main aspects are setting up the environment to recognize the specific machine's layout and defining where metadata and persistent data should be stored.",
+    "chunk_id": "research_report.md:0:40315d50",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:15.008852",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of data storage locations need to be defined when configuring Jarvis-CD?",
+    "answer": "Metadata and persistent data storage locations need to be defined when configuring Jarvis-CD.",
+    "chunk_id": "research_report.md:0:40315d50",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:15.008855",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three primary bootstrapping modes supported by Jarvis-CD?",
+    "answer": "Jarvis-CD supports three primary bootstrapping modes: Single Machine (Local) for testing on a single node, Existing Machine for known HPC clusters with pre-configured profiles, and New Configuration for custom or undefined clusters.",
+    "chunk_id": "research_report.md:0:1b131cd8",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:27.669829",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What command is used to configure Jarvis to run everything locally on a single machine?",
+    "answer": "The command `jarvis bootstrap from local` is used to configure Jarvis to run everything locally.",
+    "chunk_id": "research_report.md:0:1b131cd8",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:27.669852",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How do users initialize a new configuration for custom or undefined clusters in Jarvis-CD?",
+    "answer": "Users must initialize a new configuration manually using `jarvis init` for custom or undefined clusters.",
+    "chunk_id": "research_report.md:0:1b131cd8",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:27.669855",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three critical directory definitions required for a proper Jarvis-CD installation?",
+    "answer": "The three critical directory definitions are CONFIG_DIR (stores metadata for packages and pipelines), PRIVATE_DIR (a directory common across all machines but stores data locally to each machine), and SHARED_DIR (a directory common across all machines that provides a unified view of the data).",
+    "chunk_id": "research_report.md:0:682614d3",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:40.328685",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the purpose of the PRIVATE_DIR in Jarvis-CD?",
+    "answer": "PRIVATE_DIR is a directory that is common across all machines (same path) but stores data locally to each machine. This is crucial for shared-nothing architectures or distributed storage systems like OrangeFS that require local metadata storage on each node.",
+    "chunk_id": "research_report.md:0:682614d3",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:40.328707",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where are the three critical directory definitions for Jarvis-CD stored?",
+    "answer": "The three critical directory definitions are stored in the main configuration file (jarvis_config.yaml).",
+    "chunk_id": "research_report.md:0:682614d3",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:40.328710",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What system does Jarvis-CD use to define the set of nodes available for a pipeline?",
+    "answer": "Jarvis-CD utilizes a hostfile system similar to MPI to define the set of nodes available for a pipeline.",
+    "chunk_id": "research_report.md:0:c28aee86",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:53.035007",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How do users set an active hostfile in Jarvis-CD?",
+    "answer": "Users set an active hostfile using the command `jarvis hostfile set /path/to/hostfile`.",
+    "chunk_id": "research_report.md:0:c28aee86",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:53.035028",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Why is it recommended to have at least two nodes in the hostfile when building the Resource Graph in Jarvis-CD?",
+    "answer": "It is recommended to have at least two nodes in the hostfile during the Resource Graph build step to accurately detect valid networks and interconnects between hosts.",
+    "chunk_id": "research_report.md:0:c28aee86",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:32:53.035030",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the central operational unit in Jarvis-CD?",
+    "answer": "The Pipeline is the central operational unit in Jarvis-CD.",
+    "chunk_id": "research_report.md:0:c49938fe",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:05.113313",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does a Pipeline represent in Jarvis-CD?",
+    "answer": "A Pipeline represents an end-to-end workflow, chaining together services, interceptors, and applications into a single executable entity.",
+    "chunk_id": "research_report.md:0:c49938fe",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:05.113334",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What components does a Jarvis-CD Pipeline chain together?",
+    "answer": "A Jarvis-CD Pipeline chains together services, interceptors, and applications.",
+    "chunk_id": "research_report.md:0:c49938fe",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:05.113336",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What three components make up a typical storage I/O research pipeline?",
+    "answer": "A storage I/O research pipeline consists of three components: a Service (storage system like Hermes or OrangeFS to manage data), an Interceptor (profiling tool like the Hermes MPI-IO interceptor to capture I/O calls), and an Application (benchmark like IOR to generate load).",
+    "chunk_id": "research_report.md:0:d1a23ff0",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:18.198912",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How is a pipeline defined in this context?",
+    "answer": "A pipeline is defined as an ordered set of configured packages.",
+    "chunk_id": "research_report.md:0:d1a23ff0",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:18.198936",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does the pipeline structure ensure regarding the storage service and application execution?",
+    "answer": "The pipeline structure ensures that the storage service is fully active before the application begins execution.",
+    "chunk_id": "research_report.md:0:d1a23ff0",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:18.198939",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What CLI command is used to initialize a new pipeline in Jarvis-CD?",
+    "answer": "The command `jarvis ppl create [pipeline_name]` is used to initialize a new, empty pipeline in Jarvis-CD.",
+    "chunk_id": "research_report.md:0:af3bc30b",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:30.204688",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How can users modify specific settings for a package within a Jarvis-CD pipeline?",
+    "answer": "Users can modify specific settings for a package using the command `jarvis pkg configure [pkg_name] [parameters]`, such as setting `sleep=5` for a service or `xfer=1m` for a benchmark.",
+    "chunk_id": "research_report.md:0:af3bc30b",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:30.204705",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the purpose of the `jarvis ppl env copy` command?",
+    "answer": "The `jarvis ppl env copy [env_name]` command allows pipelines to inherit or snapshot environment variables, ensuring consistent execution contexts.",
+    "chunk_id": "research_report.md:0:af3bc30b",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:30.204707",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the first step when a Jarvis-CD pipeline is executed?",
+    "answer": "Services are started first, and Jarvis ensures they are running and healthy.",
+    "chunk_id": "research_report.md:0:06e82054",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:41.779519",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does Jarvis-CD handle environment variables during pipeline execution?",
+    "answer": "Environment variables (including LD_PRELOAD for interceptors) are set automatically based on the pipeline configuration.",
+    "chunk_id": "research_report.md:0:06e82054",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:41.779539",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What happens during the teardown phase of a Jarvis-CD pipeline execution?",
+    "answer": "Once the application completes, Jarvis can stop the services, ensuring a clean cleanup of resources.",
+    "chunk_id": "research_report.md:0:06e82054",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:41.779541",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What role do pipelines serve in scientific experiments?",
+    "answer": "Pipelines serve as static records of an experiment.",
+    "chunk_id": "research_report.md:0:a26ebc51",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:53.290816",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What information does a pipeline definition include?",
+    "answer": "The pipeline definition includes the specific versions of packages, their configuration parameters, and the environment state.",
+    "chunk_id": "research_report.md:0:a26ebc51",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:53.290835",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How can researchers use pipeline definitions to reproduce experiments on different hardware?",
+    "answer": "Researchers can share pipeline definitions to reproduce experiments exactly on different hardware by leveraging the Resource Graph for adaptation.",
+    "chunk_id": "research_report.md:0:a26ebc51",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:33:53.290836",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is one of Jarvis-CD's primary motivations?",
+    "answer": "One of Jarvis-CD's primary motivations is to manage the complexity of modern storage systems.",
+    "chunk_id": "research_report.md:0:f412437c",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:04.630662",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of integration does Jarvis-CD provide with storage solutions?",
+    "answer": "Jarvis-CD provides deep integration with several storage solutions.",
+    "chunk_id": "research_report.md:0:f412437c",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:04.630691",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What process does Jarvis-CD automate in relation to storage systems?",
+    "answer": "Jarvis-CD automates the tedious and error-prone process of configuration generation for storage systems.",
+    "chunk_id": "research_report.md:0:f412437c",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:04.630694",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Hermes and what does it manage?",
+    "answer": "Hermes is a hierarchical buffering system that manages I/O across heterogeneous storage tiers (RAM, NVMe, Burst Buffers).",
+    "chunk_id": "research_report.md:0:ef96db2b",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:18.058253",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the recommended deployment method for Hermes?",
+    "answer": "Jarvis-CD is the recommended deployment method for Hermes.",
+    "chunk_id": "research_report.md:0:ef96db2b",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:18.058272",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does Jarvis-CD enable transparent use of Hermes in applications?",
+    "answer": "Jarvis-CD handles interceptor injection by appending the hermes_api package (configured with +mpi for MPI-IO interception) to the pipeline and automatically sets the LD_PRELOAD environment variable for subsequent applications in the pipeline.",
+    "chunk_id": "research_report.md:0:ef96db2b",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:18.058274",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of file system is OrangeFS and where is it commonly used?",
+    "answer": "OrangeFS is a parallel file system that is often used in research.",
+    "chunk_id": "research_report.md:0:b400d6e2",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:30.043696",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What does OrangeFS require on each server for storage?",
+    "answer": "OrangeFS requires specific metadata and data storage directories on each server.",
+    "chunk_id": "research_report.md:0:b400d6e2",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:30.043718",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does Jarvis-CD ensure proper local OrangeFS state storage on each node?",
+    "answer": "Jarvis-CD utilizes the PRIVATE_DIR configuration to ensure that each node stores its local OrangeFS state in the correct location, distinct from the shared configuration files.",
+    "chunk_id": "research_report.md:0:b400d6e2",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:30.043722",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of parallel file systems can Jarvis-CD deploy as part of user-space pipelines?",
+    "answer": "Jarvis-CD includes packages for managing DAOS (Distributed Asynchronous Object Storage) and Lustre, allowing users to deploy these complex parallel file systems as part of user-space pipelines.",
+    "chunk_id": "research_report.md:0:e2f44201",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:43.887485",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does Jarvis-CD support distributed shared memory systems like MegaMmap?",
+    "answer": "Jarvis-CD is used to manage the deployment of memory-centric storage stacks for distributed shared memory systems like MegaMmap, leveraging the Resource Graph to configure tiered DRAM and storage management policies.",
+    "chunk_id": "research_report.md:0:e2f44201",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:43.887505",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What characteristic of Jarvis-CD enables it to support various other systems?",
+    "answer": "The extensible nature of Jarvis-CD allows it to support various other systems.",
+    "chunk_id": "research_report.md:0:e2f44201",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:43.887507",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What are the three main architectural components of Jarvis-CD?",
+    "answer": "The three main architectural components of Jarvis-CD are modular Packages, orchestrated Pipelines, and robust hardware abstractions.",
+    "chunk_id": "research_report.md:0:1b1b6ec9",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:56.315031",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "How does Jarvis-CD achieve portability and reproducibility in I/O research?",
+    "answer": "Jarvis-CD achieves portability and reproducibility by decoupling the definition of a software pipeline from the specifics of the hardware it runs on via the Resource Graph.",
+    "chunk_id": "research_report.md:0:1b1b6ec9",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:56.315053",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What types of storage systems does Jarvis-CD help deploy?",
+    "answer": "Jarvis-CD helps deploy complex, multi-component storage systems like Hermes and OrangeFS.",
+    "chunk_id": "research_report.md:0:1b1b6ec9",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:34:56.315056",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Jarvis designed to provide according to the PDSW'24 paper by Cernuda et al.?",
+    "answer": "Jarvis is designed to provide a shared, user-friendly, and reproducible I/O infrastructure.",
+    "chunk_id": "research_report.md:0:b660d83e",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:08.558471",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Who are the authors of the MegaMmap paper published in 2024?",
+    "answer": "Kougkas et al. are the authors of the MegaMmap paper.",
+    "chunk_id": "research_report.md:0:b660d83e",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:08.558502",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What type of shared memory does MegaMmap provide for data-intensive applications?",
+    "answer": "MegaMmap provides a high-performance distributed shared memory for data-intensive applications.",
+    "chunk_id": "research_report.md:0:b660d83e",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:08.558506",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is Jarvis-cd?",
+    "answer": "Jarvis-cd is a unified platform for deploying various applications.",
+    "chunk_id": "research_report.md:0:6199e520",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:22.260408",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where can the Jarvis-cd repository be found?",
+    "answer": "The Jarvis-cd repository can be found at https://github.com/grc-iit/jarvis-cd",
+    "chunk_id": "research_report.md:0:6199e520",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:22.260429",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the relationship between runtime-deployment and Jarvis-cd?",
+    "answer": "Runtime-deployment is a Jarvis-cd repository mirror/fork located at https://github.com/iowarp/runtime-deployment",
+    "chunk_id": "research_report.md:0:6199e520",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:22.260432",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "What is the URL for the Jarvis-CD Index documentation?",
+    "answer": "https://grc.iit.edu/docs/jarvis/jarvis-cd/index/",
+    "chunk_id": "research_report.md:0:ebca9338",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:34.472297",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Where can documentation about deploying Hermes be found?",
+    "answer": "https://grc.iit.edu/docs/hermes/deploying-hermes/",
+    "chunk_id": "research_report.md:0:ebca9338",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:34.472320",
+    "model": "claude-sonnet-4-20250514"
+  },
+  {
+    "question": "Which documentation covers Jarvis-CD Storage Integration?",
+    "answer": "IOWarp Documentation at https://grc.iit.edu/docs/iowarp/deployment/jarvis/",
+    "chunk_id": "research_report.md:0:ebca9338",
+    "source_file": "research_report.md",
+    "generated_at": "2026-01-05T16:35:34.472323",
+    "model": "claude-sonnet-4-20250514"
+  }
+]
