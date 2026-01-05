@@ -1,0 +1,124 @@
+# ============================================================================
+# PHAGOCYTE GENERATOR CONFIGURATION
+# Guide: Choose your LLM provider and configure settings
+# Usage: Edit this file OR override with CLI flags (--provider, --model)
+# ============================================================================
+
+# ============================================================================
+# LLM PROVIDER SETTINGS
+# ============================================================================
+# Choose ONE provider by uncommenting its section and setting provider: <name>
+# ============================================================================
+
+llm:
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ CURRENT ACTIVE PROVIDER - Change this line to switch providers     │
+  # └─────────────────────────────────────────────────────────────────────┘
+  provider: ollama            # Options: ollama, claude-sdk, adk, vllm, openai, anthropic
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ 1. OLLAMA - Local LLM (RECOMMENDED for unlimited free usage) ⭐     │
+  # │    Setup: ollama pull mistral:latest                                │
+  # │    Docs: https://ollama.com                                         │
+  # └─────────────────────────────────────────────────────────────────────┘
+  ollama:
+    base_url: http://localhost:11434
+    model: mistral:latest       # Available: mistral, llama3.3, qwen2.5, etc.
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ 2. CLAUDE SDK - Claude Code Agent (FREE, best quality) ⭐           │
+  # │    Setup: pip install claude-agent-sdk && claude auth login         │
+  # │    Rate Limit: 50 requests/min (free tier)                          │
+  # └─────────────────────────────────────────────────────────────────────┘
+  claude-sdk:
+    model: claude-code
+    use_agent_sdk: true
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ 3. GOOGLE ADK - Gemini API (FREE tier: 1500 req/day) ⭐             │
+  # │    Setup: pip install google-adk                                    │
+  # │    Get Key: https://aistudio.google.com/apikey (FREE)               │
+  # │    Set Key: export GOOGLE_API_KEY="your-key"                        │
+  # └─────────────────────────────────────────────────────────────────────┘
+  adk:
+    model: gemini-2.0-flash-exp  # Options: gemini-2.0-flash-exp, gemini-1.5-pro-002
+    api_key: ${GOOGLE_API_KEY}
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ 4. VLLM - Local vLLM Server (FREE, requires GPU setup)              │
+  # │    Setup: vllm serve Qwen/Qwen2.5-72B-Instruct                      │
+  # │    Docs: https://docs.vllm.ai                                       │
+  # └─────────────────────────────────────────────────────────────────────┘
+  vllm:
+    base_url: http://localhost:8000/v1
+    model: Qwen/Qwen2.5-72B-Instruct
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ 5. OPENAI - OpenAI API (PAID, requires API key)                     │
+  # │    Setup: export OPENAI_API_KEY="sk-..."                            │
+  # │    Pricing: https://openai.com/pricing                              │
+  # └─────────────────────────────────────────────────────────────────────┘
+  openai:
+    model: gpt-4o-mini              # Options: gpt-4o, gpt-4o-mini, gpt-4-turbo
+    api_key: ${OPENAI_API_KEY}
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ 6. ANTHROPIC - Anthropic API (PAID, requires API key)               │
+  # │    Setup: export ANTHROPIC_API_KEY="sk-ant-..."                     │
+  # │    Pricing: https://anthropic.com/pricing                           │
+  # │    Note: Can use Claude SDK for free (see option 2)                 │
+  # └─────────────────────────────────────────────────────────────────────┘
+  anthropic:
+    model: claude-sonnet-4-20250514
+    api_key: ${ANTHROPIC_API_KEY}
+    use_agent_sdk: false
+  
+  # ┌─────────────────────────────────────────────────────────────────────┐
+  # │ GENERATION PARAMETERS (applies to all providers)                    │
+  # └─────────────────────────────────────────────────────────────────────┘
+  temperature: 0.7
+  max_tokens: 4096
+
+# ============================================================================
+# GENERATION SETTINGS
+# ============================================================================
+generation:
+  n_pairs_per_chunk: 5        # Number of QA pairs to generate per chunk
+                              # Recommended: 5 (good balance of quality/quantity)
+                              # Higher values: More pairs but potentially lower quality
+  
+  batch_size: 50              # Number of chunks to process in one batch
+                              # Larger batches = faster but more memory usage
+  
+  max_retries: 3              # Number of retry attempts on LLM errors
+  retry_delay: 1.0            # Seconds to wait between retries
+
+# ============================================================================
+# CURATION SETTINGS (LLM-as-Judge Quality Filtering)
+# Based on: AlpaGasus (2023) + LIMA (2023) papers
+# ============================================================================
+curate:
+  threshold: 7.0              # Minimum rating to keep (1-10 scale)
+                              # Recommended ranges:
+                              #   - 6.0-6.5: More pairs, moderate quality (60-80% retention)
+                              #   - 7.0: Balanced quality (40-60% retention) ⭐ RECOMMENDED
+                              #   - 8.0+: Strict quality (20-40% retention, LIMA-style)
+  
+  batch_size: 5               # Number of QA pairs to rate per LLM call
+                              # Smaller batches = more API calls but better accuracy
+  
+  temperature: 0.1            # Low temperature for consistent rating
+                              # Keep low (0.1-0.2) for judge reliability
+
+# ============================================================================
+# OUTPUT SETTINGS
+# ============================================================================
+output:
+  save_intermediate: true     # Save progress during generation (resume capability)
+  lancedb_storage: true       # Store results in LanceDB (version control)
+  include_metadata: true      # Include source file, chunk ID, timestamps
+
+# ============================================================================
+# PROMPTS CONFIGURATION
+# ============================================================================
+prompts_file: prompts.yaml    # External prompt templates (easy customization)

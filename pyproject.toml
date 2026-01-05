@@ -1,0 +1,71 @@
+[project]
+name = "generator"
+version = "0.1.0"
+description = "Synthetic QA pair generator for LLM fine-tuning from LanceDB chunks"
+authors = [
+    { name = "Phagocyte Team" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "lancedb>=0.5.0", # Read processor output
+    "pandas>=2.0.0", # Data manipulation
+    "pyarrow>=14.0.0", # Arrow format support
+    "click>=8.0.0", # CLI
+    "pydantic>=2.0.0", # Config validation
+    "pyyaml>=6.0", # Config files
+    "json5>=0.9.0", # Lenient JSON parsing
+    "tiktoken>=0.5.0", # Token counting
+    "rich>=13.0.0", # Pretty CLI output
+    "httpx>=0.27.0", # HTTP client for Ollama
+    "tenacity>=8.0.0", # Retry logic
+    "openai>=2.14.0",
+    "anthropic>=0.75.0",
+]
+
+[project.optional-dependencies]
+# RECOMMENDED: Free options (no API key or free tier)
+free = [
+    "claude-agent-sdk>=0.1.18", # Claude Code SDK (no API key)
+    "google-adk>=0.1.0",        # Google ADK with Gemini (free tier)
+]
+
+# Alternative: Direct API access (requires API keys)
+apis = [
+    "openai>=1.0.0",            # For OpenAI/vLLM
+    "anthropic>=0.40.0",        # For Claude API
+]
+
+# All providers
+all = [
+    "claude-agent-sdk>=0.1.18",
+    "google-adk>=0.1.0",
+    "openai>=1.0.0",
+    "anthropic>=0.40.0",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+generator = "generator.cli:main"
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["generator"]
+package-dir = {"" = "src"}
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+
+# Backup files
+.backup/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Project specific
+output/*.json
+output/*.jsonl
+!output/README.md
+
+# Google Cloud SDK (not part of project)
+google/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Lock files (optional - keep uv.lock for reproducibility)
+# uv.lock
