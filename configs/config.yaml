@@ -43,7 +43,7 @@ llm:
   # │    Note: Rate limited to 10 requests/minute on free tier            │
   # └─────────────────────────────────────────────────────────────────────┘
   gemini:
-    model: gemini-2.5-flash-image  # Options: gemini-2.5-flash-image, gemini-2.0-flash-exp, gemini-1.5-pro-002
+    model: gemini-2.0-flash-exp  # Options: gemini-2.5-flash-image, gemini-2.0-flash-exp, gemini-1.5-pro-002
     api_key: ${GOOGLE_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐
@@ -111,6 +111,32 @@ curate:
   
   temperature: 0.1            # Low temperature for consistent rating
                               # Keep low (0.1-0.2) for judge reliability
+
+# ============================================================================
+# ENRICHMENT SETTINGS (Response Improvement)
+# ============================================================================
+enrich:
+  batch_size: 5               # Number of QA pairs to enrich per batch
+  temperature: 0.3            # Moderate temperature for creative improvements
+                              # Range: 0.2-0.4 for controlled variation
+  preserve_original: true     # Keep original answer if enrichment fails
+
+# ============================================================================
+# CHAIN-OF-THOUGHT (CoT) SETTINGS
+# ============================================================================
+cot:
+  temperature: 0.2            # Low temperature for logical reasoning
+                              # Keep low (0.1-0.3) for step-by-step clarity
+  batch_size: 5               # Number of pairs to enhance with reasoning
+
+# ============================================================================
+# RATE LIMITING (Prevent API Quota Issues)
+# ============================================================================
+rate_limit:
+  delay_between_requests: 6   # Seconds between API calls (Gemini free: 10/min)
+  save_every_n_pairs: 50      # Save intermediate results every N pairs
+  max_retries: 3              # Retry attempts for rate limit errors
+  backoff_base: 60            # Base seconds for exponential backoff (60, 120, 240...)
 
 # ============================================================================
 # OUTPUT SETTINGS

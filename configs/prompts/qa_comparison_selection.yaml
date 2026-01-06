@@ -2,7 +2,7 @@ name: "QA Dataset Winner Selection"
 description: "Select the best QA dataset based on metrics and quality scores"
 version: "1.0"
 
-template: |
+prompt: |
   You are a QA dataset selection expert. Based on the analysis below, recommend which QA dataset to use for fine-tuning.
   
   METRICS COMPARISON:

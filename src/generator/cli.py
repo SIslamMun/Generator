@@ -144,7 +144,7 @@ def list_providers():
 @click.option("--model", help="LLM model (override config)")
 def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
     """Generate QA pairs from LanceDB chunks."""
-    console.print("\n[bold]🚀 Starting QA Generation[/bold]\n")
+    console.print("\n[bold]🚀 Generating QA pairs from LanceDB[/bold]\n")
 
     # Load config
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
@@ -156,6 +156,10 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
 
     # Extract LLM config
     llm_config = _extract_llm_config(cfg, provider, model)
+    
+    # Add rate limiting config
+    if "rate_limit" in cfg:
+        llm_config["rate_limit"] = cfg["rate_limit"]
 
     # Generate QA pairs
     qa_pairs = generate_qa_from_lancedb(
@@ -188,7 +192,7 @@ def curate(input_file, output, config, threshold, batch_size, provider, model):
     Automatically detects input format (QA or CoT), converts to conversation
     format for rating, and restores to original format after curation.
     """
-    console.print("\n[bold]🎯 Starting QA Curation[/bold]\n")
+    console.print("\n[bold]🎯 Curating QA pairs with LLM-as-Judge[/bold]\n")
 
     # Load config
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
@@ -200,6 +204,11 @@ def curate(input_file, output, config, threshold, batch_size, provider, model):
 
     # Extract LLM config
     llm_config = _extract_llm_config(cfg, provider, model)
+    
+    # Merge curate temperature into llm_config
+    curate_config = cfg.get("curate", {})
+    if "temperature" in curate_config:
+        llm_config["temperature"] = curate_config["temperature"]
 
     # Curate QA pairs
     metrics = curate_qa_pairs(
@@ -235,7 +244,7 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
     Example:
         generator enrich output/qa_raw.json -o output/qa_enriched.json --config configs/config.yaml
     """
-    console.print("\n[bold]✨ Enriching QA pairs with better formatting[/bold]\n")
+    console.print("\n[bold]✨ Enriching QA pairs with improved responses[/bold]\n")
 
     # Load config
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
@@ -248,6 +257,9 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
     # Load prompts
     prompts_dir = Path(config_path).parent
 
+    # Get enrichment config
+    enrich_config = cfg.get("enrich", {})
+
     # Load QA pairs
     qa_pairs = load_qa_pairs(Path(input_file))
     console.print(f"[cyan]Loaded {len(qa_pairs)} QA pairs[/cyan]")
@@ -259,6 +271,7 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
         prompts_dir=prompts_dir,
         batch_size=batch_size,
         preserve_original=not no_preserve_original,
+        temperature=enrich_config.get("temperature", 0.3),
     )
 
     # Save enriched pairs
@@ -288,7 +301,7 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
     Example:
         generator generate-cot lancedb/ -o cot_pairs.json --target-pairs 100
     """
-    console.print("\n[bold]🧠 Starting CoT Generation[/bold]\n")
+    console.print("\n[bold]🧠 Generating CoT reasoning pairs from LanceDB[/bold]\n")
 
     # Load config
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
@@ -330,7 +343,7 @@ def enhance_cot(input_file, output, config, provider, model, batch_size):
     Example:
         generator enhance-cot qa_pairs.json -o cot_enhanced.json
     """
-    console.print("\n[bold]🧠 Enhancing QA pairs with CoT reasoning[/bold]\n")
+    console.print("\n[bold]🧠 Adding Chain-of-Thought reasoning to QA pairs[/bold]\n")
 
     # Load config
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
@@ -418,16 +431,19 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks, skip_e
 
     # Step 2: Enrich (optional)
     if not skip_enrichment:
-        console.print("\n[bold cyan]Step 2/4: Enriching with response rewriting...[/bold cyan]\n")
+        step_label = "2/4" if not skip_enrichment else "2/3"
+        console.print(f"\n[bold cyan]Step {step_label}: Enriching with response rewriting...[/bold cyan]\n")
         qa_enriched = temp_dir / "qa_enriched.json"
 
         qa_pairs = load_qa_pairs(qa_raw)
+        enrich_config = cfg.get("enrich", {})
         enriched_pairs = enrich_qa_pairs(
             qa_pairs=qa_pairs,
             llm_config=cfg["llm"],
             prompts_dir=prompts_dir,
-            batch_size=5,
-            preserve_original=True,
+            batch_size=enrich_config.get("batch_size", 5),
+            preserve_original=enrich_config.get("preserve_original", True),
+            temperature=enrich_config.get("temperature", 0.3),
         )
         save_qa_pairs(enriched_pairs, qa_enriched)
 

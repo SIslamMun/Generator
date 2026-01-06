@@ -94,7 +94,7 @@ A: {pair.get('answer', 'N/A')[:500]}...
 """
             
             # Use prompt template
-            prompt = self.prompts["qa_comparison_evaluation"]["template"].format(
+            prompt = self.prompts["qa_comparison_evaluation"]["prompt"].format(
                 sample_count=len(pairs),
                 dataset_name=dataset_name,
                 samples=samples_text.strip()
@@ -141,7 +141,7 @@ A: {pair.get('answer', 'N/A')[:500]}...
             scores_text += f"  - {name}: {score}/10\n"
         
         # Use prompt template
-        decision_prompt = self.prompts["qa_comparison_selection"]["template"].format(
+        decision_prompt = self.prompts["qa_comparison_selection"]["prompt"].format(
             metrics_comparison=metrics_text.strip(),
             quality_scores=scores_text.strip()
         )

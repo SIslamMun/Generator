@@ -133,11 +133,13 @@ def generate_qa_from_lancedb(
 
                     all_qa_pairs.extend(pairs)
 
-                    # Rate limiting: 6 seconds between requests (max 10/min for Gemini free tier)
-                    time.sleep(6)
+                    # Rate limiting: configurable delay between requests
+                    delay = llm_config.get('rate_limit', {}).get('delay_between_requests', 6)
+                    time.sleep(delay)
 
-                    # Save intermediate results every 10 chunks
-                    if len(all_qa_pairs) % 50 == 0:
+                    # Save intermediate results periodically
+                    save_freq = llm_config.get('rate_limit', {}).get('save_every_n_pairs', 50)
+                    if len(all_qa_pairs) % save_freq == 0:
                         _save_intermediate(all_qa_pairs, output_file)
 
                 except Exception as e:
@@ -194,8 +196,9 @@ def _generate_pairs_for_chunk(
 
             # Check if it's a per-minute rate limit error (429) - these can be retried
             elif '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
-                # Exponential backoff: 60s, 120s, 240s
-                wait_time = 60 * (2 ** attempt)
+                # Exponential backoff using config or default (60s, 120s, 240s...)
+                backoff_base = llm_config.get('rate_limit', {}).get('backoff_base', 60)
+                wait_time = backoff_base * (2 ** attempt)
                 console.print(f"[yellow]⚠ Rate limit hit, waiting {wait_time}s (attempt {attempt+1}/{max_retries})...[/yellow]")
                 time.sleep(wait_time)
             else:

@@ -20,6 +20,7 @@ def enrich_qa_pairs(
     prompts_dir: Path,
     batch_size: int = 5,
     preserve_original: bool = True,
+    temperature: float = 0.3,
 ) -> List[Dict]:
     """
     Enrich QA pairs by rewriting answers for better clarity and structure.
@@ -40,7 +41,7 @@ def enrich_qa_pairs(
     Returns:
         List of enriched QA pairs with improved answers
     """
-    console.print(f"[cyan]Starting enrichment of {len(qa_pairs)} QA pairs...[/cyan]")
+    console.print(f"[cyan]Enriching {len(qa_pairs)} QA pairs with improved responses...[/cyan]")
 
     # Load prompt template
     prompts = load_prompts(prompts_dir)
@@ -65,7 +66,7 @@ def enrich_qa_pairs(
     ):
         batch = qa_pairs[i : i + batch_size]
         enriched_batch = _enrich_batch(
-            batch, llm, enrichment_prompt, preserve_original
+            batch, llm, enrichment_prompt, preserve_original, temperature
         )
         enriched_pairs.extend(enriched_batch)
 
@@ -80,6 +81,7 @@ def _enrich_batch(
     llm,
     prompt_template: str,
     preserve_original: bool,
+    temperature: float = 0.3,
 ) -> List[Dict]:
     """
     Enrich a batch of QA pairs.
@@ -89,6 +91,7 @@ def _enrich_batch(
         llm: LLM client
         prompt_template: Enrichment prompt template
         preserve_original: Keep original answer
+        temperature: Sampling temperature (default: 0.3)
 
     Returns:
         List of enriched QA pairs
@@ -103,7 +106,7 @@ def _enrich_batch(
             )
 
             # Get enriched response from LLM
-            response = llm.generate(prompt, temperature=0.3)
+            response = llm.generate(prompt, temperature=temperature)
 
             # Parse JSON response
             try:

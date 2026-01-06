@@ -299,8 +299,9 @@ def _rate_batch(
     # Fill prompt
     prompt = prompt_template.format(pairs=pairs_str)
 
-    # Generate ratings
-    response = llm.generate(prompt, temperature=0.1)  # Low temp for consistency
+    # Generate ratings (use config or default to 0.1 for consistency)
+    temperature = llm_config.get('temperature', 0.1) if isinstance(llm_config, dict) else 0.1
+    response = llm.generate(prompt, temperature=temperature)
 
     # Parse JSON response
     try:

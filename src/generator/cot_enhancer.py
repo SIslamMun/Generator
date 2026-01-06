@@ -85,9 +85,10 @@ def enhance_with_cot(
             batch = conversations[i : i + batch_size]
 
             try:
-                # Enhance batch
+                # Enhance batch with config from llm_config (includes cot settings)
+                config = llm_config.copy() if isinstance(llm_config, dict) else {}
                 enhanced_batch = _enhance_batch(
-                    batch, client, cot_enhance_prompt
+                    batch, client, cot_enhance_prompt, config
                 )
                 enhanced_pairs.extend(enhanced_batch)
 
@@ -181,20 +182,25 @@ def _enhance_batch(
     conversations: List[List[Dict]],
     client,
     prompt_template: str,
+    config: Dict = None,
 ) -> List[Dict]:
     """
     Enhance a batch of conversations with CoT reasoning.
     
     Returns list of CoT pairs: [{"question": "...", "reasoning": "...", "answer": "..."}]
     """
+    if config is None:
+        config = {}
+        
     # Format conversations as JSON string for prompt
     conversations_json = json.dumps(conversations, indent=2)
 
     # Generate prompt
     prompt = prompt_template.format(conversations=conversations_json)
 
-    # Call LLM with lower temperature for consistency
-    response = client.generate(prompt, temperature=0.2)
+    # Call LLM with lower temperature for consistency (default: 0.2)
+    temperature = config.get('temperature', 0.2)
+    response = client.generate(prompt, temperature=temperature)
 
     # Parse response (expect array of conversations with reasoning)
     enhanced_convs = _parse_enhanced_response(response)

@@ -1,14 +1,14 @@
 """Claude API client using Agent SDK."""
 
 import os
-import asyncio
+import anyio
 from typing import Optional, Dict, Any
 
 from .base import BaseLLMClient
 
 
 class ClaudeSDKClient(BaseLLMClient):
-    """Claude API client (uses Agent SDK for free access, or API with key)."""
+    """Claude Agent SDK client (uses free local Claude Code CLI)."""
 
     def __init__(self, config: Dict[str, Any]):
         """
@@ -16,19 +16,26 @@ class ClaudeSDKClient(BaseLLMClient):
 
         Args:
             config: Configuration dict with:
-                - model: Model name (default: claude-code)
-                - temperature: Sampling temperature (default: 0.7)
-                - max_tokens: Maximum tokens to generate (default: 4096)
+                - model: Not used (Agent SDK uses configured model)
+                - temperature: Not used (Agent SDK manages this)
+                - max_tokens: Not used (Agent SDK manages this)
+        
+        Note:
+            Requires Claude Code CLI installed and authenticated.
+            Install: curl -fsSL https://claude.ai/install.sh | bash
+            Authenticate: claude auth login
         """
         super().__init__(config)
 
         try:
             import claude_agent_sdk  # noqa: F401
-            self.model = config.get("model", "claude-code")
         except ImportError:
             raise ImportError(
-                "claude-agent-sdk not installed. Install with: "
-                "pip install claude-agent-sdk>=0.1.18"
+                "claude-agent-sdk not installed. Install with:\n"
+                "  pip install claude-agent-sdk>=0.1.18\n\n"
+                "Also requires Claude Code CLI:\n"
+                "  curl -fsSL https://claude.ai/install.sh | bash\n"
+                "  claude auth login"
             )
 
     def generate(
@@ -39,60 +46,76 @@ class ClaudeSDKClient(BaseLLMClient):
 
         Args:
             prompt: Input prompt
-            temperature: Sampling temperature (not used for Claude SDK)
-            max_tokens: Maximum tokens (not used for Claude SDK)
+            temperature: Not used (Agent SDK manages temperature)
+            max_tokens: Not used (Agent SDK manages max_tokens)
 
         Returns:
             Generated text response
+        
+        Raises:
+            RuntimeError: If CLI is not authenticated or encounters errors
         """
         try:
-            return self._generate_impl(prompt)
+            from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
+
+            # Configure options for one-shot query
+            options = ClaudeAgentOptions(
+                max_turns=1,  # Single response
+                permission_mode='acceptEdits'  # Auto-accept (non-interactive)
+            )
+
+            async def _async_query():
+                """Run async query and collect response."""
+                response_text = ""
+                async for message in query(prompt=prompt, options=options):
+                    if isinstance(message, AssistantMessage):
+                        for block in message.content:
+                            if isinstance(block, TextBlock):
+                                response_text += block.text
+                
+                if not response_text:
+                    raise RuntimeError("No response received from Claude Agent SDK")
+                
+                return response_text
+
+            # Run async function using anyio
+            return anyio.run(_async_query)
+
         except Exception as e:
             error_msg = str(e)
 
-            # Check for rate limit or auth issues
-            if "exit code 1" in error_msg.lower() or "rate limit" in error_msg.lower():
-                print("\n⚠️  Claude CLI rate limit or auth issue.")
-                print("    Check with: claude auth status")
+            # Check for common errors
+            if "CLI not found" in error_msg or "CLINotFoundError" in error_msg:
+                raise RuntimeError(
+                    "Claude Code CLI not installed.\n\n"
+                    "Install with:\n"
+                    "  curl -fsSL https://claude.ai/install.sh | bash\n\n"
+                    "Then authenticate:\n"
+                    "  claude auth login\n\n"
+                    "Or use 'provider: anthropic' for paid API access."
+                ) from e
+            
+            if "not authenticated" in error_msg.lower() or "auth" in error_msg.lower():
+                raise RuntimeError(
+                    "Claude Code CLI not authenticated.\n\n"
+                    "Run: claude auth login\n\n"
+                    "Or use 'provider: anthropic' for paid API access."
+                ) from e
 
             # Try fallback to Anthropic API if key available
             api_key = os.environ.get("ANTHROPIC_API_KEY")
             if api_key:
-                print("Falling back to Anthropic API...")
+                print("\n⚠️  Claude Agent SDK failed, falling back to Anthropic API...")
                 return self._generate_anthropic_fallback(prompt, temperature, max_tokens, api_key)
-            else:
-                raise RuntimeError(
-                    f"Claude Agent SDK failed: {e}\n\n"
-                    "Possible causes:\n"
-                    "  1. Claude CLI rate limit (check: claude auth status)\n"
-                    "  2. Not authenticated (run: claude auth login)\n"
-                    "  3. Network issues\n\n"
-                    "To use API fallback, set ANTHROPIC_API_KEY."
-                ) from e
-
-    def _generate_impl(self, prompt: str) -> str:
-        """Actual Claude SDK generation."""
-        from claude_agent_sdk import query, ClaudeAgentOptions, AssistantMessage, TextBlock
-
-        options = ClaudeAgentOptions(max_turns=1)
-
-        async def _async_query():
-            response_text = ""
-            async for message in query(prompt=prompt, options=options):
-                if isinstance(message, AssistantMessage):
-                    for block in message.content:
-                        if isinstance(block, TextBlock):
-                            response_text += block.text
-            return response_text
-
-        # Run the async function
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        return loop.run_until_complete(_async_query())  # type: ignore[no-any-return]
+            
+            raise RuntimeError(
+                f"Claude Agent SDK error: {e}\n\n"
+                "Possible causes:\n"
+                "  1. Claude CLI not installed (install: curl -fsSL https://claude.ai/install.sh | bash)\n"
+                "  2. Not authenticated (run: claude auth login)\n"
+                "  3. Rate limit reached\n\n"
+                "Alternative: Use 'provider: anthropic' for paid API access."
+            ) from e
 
     def _generate_anthropic_fallback(
         self,
@@ -101,13 +124,13 @@ class ClaudeSDKClient(BaseLLMClient):
         max_tokens: Optional[int] = None,
         api_key: Optional[str] = None,
     ) -> str:
-        """Fallback to Anthropic API."""
+        """Fallback to Anthropic API if SDK fails."""
         from anthropic import Anthropic
 
         client = Anthropic(api_key=api_key)
 
         message = client.messages.create(
-            model=self.model or "claude-sonnet-4-20250514",
+            model="claude-sonnet-4-20250514",
             max_tokens=max_tokens or self.max_tokens,
             temperature=temperature or self.temperature,
             messages=[{"role": "user", "content": prompt}],

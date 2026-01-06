@@ -2,7 +2,7 @@ name: "QA Dataset Quality Evaluation"
 description: "Evaluate quality of sample QA pairs from a QA dataset"
 version: "1.0"
 
-template: |
+prompt: |
   You are an expert data quality evaluator for fine-tuning datasets.
   
   Evaluate these {sample_count} sample QA pairs from dataset "{dataset_name}":
