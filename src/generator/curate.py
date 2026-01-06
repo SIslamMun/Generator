@@ -18,6 +18,125 @@ from .clients import get_client, BaseLLMClient
 console = Console()
 
 
+def _detect_format(data: Any) -> str:
+    """Detect input format: 'qa', 'cot', or 'unknown'."""
+    if isinstance(data, list):
+        if len(data) == 0:
+            return "qa"  # Default to QA for empty list
+
+        first_item = data[0]
+        # Check for CoT format (has reasoning/cot/thinking fields)
+        if any(key in first_item for key in ["reasoning", "cot", "thinking", "thought"]):
+            return "cot"
+        # Check if already in conversation format
+        elif "conversations" in first_item or "messages" in first_item:
+            return "conversation"
+        # Check for QA format
+        elif "question" in first_item and "answer" in first_item:
+            return "qa"
+
+    return "qa"  # Default
+
+
+def _convert_to_conversation_format(pairs: List[Dict], format_type: str) -> List[Dict]:
+    """Convert QA or CoT to internal conversation format for uniform processing."""
+    conversations = []
+
+    for pair in pairs:
+        if format_type == "qa":
+            # QA format: question + answer
+            conversations.append({
+                "conversations": [
+                    {"role": "user", "content": pair.get("question", "")},
+                    {"role": "assistant", "content": pair.get("answer", "")}
+                ],
+                "_original_pair": pair,  # Preserve original for restoration
+                "_format": "qa"
+            })
+        elif format_type == "cot":
+            # CoT format: may have reasoning steps
+            reasoning = pair.get("reasoning", pair.get("cot", pair.get("thinking", "")))
+            question = pair.get("question", pair.get("prompt", ""))
+            answer = pair.get("answer", pair.get("response", ""))
+
+            # Combine reasoning + answer for CoT
+            full_answer = f"{reasoning}\n\n{answer}" if reasoning else answer
+
+            conversations.append({
+                "conversations": [
+                    {"role": "user", "content": question},
+                    {"role": "assistant", "content": full_answer}
+                ],
+                "_original_pair": pair,
+                "_format": "cot"
+            })
+        else:
+            # Already in conversation format or unknown
+            conversations.append(pair)
+
+    return conversations
+
+
+def _extract_qa_from_conversation(conv: Dict) -> Dict:
+    """Extract QA pair from conversation format."""
+    if "conversations" in conv:
+        messages = conv["conversations"]
+    elif "messages" in conv:
+        messages = conv["messages"]
+    else:
+        return {"question": "", "answer": ""}
+
+    question = ""
+    answer = ""
+
+    for msg in messages:
+        if msg.get("role") in ["user", "human"]:
+            question = msg.get("content", msg.get("value", ""))
+        elif msg.get("role") in ["assistant", "gpt"]:
+            answer = msg.get("content", msg.get("value", ""))
+
+    return {"question": question, "answer": answer}
+
+
+def _restore_original_format(conversations: List[Dict], original_format: str) -> List[Dict]:
+    """Restore to original format (QA or CoT) after curation."""
+    restored = []
+
+    for conv in conversations:
+        original_pair = conv.get("_original_pair", {})
+        format_type = conv.get("_format", original_format)
+
+        if format_type == "qa":
+            # Restore QA format
+            qa = _extract_qa_from_conversation(conv)
+            # Merge with original metadata and rating info
+            result = {**original_pair, **qa}
+            # Add rating fields if present
+            for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning"]:
+                if key in conv:
+                    result[key] = conv[key]
+            restored.append(result)
+        elif format_type == "cot":
+            # Restore CoT format (preserve reasoning field)
+            qa = _extract_qa_from_conversation(conv)
+            result = {**original_pair}
+            result["question"] = qa["question"]
+            # Keep reasoning separate from answer in CoT format
+            if "reasoning" in original_pair:
+                result["reasoning"] = original_pair["reasoning"]
+            result["answer"] = qa["answer"]
+            # Add rating fields
+            for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning"]:
+                if key in conv and key not in result:  # Don't overwrite CoT reasoning
+                    result[key] = conv[key]
+            restored.append(result)
+        else:
+            # Unknown format, keep as-is
+            restored.append(conv)
+
+    return restored
+
+
 def curate_qa_pairs(
     input_path: str,
     output_path: str,
@@ -40,14 +159,22 @@ def curate_qa_pairs(
     Returns:
         Dict with metrics (total, filtered, retention_rate, avg_score)
     """
-    console.print(f"\n[bold cyan]📊 Loading QA pairs from: {input_path}[/bold cyan]")
+    console.print(f"\n[bold cyan]📊 Loading data from: {input_path}[/bold cyan]")
 
-    # Load QA pairs
+    # Load data
     with open(input_path, "r", encoding="utf-8") as f:
-        qa_pairs = json.load(f)
+        data = json.load(f)
 
-    total_pairs = len(qa_pairs)
-    console.print(f"[green]✓ Loaded {total_pairs} QA pairs[/green]\n")
+    # Detect format
+    original_format = _detect_format(data)
+    console.print(f"[cyan]→ Detected format: {original_format}[/cyan]")
+
+    # Convert to conversation format for uniform processing
+    console.print("[cyan]→ Converting to conversation format...[/cyan]")
+    conversations = _convert_to_conversation_format(data, original_format)
+
+    total_pairs = len(conversations)
+    console.print(f"[green]✓ Loaded {total_pairs} pairs[/green]\n")
 
     # Initialize LLM client
     console.print(f"[bold cyan]🤖 Initializing Judge LLM: {llm_config['provider']}[/bold cyan]")
@@ -75,26 +202,36 @@ def curate_qa_pairs(
         TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
         console=console,
     ) as progress:
-        task = progress.add_task("[cyan]Rating QA pairs...", total=total_pairs)
+        task = progress.add_task("[cyan]Rating pairs...", total=total_pairs)
 
         for i in range(0, total_pairs, batch_size):
-            batch = qa_pairs[i : i + batch_size]
+            batch = conversations[i : i + batch_size]
 
             try:
+                # Extract QA for rating
+                qa_batch = [_extract_qa_from_conversation(conv) for conv in batch]
+
                 # Rate this batch
                 rated_batch = _rate_batch(
-                    pairs=batch, llm=llm, prompt_template=rating_prompt_template
+                    pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template
                 )
 
-                for pair in rated_batch:
-                    rating = pair.get("rating", 0)
-                    total_score += rating
+                # Merge ratings back to conversation format
+                for j, conv in enumerate(batch):
+                    if j < len(rated_batch):
+                        rating = rated_batch[j].get("rating", 0)
+                        total_score += rating
 
-                    rated_pairs.append(pair)
+                        # Copy rating fields to conversation
+                        for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning"]:
+                            if key in rated_batch[j]:
+                                conv[key] = rated_batch[j][key]
 
-                    # Filter by threshold
-                    if rating >= threshold:
-                        filtered_pairs.append(pair)
+                        rated_pairs.append(conv)
+
+                        # Filter by threshold
+                        if rating >= threshold:
+                            filtered_pairs.append(conv)
 
             except Exception as e:
                 console.print(f"[yellow]⚠ Error rating batch {i}-{i+batch_size}: {e}[/yellow]")
@@ -112,12 +249,18 @@ def curate_qa_pairs(
         "retention_rate": retention_rate,
         "avg_score": avg_score,
         "threshold": threshold,
+        "original_format": original_format,
         "curated_at": datetime.now().isoformat(),
     }
 
+    # Restore to original format (QA or CoT)
+    console.print(f"[cyan]→ Restoring to original format ({original_format})...[/cyan]")
+    curated_restored = _restore_original_format(filtered_pairs, original_format)
+    all_rated_restored = _restore_original_format(rated_pairs, original_format)
+
     # Save results
     _save_curated_results(
-        curated_pairs=filtered_pairs, all_rated=rated_pairs, metrics=metrics, output_path=output_file
+        curated_pairs=curated_restored, all_rated=all_rated_restored, metrics=metrics, output_path=output_file
     )
 
     console.print(f"\n[bold green]✓ Curated {len(filtered_pairs)} / {total_pairs} pairs[/bold green]")
@@ -131,7 +274,7 @@ def curate_qa_pairs(
 def _rate_batch(
     pairs: List[Dict], llm: BaseLLMClient, prompt_template: str
 ) -> List[Dict]:
-    """Rate a batch of QA pairs."""
+    """Rate a batch of QA pairs with detailed criteria breakdown."""
     # Format pairs for prompt
     pairs_str = json.dumps(
         [{"question": p["question"], "answer": p["answer"]} for p in pairs],
@@ -158,15 +301,39 @@ def _rate_batch(
             rated = json5.loads(json_str)
         else:
             # Fallback: assign default rating
-            rated = [{"question": p["question"], "answer": p["answer"], "rating": 5} for p in pairs]
+            rated = [
+                {
+                    "question": p["question"],
+                    "answer": p["answer"],
+                    "rating": 5,
+                    "clarity": 2,
+                    "accuracy": 2,
+                    "usefulness": 1,
+                    "difficulty": 0,
+                    "reasoning": "Default rating (parsing failed)",
+                }
+                for p in pairs
+            ]
 
     # Merge ratings with original pairs
     result = []
     for i, pair in enumerate(pairs):
         if i < len(rated):
+            # Copy all rating details
             pair["rating"] = rated[i].get("rating", 5)
+            pair["clarity"] = rated[i].get("clarity", 2)
+            pair["accuracy"] = rated[i].get("accuracy", 2)
+            pair["usefulness"] = rated[i].get("usefulness", 1)
+            pair["difficulty"] = rated[i].get("difficulty", 0)
+            pair["reasoning"] = rated[i].get("reasoning", "No reasoning provided")
         else:
-            pair["rating"] = 5  # Default if not enough ratings
+            # Default if not enough ratings
+            pair["rating"] = 5
+            pair["clarity"] = 2
+            pair["accuracy"] = 2
+            pair["usefulness"] = 1
+            pair["difficulty"] = 0
+            pair["reasoning"] = "Default rating (insufficient results)"
         result.append(pair)
 
     return result
