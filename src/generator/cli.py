@@ -15,6 +15,9 @@ from .qa_generator import generate_qa_from_lancedb
 from .curate import curate_qa_pairs
 from .formatters import export_to_format
 from .prompt_loader import load_prompts
+from .enrich import enrich_qa_pairs, load_qa_pairs, save_qa_pairs
+from .cot_generator import generate_cot_pairs
+from .cot_enhancer import enhance_with_cot
 
 console = Console()
 
@@ -30,7 +33,7 @@ def main():
 def list_providers():
     """List all available LLM providers and their status."""
     console.print("\n[bold]📋 Available LLM Providers[/bold]\n")
-    
+
     providers = [
         {
             "name": "ollama",
@@ -75,13 +78,13 @@ def list_providers():
             "requires": "Anthropic API key",
         },
     ]
-    
+
     for p in providers:
         console.print(f"[bold cyan]{p['name']}[/bold cyan] - {p['description']}")
         console.print(f"  Status: {p['status']}")
         console.print(f"  Setup: [dim]{p['setup']}[/dim]")
         console.print(f"  Requires: {p['requires']}\n")
-    
+
     console.print("[bold]Usage Examples:[/bold]")
     console.print("  # Use Ollama (default)")
     console.print("  uv run generator generate lancedb/ -o output.json --provider ollama")
@@ -96,12 +99,13 @@ def list_providers():
 @click.option("-o", "--output", required=True, help="Output JSON file path")
 @click.option("--config", type=click.Path(exists=True), help="Config YAML file")
 @click.option("--table", default="text_chunks", help="LanceDB table name")
-@click.option("--n-pairs", type=int, default=5, help="QA pairs per chunk")
+@click.option("--n-pairs", type=int, help="QA pairs per chunk (fixed)")
+@click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
 @click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunks, provider, model):
+def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
     """Generate QA pairs from LanceDB chunks."""
     console.print("\n[bold]🚀 Starting QA Generation[/bold]\n")
 
@@ -124,7 +128,7 @@ def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunk
         }
         normalized_provider = provider_map.get(provider, provider)
         llm_config["provider"] = normalized_provider
-        
+
         # Try both old and new names for config lookup
         provider_config = llm_config.get(normalized_provider) or llm_config.get(provider)
         if provider_config:
@@ -140,6 +144,7 @@ def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunk
         llm_config=llm_config,
         table_name=table,
         n_pairs_per_chunk=n_pairs,
+        target_pairs=target_pairs,
         batch_size=batch_size,
         max_chunks=max_chunks,
     )
@@ -156,7 +161,12 @@ def generate(lancedb_path, output, config, table, n_pairs, batch_size, max_chunk
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
 def curate(input_file, output, config, threshold, batch_size, provider, model):
-    """Filter QA pairs by quality using LLM-as-Judge."""
+    """
+    Filter QA pairs or CoT examples by quality using LLM-as-Judge.
+    
+    Automatically detects input format (QA or CoT), converts to conversation
+    format for rating, and restores to original format after curation.
+    """
     console.print("\n[bold]🎯 Starting QA Curation[/bold]\n")
 
     # Load config
@@ -188,6 +198,167 @@ def curate(input_file, output, config, threshold, batch_size, provider, model):
         f"[bold green]✨ Success! Filtered {metrics['filtered_pairs']} / "
         f"{metrics['total_pairs']} pairs ({metrics['retention_rate']:.1%})[/bold green]\n"
     )
+
+
+@main.command()
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+@click.option("--batch-size", type=int, default=5, help="Pairs to process per batch")
+@click.option("--no-preserve-original", is_flag=True, help="Don't keep original answer")
+def enrich(input_file, output, config, provider, model, batch_size, no_preserve_original):
+    """
+    Enrich QA pairs by rewriting answers for better clarity and structure.
+    
+    This implements response rewriting to improve answer quality while preserving
+    all information. Useful for improving generated pairs before curation.
+    
+    Example:
+        generator enrich output/qa_raw.json -o output/qa_enriched.json --config configs/config.yaml
+    """
+    console.print("\n[bold]✨ Enriching QA pairs with better formatting[/bold]\n")
+
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    llm_config = cfg["llm"].copy()
+    if provider:
+        llm_config["provider"] = provider
+    if model:
+        llm_config["model"] = model
+
+    # Load prompts
+    prompts_dir = Path(config_path).parent
+
+    # Load QA pairs
+    qa_pairs = load_qa_pairs(Path(input_file))
+    console.print(f"[cyan]Loaded {len(qa_pairs)} QA pairs[/cyan]")
+
+    # Enrich pairs
+    enriched_pairs = enrich_qa_pairs(
+        qa_pairs=qa_pairs,
+        llm_config=llm_config,
+        prompts_dir=prompts_dir,
+        batch_size=batch_size,
+        preserve_original=not no_preserve_original,
+    )
+
+    # Save enriched pairs
+    save_qa_pairs(enriched_pairs, Path(output))
+
+    console.print(f"[bold green]✨ Success! Enriched {len(enriched_pairs)} pairs[/bold green]\n")
+
+
+@main.command()
+@click.argument("lancedb_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--table", default="text_chunks", help="LanceDB table name")
+@click.option("--n-pairs", type=int, help="CoT pairs per chunk (fixed)")
+@click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
+@click.option("--batch-size", type=int, default=50, help="Chunks per batch")
+@click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
+    """
+    Generate CoT (Chain-of-Thought) pairs from LanceDB chunks.
+    
+    Creates QA pairs with step-by-step reasoning from documents.
+    Based on "Distilling Step-by-Step" methodology (Google, 2023).
+    
+    Example:
+        generator generate-cot lancedb/ -o cot_pairs.json --target-pairs 100
+    """
+    console.print("\n[bold]🧠 Starting CoT Generation[/bold]\n")
+
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    # Override LLM settings if provided
+    llm_config = cfg["llm"]
+    if provider:
+        provider_map = {
+            "adk": "gemini",
+            "claude-sdk": "claude",
+            "claude_sdk": "claude",
+        }
+        normalized_provider = provider_map.get(provider, provider)
+        llm_config["provider"] = normalized_provider
+
+        provider_config = llm_config.get(normalized_provider) or llm_config.get(provider)
+        if provider_config:
+            llm_config.update(provider_config)
+    if model:
+        llm_config["model"] = model
+
+    # Generate CoT pairs
+    result = generate_cot_pairs(
+        lancedb_path=lancedb_path,
+        output_path=output,
+        llm_config=llm_config,
+        table_name=table,
+        n_pairs=n_pairs,
+        target_pairs=target_pairs,
+        batch_size=batch_size,
+        max_chunks=max_chunks,
+    )
+
+    console.print(f"[bold green]✨ Success! Generated {result['cot_pairs_generated']} CoT pairs[/bold green]\n")
+
+
+@main.command()
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+@click.option("--batch-size", type=int, default=5, help="Pairs to enhance per batch")
+def enhance_cot(input_file, output, config, provider, model, batch_size):
+    """
+    Add CoT reasoning to existing QA pairs.
+    
+    Takes plain QA pairs and enhances them with step-by-step reasoning,
+    converting them to CoT format: {"question": "...", "reasoning": "...", "answer": "..."}.
+    
+    Example:
+        generator enhance-cot qa_pairs.json -o cot_enhanced.json
+    """
+    console.print("\n[bold]🧠 Enhancing QA pairs with CoT reasoning[/bold]\n")
+
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    # Override LLM settings if provided
+    llm_config = cfg["llm"]
+    if provider:
+        provider_map = {
+            "adk": "gemini",
+            "claude-sdk": "claude",
+            "claude_sdk": "claude",
+        }
+        normalized_provider = provider_map.get(provider, provider)
+        llm_config["provider"] = normalized_provider
+    if model:
+        llm_config["model"] = model
+
+    # Enhance with CoT
+    result = enhance_with_cot(
+        input_path=input_file,
+        output_path=output,
+        llm_config=llm_config,
+        batch_size=batch_size,
+    )
+
+    console.print(f"[bold green]✨ Success! Enhanced {result['enhanced_pairs']} pairs with CoT reasoning[/bold green]\n")
 
 
 @main.command()
@@ -225,8 +396,9 @@ def export(input_file, output, format, system_prompt):
     help="Output format",
 )
 @click.option("--max-chunks", type=int, help="Max chunks (for testing)")
-def pipeline(lancedb_path, output, config, threshold, format, max_chunks):
-    """Run full pipeline: generate → curate → export."""
+@click.option("--skip-enrichment", is_flag=True, help="Skip enrichment step")
+def pipeline(lancedb_path, output, config, threshold, format, max_chunks, skip_enrichment):
+    """Run full pipeline: generate → enrich → curate → export."""
     console.print("\n[bold]🚀 Starting Full Pipeline[/bold]\n")
 
     output_path = Path(output)
@@ -234,16 +406,18 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks):
     temp_dir.mkdir(exist_ok=True)
 
     # Step 1: Generate
-    console.print("[bold cyan]Step 1/3: Generating QA pairs...[/bold cyan]\n")
+    step_label = "1/4" if not skip_enrichment else "1/3"
+    console.print(f"[bold cyan]Step {step_label}: Generating QA pairs...[/bold cyan]\n")
     qa_raw = temp_dir / "qa_raw.json"
-    
+
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
-    
+
     # Load prompts from individual files
-    prompts = load_prompts(Path(config_path).parent)
-    
+    prompts_dir = Path(config_path).parent
+    prompts = load_prompts(prompts_dir)
+
     generate_qa_from_lancedb(
         db_path=lancedb_path,
         output_path=str(qa_raw),
@@ -252,21 +426,46 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks):
         max_chunks=max_chunks,
     )
 
-    # Step 2: Curate
-    console.print("\n[bold cyan]Step 2/3: Curating with LLM-as-Judge...[/bold cyan]\n")
+    # Step 2: Enrich (optional)
+    if not skip_enrichment:
+        console.print("\n[bold cyan]Step 2/4: Enriching with response rewriting...[/bold cyan]\n")
+        qa_enriched = temp_dir / "qa_enriched.json"
+
+        qa_pairs = load_qa_pairs(qa_raw)
+        enriched_pairs = enrich_qa_pairs(
+            qa_pairs=qa_pairs,
+            llm_config=cfg["llm"],
+            prompts_dir=prompts_dir,
+            batch_size=5,
+            preserve_original=True,
+        )
+        save_qa_pairs(enriched_pairs, qa_enriched)
+
+        # Use enriched pairs for next step
+        next_input = qa_enriched
+        step_offset = 1
+    else:
+        console.print("\n[yellow]⏭️  Skipping enrichment step[/yellow]\n")
+        next_input = qa_raw
+        step_offset = 0
+
+    # Step 3: Curate
+    step_label = f"{2 + step_offset}/4" if not skip_enrichment else "2/3"
+    console.print(f"\n[bold cyan]Step {step_label}: Curating with LLM-as-Judge...[/bold cyan]\n")
     qa_curated = temp_dir / "qa_curated.json"
-    
+
     curate_qa_pairs(
-        input_path=str(qa_raw),
+        input_path=str(next_input),
         output_path=str(qa_curated),
         prompts=prompts,
         llm_config=cfg["llm"],
         threshold=threshold,
     )
 
-    # Step 3: Export
-    console.print(f"\n[bold cyan]Step 3/3: Exporting to {format}...[/bold cyan]\n")
-    
+    # Step 4: Export
+    step_label = f"{3 + step_offset}/4" if not skip_enrichment else "3/3"
+    console.print(f"\n[bold cyan]Step {step_label}: Exporting to {format}...[/bold cyan]\n")
+
     export_to_format(
         input_path=str(qa_curated), output_path=str(output_path), format_type=format
     )

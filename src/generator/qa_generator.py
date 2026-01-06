@@ -27,7 +27,8 @@ def generate_qa_from_lancedb(
     prompts: Dict[str, str],
     llm_config: Dict[str, Any],
     table_name: str = "text_chunks",
-    n_pairs_per_chunk: int = 5,
+    n_pairs_per_chunk: Optional[int] = None,
+    target_pairs: Optional[int] = None,
     batch_size: int = 50,
     max_chunks: Optional[int] = None,
 ) -> List[Dict]:
@@ -40,7 +41,8 @@ def generate_qa_from_lancedb(
         prompts: Prompt templates dict
         llm_config: LLM configuration dict
         table_name: LanceDB table name ("text_chunks" or "code_chunks")
-        n_pairs_per_chunk: Number of QA pairs to generate per chunk
+        n_pairs_per_chunk: Fixed number per chunk (if specified)
+        target_pairs: Total pairs target (calculates per-chunk if specified)
         batch_size: Number of chunks to process in one batch
         max_chunks: Optional limit on chunks to process (for testing)
 
@@ -57,7 +59,19 @@ def generate_qa_from_lancedb(
     if max_chunks:
         total_chunks = min(total_chunks, max_chunks)
 
-    console.print(f"[green]✓ Found {total_chunks} chunks in '{table_name}'[/green]\n")
+    console.print(f"[green]✓ Found {total_chunks} chunks in '{table_name}'[/green]")
+
+    # Calculate pairs per chunk from target (if specified)
+    if target_pairs and not n_pairs_per_chunk:
+        n_pairs_per_chunk = max(1, round(target_pairs / total_chunks))
+        console.print(f"[cyan]→ Target: {target_pairs} pairs → {n_pairs_per_chunk} per chunk[/cyan]")
+    elif not n_pairs_per_chunk:
+        n_pairs_per_chunk = 3  # Default
+        console.print(f"[cyan]→ Using default: {n_pairs_per_chunk} pairs per chunk[/cyan]")
+    else:
+        console.print(f"[cyan]→ Fixed: {n_pairs_per_chunk} pairs per chunk[/cyan]")
+
+    console.print()
 
     # Initialize LLM client
     console.print(f"[bold cyan]🤖 Initializing LLM: {llm_config['provider']}[/bold cyan]")
@@ -113,7 +127,7 @@ def generate_qa_from_lancedb(
                     )
 
                     all_qa_pairs.extend(pairs)
-                    
+
                     # Rate limiting: 6 seconds between requests (max 10/min for Gemini free tier)
                     time.sleep(6)
 
@@ -155,24 +169,24 @@ def _generate_pairs_for_chunk(
     for attempt in range(max_retries):
         try:
             response = llm.generate(prompt)
-            
+
             # Check for empty response before proceeding
             if not response or not response.strip():
                 raise ValueError("LLM returned empty response")
-            
+
             break  # Success, exit retry loop
         except Exception as e:
             last_error = e
             error_msg = str(e).lower()
-            
+
             # Don't retry empty responses or JSON parsing errors
             if 'empty' in error_msg or 'json' in error_msg:
                 raise ValueError(f"Invalid response (won't retry): {str(e)[:100]}")
-            
+
             # Check for daily quota exhaustion (stop immediately, don't retry)
             if 'per_day' in error_msg or 'daily' in error_msg or 'generate_requests_per_model_per_day' in str(e):
                 raise ValueError("Daily quota exceeded. Try again tomorrow or switch to gemini-1.5-flash or gemini-2.5-flash-image")
-            
+
             # Check if it's a per-minute rate limit error (429) - these can be retried
             elif '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
                 # Exponential backoff: 60s, 120s, 240s

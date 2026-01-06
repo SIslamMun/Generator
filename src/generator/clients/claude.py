@@ -21,7 +21,7 @@ class ClaudeSDKClient(BaseLLMClient):
                 - max_tokens: Maximum tokens to generate (default: 4096)
         """
         super().__init__(config)
-        
+
         try:
             import claude_agent_sdk  # noqa: F401
             self.model = config.get("model", "claude-code")
@@ -91,7 +91,7 @@ class ClaudeSDKClient(BaseLLMClient):
         except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        
+
         return loop.run_until_complete(_async_query())  # type: ignore[no-any-return]
 
     def _generate_anthropic_fallback(

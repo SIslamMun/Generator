@@ -23,21 +23,21 @@ def load_prompts(config_dir: Path) -> Dict[str, str]:
         Dict mapping prompt name to prompt template string
     """
     prompts_dir = config_dir / "prompts"
-    
+
     if not prompts_dir.exists():
         raise FileNotFoundError(f"Prompts directory not found: {prompts_dir}")
 
     prompts = {}
-    
+
     for prompt_file in prompts_dir.glob("*.yaml"):
         prompt_name = prompt_file.stem  # filename without .yaml
-        
+
         with open(prompt_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
-            
+
         if "prompt" not in data:
             raise ValueError(f"'{prompt_file.name}' missing 'prompt' key")
-            
+
         prompts[prompt_name] = data["prompt"]
-    
+
     return prompts
