@@ -22,6 +22,42 @@ from .cot_enhancer import enhance_with_cot
 console = Console()
 
 
+def _extract_llm_config(cfg, provider=None, model=None):
+    """
+    Extract and prepare LLM config from full config.
+    
+    Args:
+        cfg: Full config dict
+        provider: Optional provider override
+        model: Optional model override
+    
+    Returns:
+        LLM config dict ready for client initialization
+    """
+    llm_config = cfg["llm"].copy()
+    
+    # Get the active provider
+    active_provider = provider if provider else llm_config.get("provider", "ollama")
+    
+    # Normalize provider names (backward compatibility)
+    provider_map = {
+        "adk": "gemini",
+        "claude-sdk": "claude",
+        "claude_sdk": "claude",
+    }
+    active_provider = provider_map.get(active_provider, active_provider)
+    
+    # Extract provider-specific config and merge
+    provider_config = llm_config.get(active_provider, {})
+    llm_config = {**provider_config, "provider": active_provider}
+    
+    # Override model if provided
+    if model:
+        llm_config["model"] = model
+    
+    return llm_config
+
+
 @click.group()
 @click.version_option(version="0.1.0")
 def main():
@@ -117,24 +153,8 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
     # Load prompts from individual files
     prompts = load_prompts(Path(config_path).parent)
 
-    # Override LLM settings if provided
-    llm_config = cfg["llm"]
-    if provider:
-        # Normalize provider names (backward compatibility)
-        provider_map = {
-            "adk": "gemini",          # Old name -> new name
-            "claude-sdk": "claude",   # Old name -> new name  
-            "claude_sdk": "claude",   # Old name -> new name
-        }
-        normalized_provider = provider_map.get(provider, provider)
-        llm_config["provider"] = normalized_provider
-
-        # Try both old and new names for config lookup
-        provider_config = llm_config.get(normalized_provider) or llm_config.get(provider)
-        if provider_config:
-            llm_config.update(provider_config)
-    if model:
-        llm_config["model"] = model
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
 
     # Generate QA pairs
     qa_pairs = generate_qa_from_lancedb(
@@ -177,12 +197,8 @@ def curate(input_file, output, config, threshold, batch_size, provider, model):
     # Load prompts from individual files
     prompts = load_prompts(Path(config_path).parent)
 
-    # Override LLM settings if provided
-    llm_config = cfg["llm"]
-    if provider:
-        llm_config["provider"] = provider
-    if model:
-        llm_config["model"] = model
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
 
     # Curate QA pairs
     metrics = curate_qa_pairs(
@@ -225,11 +241,8 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    llm_config = cfg["llm"].copy()
-    if provider:
-        llm_config["provider"] = provider
-    if model:
-        llm_config["model"] = model
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
 
     # Load prompts
     prompts_dir = Path(config_path).parent
@@ -281,22 +294,8 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Override LLM settings if provided
-    llm_config = cfg["llm"]
-    if provider:
-        provider_map = {
-            "adk": "gemini",
-            "claude-sdk": "claude",
-            "claude_sdk": "claude",
-        }
-        normalized_provider = provider_map.get(provider, provider)
-        llm_config["provider"] = normalized_provider
-
-        provider_config = llm_config.get(normalized_provider) or llm_config.get(provider)
-        if provider_config:
-            llm_config.update(provider_config)
-    if model:
-        llm_config["model"] = model
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
 
     # Generate CoT pairs
     result = generate_cot_pairs(
@@ -337,18 +336,8 @@ def enhance_cot(input_file, output, config, provider, model, batch_size):
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Override LLM settings if provided
-    llm_config = cfg["llm"]
-    if provider:
-        provider_map = {
-            "adk": "gemini",
-            "claude-sdk": "claude",
-            "claude_sdk": "claude",
-        }
-        normalized_provider = provider_map.get(provider, provider)
-        llm_config["provider"] = normalized_provider
-    if model:
-        llm_config["model"] = model
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
 
     # Enhance with CoT
     result = enhance_with_cot(

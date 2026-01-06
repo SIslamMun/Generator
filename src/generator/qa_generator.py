@@ -110,6 +110,11 @@ def generate_qa_from_lancedb(
                 content = row.get("content", "")
                 source_file = row.get("source_file", "unknown")
 
+                # Skip log files (paper retrieval metadata)
+                if "_log.md" in source_file:
+                    progress.advance(task)
+                    continue
+
                 # Skip very short chunks (headers, citations, etc.)
                 if not content or len(content.strip()) < 200:
                     progress.advance(task)

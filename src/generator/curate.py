@@ -8,6 +8,7 @@ Implements quality filtering based on:
 
 import json
 import json5
+import logging
 from pathlib import Path
 from typing import List, Dict, Any
 from datetime import datetime
@@ -16,7 +17,7 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from .clients import get_client, BaseLLMClient
 
 console = Console()
-
+logger = logging.getLogger(__name__)
 
 def _detect_format(data: Any) -> str:
     """Detect input format: 'qa', 'cot', or 'unknown'."""
@@ -43,8 +44,17 @@ def _convert_to_conversation_format(pairs: List[Dict], format_type: str) -> List
     conversations = []
 
     for pair in pairs:
+        # Skip malformed pairs (not dict or missing keys)
+        if not isinstance(pair, dict):
+            logger.warning(f"Skipping malformed pair (not a dict): {type(pair)}")
+            continue
+            
         if format_type == "qa":
             # QA format: question + answer
+            if "question" not in pair or "answer" not in pair:
+                logger.warning(f"Skipping QA pair missing question/answer keys: {list(pair.keys())}")
+                continue
+                
             conversations.append({
                 "conversations": [
                     {"role": "user", "content": pair.get("question", "")},
@@ -90,6 +100,10 @@ def _extract_qa_from_conversation(conv: Dict) -> Dict:
     answer = ""
 
     for msg in messages:
+        # Skip if msg is not a dict (safety check)
+        if not isinstance(msg, dict):
+            continue
+            
         if msg.get("role") in ["user", "human"]:
             question = msg.get("content", msg.get("value", ""))
         elif msg.get("role") in ["assistant", "gpt"]:
