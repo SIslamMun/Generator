@@ -15,10 +15,33 @@ prompt: |
 
   Rate STRICTLY - most pairs should score 5-7. Only exceptional pairs score 8+.
 
-  Return valid JSON with ratings:
+  For each pair, provide:
+  1. Individual criteria scores
+  2. Total rating (sum of criteria, max 10)
+  3. Brief reasoning explaining the rating
+
+  Return valid JSON with detailed ratings:
   [
-    {{"question": "Original question", "answer": "Original answer", "rating": 7}},
-    {{"question": "Original question", "answer": "Original answer", "rating": 5}}
+    {{
+      "question": "Original question",
+      "answer": "Original answer",
+      "rating": 7,
+      "clarity": 2,
+      "accuracy": 3,
+      "usefulness": 1,
+      "difficulty": 1,
+      "reasoning": "Clear question with accurate, well-supported answer. Moderately useful for training."
+    }},
+    {{
+      "question": "Original question",
+      "answer": "Original answer",
+      "rating": 5,
+      "clarity": 2,
+      "accuracy": 2,
+      "usefulness": 1,
+      "difficulty": 0,
+      "reasoning": "Question is clear but answer lacks depth and complexity."
+    }}
   ]
 
   QA pairs to rate:

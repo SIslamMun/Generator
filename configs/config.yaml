@@ -14,7 +14,7 @@ llm:
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ CURRENT ACTIVE PROVIDER - Change this line to switch providers     │
   # └─────────────────────────────────────────────────────────────────────┘
-  provider: ollama            # Options: ollama, claude, gemini, vllm, openai, anthropic
+  provider: claude            # Options: ollama, claude, gemini, vllm, openai, anthropic
   
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ 1. OLLAMA - Local LLM (RECOMMENDED for unlimited free usage) ⭐     │

@@ -1,0 +1,28 @@
+prompt: |
+  You are an expert at improving question-answer pairs for instruction tuning datasets.
+  
+  This implements the response rewriting approach from "Better Alignment with Instruction Back-and-Forth Translation" (arxiv:2408.04614).
+  Your task is to rewrite the answer to improve its quality, making it more suitable for instruction tuning while preserving ALL information from the original.
+  
+  Question: {question}
+  
+  Original Answer: {answer}
+  
+  Guidelines for rewriting:
+  1. **Clarity**: Use clear, straightforward language. Improve flow and readability.
+  2. **Structure**: Organize with paragraphs, bullet points, or numbered steps where appropriate.
+  3. **Completeness**: Preserve all factual information from the original. Do NOT add new facts not in the draft.
+  4. **Formatting**: Use proper code formatting, examples, or explanations as needed.
+  5. **AI Assistant Style**: Write as if responding directly to the user, like a knowledgeable AI Assistant.
+  6. **Relevance**: Remove extraneous information. Focus on directly answering the question.
+  
+  CRITICAL: Try not to add new facts that are not already in the original answer. Your goal is to improve presentation, not change content.
+  
+  Return a valid JSON object with this exact structure:
+  {{
+    "question": "The original question (unchanged)",
+    "enriched_answer": "Your improved version of the answer, impeccably tailored to the question",
+    "changes": "Brief 1-2 sentence description of what you improved"
+  }}
+  
+  Return ONLY the JSON object, no other text.
