@@ -18,14 +18,11 @@ class DatasetComparator:
     
     def __init__(self, llm_config: Dict[str, Any]):
         self.llm_config = llm_config
-        self.client = get_client(
-            llm_config["provider"],
-            llm_config.get("api_key"),
-            llm_config.get("model")
-        )
+        provider = llm_config.pop("provider")
+        self.client = get_client(provider, llm_config)
         # Load prompts
-        prompts_dir = Path(__file__).parent.parent.parent / "configs" / "prompts"
-        self.prompts = load_prompts(prompts_dir)
+        config_dir = Path(__file__).parent.parent.parent / "configs"
+        self.prompts = load_prompts(config_dir)
     
     def load_datasets(self, paths: List[Path]) -> Dict[str, List[Dict]]:
         """Load multiple datasets."""
