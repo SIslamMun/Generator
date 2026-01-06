@@ -50,7 +50,7 @@ class TestClientFactory:
     def test_available_providers(self):
         """Test that all expected providers are available."""
         expected_providers = {"ollama", "claude", "gemini", "vllm", "openai", "anthropic"}
-        
+
         # Try to get each provider (won't actually initialize without proper config)
         for provider in expected_providers:
             try:

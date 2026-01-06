@@ -35,6 +35,27 @@ def sample_qa_pairs() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
+def sample_cot_pairs() -> List[Dict[str, Any]]:
+    """Sample CoT pairs for testing."""
+    return [
+        {
+            "question": "How does HDF5 handle parallel I/O?",
+            "reasoning": "Step 1: HDF5 uses MPI-IO for parallel operations.\nStep 2: Multiple processes can access the same file.\nStep 3: Collective operations ensure data consistency.",
+            "answer": "HDF5 handles parallel I/O through MPI-IO, enabling multiple processes to access shared files with coordinated operations.",
+            "chunk_id": "test_chunk_1",
+            "source": "test.md"
+        },
+        {
+            "question": "What are the benefits of chunking in HDF5?",
+            "reasoning": "Step 1: Chunking divides datasets into fixed-size blocks.\nStep 2: This enables efficient partial I/O operations.\nStep 3: Compression works better on chunks.",
+            "answer": "Chunking in HDF5 improves performance by enabling partial I/O and better compression.",
+            "chunk_id": "test_chunk_2",
+            "source": "test.md"
+        },
+    ]
+
+
+@pytest.fixture
 def sample_config() -> Dict[str, Any]:
     """Sample configuration for testing."""
     return {
@@ -67,6 +88,16 @@ Question: {question}
 Answer: {answer}
 
 Return only a number between 1 and 10.""",
+        "cot_generation": """Create {n_pairs} complex reasoning examples from this text.
+
+Text: {text}
+
+Return JSON with "question", "reasoning", and "answer" fields.""",
+        "cot_enhancement": """Add step-by-step reasoning to these conversations.
+
+Conversations: {conversations}
+
+Return enhanced conversations with reasoning.""",
     }
 
 
