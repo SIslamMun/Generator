@@ -18,6 +18,7 @@ from .prompt_loader import load_prompts
 from .enrich import enrich_qa_pairs, load_qa_pairs, save_qa_pairs
 from .cot_generator import generate_cot_pairs
 from .cot_enhancer import enhance_with_cot
+from .compare import compare_datasets
 
 console = Console()
 
@@ -461,6 +462,64 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks, skip_e
 
     console.print("\n[bold green]✨ Pipeline Complete![/bold green]")
     console.print(f"[bold green]📁 Training data: {output_path}[/bold green]\n")
+
+
+@main.command()
+@click.argument("datasets", nargs=-1, type=click.Path(exists=True), required=True)
+@click.option("-o", "--output", type=click.Path(), required=True, help="Output comparison report path")
+@click.option("--sample-size", type=int, default=10, help="Number of samples to judge per dataset")
+@click.option("--config", type=click.Path(exists=True), help="Path to config file")
+@click.option("--provider", type=str, help="LLM provider override")
+@click.option("--model", type=str, help="Model override")
+def compare(datasets, output, sample_size, config, provider, model):
+    """
+    Compare multiple QA datasets using LLM judge.
+    
+    Can accept multiple files or use glob pattern:
+    
+    \b
+    Compare two files:
+      uv run generator compare file1.json file2.json -o report.json
+    
+    \b
+    Compare all files in folder:
+      uv run generator compare phase4_curate/*.json -o comparison.json
+    """
+    console.print("\n[bold cyan]🔍 Comparing datasets with LLM judge[/bold cyan]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, 'r') as f:
+        cfg = yaml.safe_load(f)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    # Convert paths
+    dataset_paths = [Path(d) for d in datasets]
+    output_path = Path(output)
+    
+    console.print(f"📊 Datasets to compare: {len(dataset_paths)}")
+    for p in dataset_paths:
+        console.print(f"  - {p.name}")
+    console.print(f"📝 Sample size per dataset: {sample_size}")
+    console.print(f"🤖 Using: {llm_config['provider']} / {llm_config['model']}\n")
+    
+    # Run comparison
+    report = compare_datasets(
+        dataset_paths=dataset_paths,
+        output_path=output_path,
+        llm_config=llm_config,
+        sample_size=sample_size
+    )
+    
+    # Display winner
+    winner = report.get("final_decision", {}).get("winner")
+    if winner:
+        console.print(f"\n[bold green]🏆 Recommended Winner: {winner}[/bold green]")
+        console.print(f"[bold]📄 Full report: {output_path}[/bold]\n")
+    else:
+        console.print("\n[yellow]⚠️  Could not determine clear winner. Check report.[/yellow]\n")
 
 
 if __name__ == "__main__":

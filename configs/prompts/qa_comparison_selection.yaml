@@ -1,0 +1,26 @@
+name: "QA Dataset Winner Selection"
+description: "Select the best QA dataset based on metrics and quality scores"
+version: "1.0"
+
+template: |
+  You are a QA dataset selection expert. Based on the analysis below, recommend which QA dataset to use for fine-tuning.
+  
+  METRICS COMPARISON:
+  {metrics_comparison}
+  
+  LLM QUALITY SCORES:
+  {quality_scores}
+  
+  Recommend the BEST QA dataset considering:
+  1. Quality > Quantity (prefer higher LLM scores)
+  2. Diversity (more sources, question types)
+  3. Practical size (not too small, not bloated)
+  
+  Respond with:
+  WINNER: [qa_dataset_name]
+  REASONING: [2-3 sentences]
+  ALTERNATIVE: [if close, suggest merge/hybrid]
+
+variables:
+  - metrics_comparison: "Formatted metrics for all QA datasets"
+  - quality_scores: "LLM quality scores for each QA dataset"

@@ -1,0 +1,36 @@
+name: "QA Dataset Quality Evaluation"
+description: "Evaluate quality of sample QA pairs from a QA dataset"
+version: "1.0"
+
+template: |
+  You are an expert data quality evaluator for fine-tuning datasets.
+  
+  Evaluate these {sample_count} sample QA pairs from dataset "{dataset_name}":
+  
+  {samples}
+  
+  Evaluate this dataset on:
+  1. **Answer Quality**: Accuracy, completeness, clarity
+  2. **Relevance**: How well answers address questions
+  3. **Consistency**: Format and style consistency
+  4. **Technical Depth**: Appropriate level of detail
+  5. **Usefulness for Training**: Would this teach an LLM effectively?
+  
+  Provide:
+  - Overall score (1-10)
+  - Key strengths (2-3 points)
+  - Key weaknesses (2-3 points)
+  - Recommendation (use/avoid for training)
+  
+  Format:
+  SCORE: X/10
+  STRENGTHS:
+  - ...
+  WEAKNESSES:
+  - ...
+  RECOMMENDATION: ...
+
+variables:
+  - sample_count: "Number of samples being evaluated"
+  - dataset_name: "Name of the dataset"
+  - samples: "Formatted QA pairs to evaluate"
