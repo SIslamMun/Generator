@@ -30,6 +30,7 @@ prompt: |
       "accuracy": 3,
       "usefulness": 1,
       "difficulty": 1,
+      "topic_relevant": true,
       "reasoning": "Clear question with accurate, well-supported answer. Moderately useful for training."
     }},
     {{
@@ -40,6 +41,7 @@ prompt: |
       "accuracy": 2,
       "usefulness": 1,
       "difficulty": 0,
+      "topic_relevant": true,
       "reasoning": "Question is clear but answer lacks depth and complexity."
     }}
   ]

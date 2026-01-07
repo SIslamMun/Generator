@@ -158,6 +158,7 @@ def curate_qa_pairs(
     llm_config: Dict[str, Any],
     threshold: float = 7.0,
     batch_size: int = 5,
+    topic_filter: str = None,
 ) -> Dict[str, Any]:
     """
     Filter QA pairs by quality using LLM-as-Judge.
@@ -169,6 +170,7 @@ def curate_qa_pairs(
         llm_config: LLM configuration dict
         threshold: Minimum rating to keep (1-10 scale)
         batch_size: Number of pairs to rate in one LLM call
+        topic_filter: Optional topic (e.g., 'HDF5') to filter irrelevant pairs
 
     Returns:
         Dict with metrics (total, filtered, retention_rate, avg_score)
@@ -228,7 +230,7 @@ def curate_qa_pairs(
                 # Rate this batch
                 temperature = llm_config.get('temperature', 0.1) if isinstance(llm_config, dict) else 0.1
                 rated_batch = _rate_batch(
-                    pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template, temperature=temperature
+                    pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template, temperature=temperature, topic_filter=topic_filter
                 )
 
                 # Merge ratings back to conversation format
@@ -238,14 +240,15 @@ def curate_qa_pairs(
                         total_score += rating
 
                         # Copy rating fields to conversation
-                        for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning"]:
+                        for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning", "topic_relevant"]:
                             if key in rated_batch[j]:
                                 conv[key] = rated_batch[j][key]
 
                         rated_pairs.append(conv)
 
-                        # Filter by threshold
-                        if rating >= threshold:
+                        # Filter by threshold AND topic relevance
+                        topic_relevant = rated_batch[j].get("topic_relevant", True)
+                        if rating >= threshold and topic_relevant:
                             filtered_pairs.append(conv)
 
             except Exception as e:
@@ -287,7 +290,7 @@ def curate_qa_pairs(
 
 
 def _rate_batch(
-    pairs: List[Dict], llm: BaseLLMClient, prompt_template: str, temperature: float = 0.1
+    pairs: List[Dict], llm: BaseLLMClient, prompt_template: str, temperature: float = 0.1, topic_filter: str = None
 ) -> List[Dict]:
     """Rate a batch of QA pairs with detailed criteria breakdown."""
     # Format pairs for prompt
@@ -297,8 +300,13 @@ def _rate_batch(
         ensure_ascii=False,
     )
 
+    # Add topic filter instruction if provided
+    topic_instruction = ""
+    if topic_filter:
+        topic_instruction = f"\n\n**TOPIC FILTER:** Only keep pairs directly related to **{topic_filter}**. Mark pairs as topic_relevant: false if they are off-topic or not directly about {topic_filter}."
+
     # Fill prompt
-    prompt = prompt_template.format(pairs=pairs_str)
+    prompt = prompt_template.format(pairs=pairs_str) + topic_instruction
 
     # Generate ratings
     response = llm.generate(prompt, temperature=temperature)
@@ -338,6 +346,7 @@ def _rate_batch(
             pair["clarity"] = rated[i].get("clarity", 2)
             pair["accuracy"] = rated[i].get("accuracy", 2)
             pair["usefulness"] = rated[i].get("usefulness", 1)
+            pair["topic_relevant"] = rated[i].get("topic_relevant", True)
             pair["difficulty"] = rated[i].get("difficulty", 0)
             pair["reasoning"] = rated[i].get("reasoning", "No reasoning provided")
         else:

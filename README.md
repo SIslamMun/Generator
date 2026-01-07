@@ -1,6 +1,6 @@
 # Generator - Synthetic QA Pair Generator
 
-Generate high-quality QA pairs from LanceDB chunks for LLM fine-tuning. Implements **Instruction Backtranslation** (Meta AI, ICLR 2024) and **Response Rewriting** ([arxiv:2408.04614](https://arxiv.org/abs/2408.04614)).
+Generate high-quality QA pairs from LanceDB chunks for LLM fine-tuning.
 
 ## ✨ Features
 
@@ -69,6 +69,7 @@ uv run generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 - `--target-pairs INT` - Total target pairs (auto-calculates per chunk) ⭐
 - `--batch-size INT` - Chunks per batch (default: 50)
 - `--max-chunks INT` - Limit chunks (for testing)
+- `--topic TEXT` - Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation ⭐ NEW
 - `--provider TEXT` - Override provider from config
 - `--model TEXT` - Override model from config
 
@@ -79,6 +80,9 @@ uv run generator generate /path/to/lancedb -o qa.json --target-pairs 300
 
 # Test with limited data
 uv run generator generate /path/to/lancedb -o qa.json --max-chunks 10 --target-pairs 50
+
+# Generate with topic filtering (removes off-topic pairs)
+uv run generator generate /path/to/lancedb -o qa.json --target-pairs 300 --topic "HDF5"
 
 # Override provider
 uv run generator generate /path/to/lancedb -o qa.json --provider gemini --model gemini-2.0-flash-exp
@@ -124,6 +128,7 @@ uv run generator generate-cot LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 - `--target-pairs INT` - Total target pairs (auto-calculates per chunk) ⭐
 - `--batch-size INT` - Chunks per batch (default: 50)
 - `--max-chunks INT` - Limit chunks (for testing)
+- `--topic TEXT` - Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation ⭐ NEW
 - `--provider TEXT` - Override provider
 - `--model TEXT` - Override model
 
@@ -131,6 +136,9 @@ uv run generator generate-cot LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 ```bash
 uv run generator generate-cot /path/to/lancedb -o cot.json --target-pairs 100
 uv run generator generate-cot /path/to/lancedb -o cot.json --max-chunks 10
+
+# Generate with topic filtering
+uv run generator generate-cot /path/to/lancedb -o cot.json --target-pairs 100 --topic "HDF5"
 ```
 
 **Output:** `[{"question": "...", "reasoning": "Step 1: ...\nStep 2: ...", "answer": "...", "chunk_id": "...", "source": "..."}]`
@@ -169,6 +177,7 @@ uv run generator curate INPUT.json -o OUTPUT.json [OPTIONS]
 - `--config PATH` - Config file
 - `--threshold FLOAT` - Minimum rating 1-10 (default: 7.0)
 - `--batch-size INT` - Pairs rated per call (default: 5)
+- `--topic TEXT` - Topic filter (e.g., 'HDF5') - removes off-topic pairs ⭐ NEW
 - `--provider TEXT` - Override provider
 - `--model TEXT` - Override model
 
@@ -176,14 +185,20 @@ uv run generator curate INPUT.json -o OUTPUT.json [OPTIONS]
 
 **Rating Criteria:** Clarity (0-3), Accuracy (0-3), Usefulness (0-2), Difficulty (0-2), Total (0-10)
 
+**Topic Filtering:** When `--topic` is specified, the LLM judge evaluates whether each QA pair is directly related to the given topic and filters out irrelevant pairs. This is useful for removing off-topic content from your training data.
+
 **Examples:**
 ```bash
 uv run generator curate qa.json -o curated.json
 uv run generator curate qa.json -o curated.json --threshold 8.0  # High quality only
 uv run generator curate cot.json -o cot_curated.json  # Works with CoT format too
+
+# Filter by topic - removes off-topic pairs
+uv run generator curate qa.json -o hdf5_curated.json --topic "HDF5"
+uv run generator curate qa.json -o python_curated.json --topic "Python programming" --threshold 7.5
 ```
 
-**Output:** Adds `rating`, `clarity`, `accuracy`, `usefulness`, `difficulty`, `reasoning` fields
+**Output:** Adds `rating`, `clarity`, `accuracy`, `usefulness`, `difficulty`, `topic_relevant`, `reasoning` fields
 
 ---
 
@@ -348,13 +363,6 @@ uv run ruff check src/                     # All checks passed ✅
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Detailed status & planned features
 - [CHANGES.md](CHANGES.md) - Recent updates & implementation notes
 - [configs/prompts/](configs/prompts/) - Prompt templates
-
-## 🛣️ Roadmap
-
-**✅ Phase 1** - Core QA pipeline (generate, enrich, curate, export)  
-**✅ Phase 2** - CoT generation & enhancement, format detection/restoration  
-**🔄 Phase 3** - Tool use support, multi-turn conversations  
-**🔮 Phase 4** - Parallel processing, caching, web UI
 
 ---
 

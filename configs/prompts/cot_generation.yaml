@@ -12,6 +12,20 @@ prompt: |
   2. Detailed reasoning steps that break down the problem
   3. A concise final answer
 
+  **IMPORTANT - Avoid these question types:**
+  - Questions about paper authors, affiliations, or institutions
+  - Questions about lab locations or addresses
+  - Questions about grant numbers or funding sources
+  - Questions about publication titles or references
+  - Meta-information about the document itself
+
+  **FOCUS ON:**
+  - Technical concepts and methodologies
+  - System architectures and designs
+  - Problem-solving approaches
+  - Performance analysis and optimization
+  - Domain-specific knowledge and applications
+
   Return JSON format only:
 
   [

@@ -13,7 +13,14 @@ prompt: |
   3. Create {n_pairs} diverse question-answer pairs
   4. IMPORTANT: Work with whatever text is provided, even if limited
   5. Extract facts from titles, headers, or any available content
-  6. Return ONLY valid JSON array format (no markdown, no explanation, no comments):
+  6. **DO NOT** create questions about:
+     - Paper authors, affiliations, or institutions
+     - Lab locations or addresses
+     - Grant numbers or funding sources
+     - Publication titles or references
+     - Meta-information about the document itself
+  7. **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
+  8. Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
   [
     {{

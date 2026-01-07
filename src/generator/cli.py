@@ -140,9 +140,10 @@ def list_providers():
 @click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
 @click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
+@click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
+def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, topic, provider, model):
     """Generate QA pairs from LanceDB chunks."""
     console.print("\n[bold]🚀 Generating QA pairs from LanceDB[/bold]\n")
 
@@ -174,6 +175,48 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
         max_chunks=max_chunks,
     )
 
+    # Apply topic filtering if requested
+    if topic:
+        console.print(f"\n[bold cyan]🔍 Filtering pairs by topic: {topic}[/bold cyan]\n")
+        from .curate import _rate_batch
+        
+        # Get rating prompt for topic filtering
+        rating_prompt = prompts.get("qa_rating")
+        if not rating_prompt:
+            console.print("[yellow]⚠️  Warning: qa_rating prompt not found, skipping topic filter[/yellow]\n")
+        else:
+            # Initialize LLM for filtering
+            filter_llm = get_client(llm_config['provider'], llm_config)
+            
+            # Rate pairs with topic filter
+            original_count = len(qa_pairs)
+            filtered_pairs = []
+            batch_size_filter = 10
+            
+            for i in range(0, len(qa_pairs), batch_size_filter):
+                batch = qa_pairs[i:i + batch_size_filter]
+                rated_batch = _rate_batch(
+                    pairs=batch,
+                    llm=filter_llm,
+                    prompt_template=rating_prompt,
+                    temperature=0.1,
+                    topic_filter=topic
+                )
+                
+                # Keep only topic-relevant pairs
+                for pair in rated_batch:
+                    if pair.get('topic_relevant', True):
+                        filtered_pairs.append(pair)
+            
+            qa_pairs = filtered_pairs
+            removed = original_count - len(qa_pairs)
+            console.print(f"[green]✓ Filtered: kept {len(qa_pairs)}/{original_count} pairs (removed {removed} off-topic)[/green]\n")
+            
+            # Save filtered pairs
+            import json
+            with open(output, 'w', encoding='utf-8') as f:
+                json.dump(qa_pairs, f, indent=2, ensure_ascii=False)
+
     console.print(f"[bold green]✨ Success! Generated {len(qa_pairs)} QA pairs[/bold green]\n")
 
 
@@ -183,9 +226,10 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
 @click.option("--config", type=click.Path(exists=True), help="Config YAML file")
 @click.option("--threshold", type=float, default=7.0, help="Minimum rating (1-10)")
 @click.option("--batch-size", type=int, default=5, help="Pairs rated per LLM call")
+@click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def curate(input_file, output, config, threshold, batch_size, provider, model):
+def curate(input_file, output, config, threshold, batch_size, topic, provider, model):
     """
     Filter QA pairs or CoT examples by quality using LLM-as-Judge.
     
@@ -218,6 +262,7 @@ def curate(input_file, output, config, threshold, batch_size, provider, model):
         llm_config=llm_config,
         threshold=threshold,
         batch_size=batch_size,
+        topic_filter=topic,
     )
 
     console.print(
@@ -289,9 +334,10 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
 @click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
 @click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
+@click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
+def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, topic, provider, model):
     """
     Generate CoT (Chain-of-Thought) pairs from LanceDB chunks.
     
@@ -322,6 +368,60 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
         batch_size=batch_size,
         max_chunks=max_chunks,
     )
+
+    # Apply topic filtering if requested
+    if topic:
+        console.print(f"\n[bold cyan]🔍 Filtering CoT pairs by topic: {topic}[/bold cyan]\n")
+        from .curate import _rate_batch, load_prompts
+        import json
+        
+        # Load prompts
+        config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+        prompts = load_prompts(Path(config_path).parent)
+        
+        # Get rating prompt for topic filtering
+        rating_prompt = prompts.get("qa_rating")
+        if not rating_prompt:
+            console.print("[yellow]⚠️  Warning: qa_rating prompt not found, skipping topic filter[/yellow]\n")
+        else:
+            # Load generated pairs
+            with open(output, 'r', encoding='utf-8') as f:
+                cot_pairs = json.load(f)
+            
+            # Initialize LLM for filtering
+            filter_llm = get_client(llm_config['provider'], llm_config)
+            
+            # Convert CoT to QA format for rating
+            original_count = len(cot_pairs)
+            filtered_pairs = []
+            batch_size_filter = 10
+            
+            for i in range(0, len(cot_pairs), batch_size_filter):
+                batch = cot_pairs[i:i + batch_size_filter]
+                # Convert to QA format for rating
+                qa_batch = [{'question': p['question'], 'answer': p['answer']} for p in batch]
+                
+                rated_batch = _rate_batch(
+                    pairs=qa_batch,
+                    llm=filter_llm,
+                    prompt_template=rating_prompt,
+                    temperature=0.1,
+                    topic_filter=topic
+                )
+                
+                # Keep only topic-relevant pairs (preserve original CoT structure)
+                for j, pair in enumerate(rated_batch):
+                    if pair.get('topic_relevant', True):
+                        filtered_pairs.append(batch[j])
+            
+            removed = original_count - len(filtered_pairs)
+            console.print(f"[green]✓ Filtered: kept {len(filtered_pairs)}/{original_count} pairs (removed {removed} off-topic)[/green]\n")
+            
+            # Save filtered pairs
+            with open(output, 'w', encoding='utf-8') as f:
+                json.dump(filtered_pairs, f, indent=2, ensure_ascii=False)
+            
+            result['cot_pairs_generated'] = len(filtered_pairs)
 
     console.print(f"[bold green]✨ Success! Generated {result['cot_pairs_generated']} CoT pairs[/bold green]\n")
 
