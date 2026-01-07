@@ -9,6 +9,7 @@ Paper: https://arxiv.org/abs/2305.02301
 
 import json
 import json5
+import re
 import logging
 from pathlib import Path
 from typing import Dict, List
@@ -244,24 +245,47 @@ def _parse_enhanced_response(response: str) -> List[List[Dict]]:
     ]
     """
     try:
+        # Clean response - check for markdown wrapping FIRST
+        cleaned_response = response.strip()
+        if cleaned_response.startswith("```json"):
+            cleaned_response = cleaned_response.split("```json", 1)[1].split("```")[0].strip()
+        elif cleaned_response.startswith("```"):
+            cleaned_response = cleaned_response.split("```", 1)[1].split("```")[0].strip()
+        
         # Extract JSON array
-        start_idx = response.find("[")
-        end_idx = response.rfind("]")
+        start_idx = cleaned_response.find("[")
+        end_idx = cleaned_response.rfind("]")
 
         if start_idx == -1 or end_idx == -1:
             logger.warning("No JSON array found in enhanced response")
             return []
 
-        json_str = response[start_idx : end_idx + 1]
-        conversations = json5.loads(json_str)
-
-        if not isinstance(conversations, list):
-            return []
-
-        return conversations
+        json_str = cleaned_response[start_idx : end_idx + 1]
+        
+        # Try json5 parsing first
+        try:
+            conversations = json5.loads(json_str)
+            if isinstance(conversations, list):
+                return conversations
+        except Exception as parse_err:
+            # Regex fallback: extract JSON array with nested objects
+            logger.debug(f"json5 parse failed, trying regex fallback: {parse_err}")
+            pattern = r'\[\s*\[\s*\{.*?\}\s*(?:,\s*\{.*?\}\s*)*\]\s*(?:,\s*\[\s*\{.*?\}\s*(?:,\s*\{.*?\}\s*)*\]\s*)*\]'
+            match = re.search(pattern, cleaned_response, re.DOTALL)
+            if match:
+                try:
+                    conversations = json5.loads(match.group(0))
+                    if isinstance(conversations, list):
+                        return conversations
+                except:
+                    pass
+        
+        logger.warning("Could not parse conversations as list")
+        return []
 
     except Exception as e:
         logger.error(f"Failed to parse enhanced response: {e}")
+        logger.debug(f"Response preview: {response[:500]}")
         return []
 
 
