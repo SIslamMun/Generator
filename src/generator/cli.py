@@ -19,6 +19,7 @@ from .enrich import enrich_qa_pairs, load_qa_pairs, save_qa_pairs
 from .cot_generator import generate_cot_pairs
 from .cot_enhancer import enhance_with_cot
 from .compare import compare_datasets
+from .clients import get_client
 
 console = Console()
 
@@ -185,8 +186,9 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
         if not rating_prompt:
             console.print("[yellow]⚠️  Warning: qa_rating prompt not found, skipping topic filter[/yellow]\n")
         else:
-            # Initialize LLM for filtering
-            filter_llm = get_client(llm_config['provider'], llm_config)
+            # Initialize LLM for filtering (extract provider without modifying llm_config)
+            provider = llm_config.get('provider', 'gemini')
+            filter_llm = get_client(provider, llm_config)
             
             # Rate pairs with topic filter
             original_count = len(qa_pairs)
@@ -388,8 +390,9 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
             with open(output, 'r', encoding='utf-8') as f:
                 cot_pairs = json.load(f)
             
-            # Initialize LLM for filtering
-            filter_llm = get_client(llm_config['provider'], llm_config)
+            # Initialize LLM for filtering (extract provider without modifying llm_config)
+            provider = llm_config.get('provider', 'gemini')
+            filter_llm = get_client(provider, llm_config)
             
             # Convert CoT to QA format for rating
             original_count = len(cot_pairs)
