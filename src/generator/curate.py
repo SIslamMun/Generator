@@ -226,8 +226,9 @@ def curate_qa_pairs(
                 qa_batch = [_extract_qa_from_conversation(conv) for conv in batch]
 
                 # Rate this batch
+                temperature = llm_config.get('temperature', 0.1) if isinstance(llm_config, dict) else 0.1
                 rated_batch = _rate_batch(
-                    pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template
+                    pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template, temperature=temperature
                 )
 
                 # Merge ratings back to conversation format
@@ -286,7 +287,7 @@ def curate_qa_pairs(
 
 
 def _rate_batch(
-    pairs: List[Dict], llm: BaseLLMClient, prompt_template: str
+    pairs: List[Dict], llm: BaseLLMClient, prompt_template: str, temperature: float = 0.1
 ) -> List[Dict]:
     """Rate a batch of QA pairs with detailed criteria breakdown."""
     # Format pairs for prompt
@@ -299,35 +300,33 @@ def _rate_batch(
     # Fill prompt
     prompt = prompt_template.format(pairs=pairs_str)
 
-    # Generate ratings (use config or default to 0.1 for consistency)
-    temperature = llm_config.get('temperature', 0.1) if isinstance(llm_config, dict) else 0.1
+    # Generate ratings
     response = llm.generate(prompt, temperature=temperature)
+
+    # Clean response - check for markdown wrapping FIRST
+    cleaned_response = response.strip()
+    if cleaned_response.startswith("```json"):
+        cleaned_response = cleaned_response.split("```json", 1)[1].split("```")[0].strip()
+    elif cleaned_response.startswith("```"):
+        cleaned_response = cleaned_response.split("```", 1)[1].split("```")[0].strip()
 
     # Parse JSON response
     try:
-        rated = json5.loads(response)
+        rated = json5.loads(cleaned_response)
     except Exception:
-        # Try to extract JSON from markdown
-        if "```json" in response:
-            json_str = response.split("```json")[1].split("```")[0].strip()
-            rated = json5.loads(json_str)
-        elif "```" in response:
-            json_str = response.split("```")[1].split("```")[0].strip()
-            rated = json5.loads(json_str)
-        else:
-            # Fallback: assign default rating
-            rated = [
-                {
-                    "question": p["question"],
-                    "answer": p["answer"],
-                    "rating": 5,
-                    "clarity": 2,
-                    "accuracy": 2,
-                    "usefulness": 1,
-                    "difficulty": 0,
-                    "reasoning": "Default rating (parsing failed)",
-                }
-                for p in pairs
+        # Fallback: assign default rating
+        rated = [
+            {
+                "question": p["question"],
+                "answer": p["answer"],
+                "rating": 5,
+                "clarity": 2,
+                "accuracy": 2,
+                "usefulness": 1,
+                "difficulty": 0,
+                "reasoning": "Default rating (parsing failed)",
+            }
+            for p in pairs
             ]
 
     # Merge ratings with original pairs

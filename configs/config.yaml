@@ -43,7 +43,7 @@ llm:
   # │    Note: Rate limited to 10 requests/minute on free tier            │
   # └─────────────────────────────────────────────────────────────────────┘
   gemini:
-    model: gemini-2.0-flash-exp  # Options: gemini-2.5-flash-image, gemini-2.0-flash-exp, gemini-1.5-pro-002
+    model: gemini-2.0-flash  # Options: gemini-2.5-flash-image, gemini-2.0-flash-exp, gemini-1.5-pro-002
     api_key: ${GOOGLE_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐

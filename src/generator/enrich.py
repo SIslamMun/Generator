@@ -108,19 +108,29 @@ def _enrich_batch(
             # Get enriched response from LLM
             response = llm.generate(prompt, temperature=temperature)
 
+            # Clean response - check for markdown wrapping FIRST
+            cleaned_response = response.strip()
+            if cleaned_response.startswith("```json"):
+                cleaned_response = cleaned_response.split("```json", 1)[1].split("```")[0].strip()
+            elif cleaned_response.startswith("```"):
+                cleaned_response = cleaned_response.split("```", 1)[1].split("```")[0].strip()
+            
             # Parse JSON response
             try:
-                result = json5.loads(response)
-            except Exception:
-                # If JSON parsing fails, try to extract JSON from markdown code blocks
-                if "```json" in response:
-                    json_str = response.split("```json")[1].split("```")[0].strip()
-                    result = json5.loads(json_str)
-                elif "```" in response:
-                    json_str = response.split("```")[1].split("```")[0].strip()
-                    result = json5.loads(json_str)
-                else:
-                    raise
+                result = json5.loads(cleaned_response)
+            except Exception as e1:
+                # If JSON parsing still fails, try to extract JSON object
+                try:
+                    import re
+                    # Look for JSON object with enriched_answer field
+                    json_match = re.search(r'\{[^{}]*"enriched_answer"[^{}]*\}', cleaned_response, re.DOTALL)
+                    if json_match:
+                        result = json5.loads(json_match.group(0))
+                    else:
+                        raise e1
+                except Exception as e2:
+                    # If all parsing attempts fail, raise the original error
+                    raise e1
 
             # Create enriched pair
             enriched_pair = {
