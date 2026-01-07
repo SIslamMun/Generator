@@ -1,11 +1,15 @@
 """
-Export QA pairs to various training formats.
+Export QA pairs and tool examples to various training formats.
 
 Supported formats:
 - chatml: ChatML format (for OpenAI-style models)
 - alpaca: Alpaca instruction format
 - sharegpt: ShareGPT conversation format
 - jsonl: Simple JSONL (one pair per line)
+
+Supports both:
+- QA pairs: {"question": "...", "answer": "..."}
+- Tool examples: {"instruction": "...", "solution": {...}}
 """
 
 import json
@@ -14,6 +18,34 @@ from typing import List, Dict, Optional
 from rich.console import Console
 
 console = Console()
+
+
+def _is_tool_example(pair: Dict) -> bool:
+    """Check if this is a tool example vs QA pair."""
+    return "instruction" in pair and "solution" in pair
+
+
+def _format_tool_solution(solution: Dict) -> str:
+    """Format tool solution as readable assistant response."""
+    parts = []
+    
+    # Add reasoning steps
+    if "reasoning_path" in solution:
+        for step in solution["reasoning_path"]:
+            step_num = step.get("step", "")
+            thought = step.get("thought", "")
+            tool = step.get("tool", "")
+            args = step.get("args", {})
+            
+            parts.append(f"Step {step_num}: {thought}")
+            parts.append(f"Tool: {tool}({', '.join(f'{k}={repr(v)}' for k, v in args.items())})")
+            parts.append("")
+    
+    # Add final answer
+    if "final_answer" in solution:
+        parts.append(solution["final_answer"])
+    
+    return "\n".join(parts).strip()
 
 
 def export_to_format(
@@ -84,11 +116,20 @@ def _to_chatml(qa_pairs: List[Dict], system_prompt: Optional[str] = None) -> Lis
 
     formatted = []
     for pair in qa_pairs:
+        # Handle tool examples
+        if _is_tool_example(pair):
+            user_content = pair["instruction"]
+            assistant_content = _format_tool_solution(pair["solution"])
+        else:
+            # Standard QA pair
+            user_content = pair["question"]
+            assistant_content = pair["answer"]
+        
         item = {
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": pair["question"]},
-                {"role": "assistant", "content": pair["answer"]},
+                {"role": "user", "content": user_content},
+                {"role": "assistant", "content": assistant_content},
             ]
         }
         formatted.append(item)
@@ -109,10 +150,19 @@ def _to_alpaca(qa_pairs: List[Dict]) -> List[Dict]:
     """
     formatted = []
     for pair in qa_pairs:
+        # Handle tool examples
+        if _is_tool_example(pair):
+            instruction = pair["instruction"]
+            output = _format_tool_solution(pair["solution"])
+        else:
+            # Standard QA pair
+            instruction = pair["question"]
+            output = pair["answer"]
+        
         item = {
-            "instruction": pair["question"],
+            "instruction": instruction,
             "input": "",  # No additional input in our case
-            "output": pair["answer"],
+            "output": output,
         }
         formatted.append(item)
 
@@ -137,11 +187,20 @@ def _to_sharegpt(qa_pairs: List[Dict], system_prompt: Optional[str] = None) -> L
 
     formatted = []
     for pair in qa_pairs:
+        # Handle tool examples
+        if _is_tool_example(pair):
+            user_content = pair["instruction"]
+            assistant_content = _format_tool_solution(pair["solution"])
+        else:
+            # Standard QA pair
+            user_content = pair["question"]
+            assistant_content = pair["answer"]
+        
         item = {
             "conversations": [
                 {"from": "system", "value": system_prompt},
-                {"from": "human", "value": pair["question"]},
-                {"from": "gpt", "value": pair["answer"]},
+                {"from": "human", "value": user_content},
+                {"from": "gpt", "value": assistant_content},
             ]
         }
         formatted.append(item)
@@ -153,24 +212,44 @@ def _to_jsonl(qa_pairs: List[Dict]) -> List[Dict]:
     """
     Convert to simple JSONL format.
 
-    Example:
+    Example (QA):
     {
         "question": "What is HDF5?",
         "answer": "HDF5 is a data model...",
         "metadata": {...}
     }
+    
+    Example (Tool):
+    {
+        "instruction": "Open my data file",
+        "response": "Step 1: ...",
+        "metadata": {...}
+    }
     """
     formatted = []
     for pair in qa_pairs:
-        item = {
-            "question": pair["question"],
-            "answer": pair["answer"],
-            "metadata": {
-                k: v
-                for k, v in pair.items()
-                if k not in ["question", "answer"]
-            },
-        }
+        # Handle tool examples
+        if _is_tool_example(pair):
+            item = {
+                "instruction": pair["instruction"],
+                "response": _format_tool_solution(pair["solution"]),
+                "metadata": {
+                    k: v
+                    for k, v in pair.items()
+                    if k not in ["instruction", "solution"]
+                },
+            }
+        else:
+            # Standard QA pair
+            item = {
+                "question": pair["question"],
+                "answer": pair["answer"],
+                "metadata": {
+                    k: v
+                    for k, v in pair.items()
+                    if k not in ["question", "answer"]
+                },
+            }
         formatted.append(item)
 
     return formatted

@@ -2,7 +2,8 @@
 Prompt loading utilities.
 
 Loads prompts from individual YAML files in configs/prompts/ directory.
-Each prompt file has a 'prompt' key containing the template.
+- Single-prompt files: have a 'prompt' key containing the template
+- Multi-prompt files (e.g., tool_prompts.yaml): have multiple keys, each being a prompt
 """
 
 import yaml  # type: ignore[import-untyped]
@@ -14,7 +15,9 @@ def load_prompts(config_dir: Path) -> Dict[str, str]:
     """
     Load all prompts from configs/prompts/ directory.
 
-    Each YAML file should have a 'prompt' key with the template.
+    Supports two formats:
+    - Single-prompt files: YAML with a 'prompt' key
+    - Multi-prompt files: YAML with multiple prompt keys (e.g., tool_prompts.yaml)
 
     Args:
         config_dir: Path to configs directory
@@ -35,9 +38,17 @@ def load_prompts(config_dir: Path) -> Dict[str, str]:
         with open(prompt_file, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
-        if "prompt" not in data:
-            raise ValueError(f"'{prompt_file.name}' missing 'prompt' key")
-
-        prompts[prompt_name] = data["prompt"]
+        if data is None:
+            continue
+            
+        # Check if it's a single-prompt file (has 'prompt' key)
+        if "prompt" in data:
+            prompts[prompt_name] = data["prompt"]
+        else:
+            # Multi-prompt file: all keys are prompt names
+            # Only include string values (skip comments, metadata, etc.)
+            for key, value in data.items():
+                if isinstance(value, str):
+                    prompts[key] = value
 
     return prompts

@@ -641,5 +641,364 @@ def compare(datasets, output, sample_size, config, provider, model):
         console.print("\n[yellow]⚠️  Could not determine clear winner. Check report.[/yellow]\n")
 
 
+# ==============================================================================
+# PHASE 3: TOOL USE COMMANDS
+# ==============================================================================
+
+@main.command("tool-parse")
+@click.argument("input_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--format", "fmt", type=click.Choice(["auto", "openapi", "json", "python"]), 
+              default="auto", help="Input format (auto-detect if not specified)")
+def tool_parse(input_path, output, fmt):
+    """
+    Parse tool definitions from OpenAPI, JSON Schema, or Python modules.
+    
+    \b
+    Examples:
+      uv run generator tool-parse api.json -o tools.json
+      uv run generator tool-parse openapi.yaml -o tools.json --format openapi
+      uv run generator tool-parse tools.py -o tools.json --format python
+    """
+    from pathlib import Path
+    from .tool_parser import ToolParser
+    from .tool_schemas import save_tools
+    
+    console.print("\n[bold]🔧 Parsing tool definitions[/bold]\n")
+    
+    parser = ToolParser()
+    input_file = Path(input_path)
+    
+    # Auto-detect format
+    if fmt == "auto":
+        if input_file.suffix in [".yaml", ".yml"]:
+            fmt = "openapi"
+        elif input_file.suffix == ".py":
+            fmt = "python"
+        else:
+            fmt = "json"
+    
+    console.print(f"[cyan]Input: {input_path} (format: {fmt})[/cyan]")
+    
+    # Parse based on format
+    if fmt == "openapi":
+        tools = parser.parse_openapi(input_path)
+    elif fmt == "python":
+        tools = parser.parse_python_module(input_path)
+    else:
+        tools = parser.parse_json_schema(input_path)
+    
+    # Validate
+    errors = parser.validate_tools(tools)
+    if errors:
+        console.print("[yellow]⚠️  Validation warnings:[/yellow]")
+        for tool_id, errs in errors.items():
+            for err in errs:
+                console.print(f"  {tool_id}: {err}")
+    
+    # Save
+    save_tools(tools, output)
+    
+    console.print(f"\n[bold green]✨ Parsed {len(tools)} tools → {output}[/bold green]\n")
+
+
+@main.command("tool-generate")
+@click.argument("tools_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--single-step", "mode", flag_value="single", help="Generate only single-step examples")
+@click.option("--multi-step", "mode", flag_value="multi", help="Generate only multi-step examples")
+@click.option("--target-pairs", type=int, default=100, help="Total examples to generate")
+@click.option("--max-steps", type=int, default=5, help="Max steps for multi-step")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+def tool_generate(tools_path, output, config, mode, target_pairs, max_steps, provider, model):
+    """
+    Generate tool-use training examples.
+    
+    By default generates a balanced mix of single and multi-step examples
+    based on instruction complexity (auto mode).
+    
+    \b
+    Examples:
+      uv run generator tool-generate tools.json -o examples.json
+      uv run generator tool-generate tools.json -o examples.json --single-step
+      uv run generator tool-generate tools.json -o examples.json --multi-step
+      uv run generator tool-generate tools.json -o examples.json --target-pairs 500
+    """
+    import json
+    from pathlib import Path
+    from .tool_schemas import load_tools, save_examples
+    from .tool_generator import ToolGenerator
+    from .prompt_loader import load_prompts
+    
+    # Default to auto mode
+    if mode is None:
+        mode = "auto"
+    
+    console.print(f"\n[bold]🔧 Generating tool-use examples[/bold]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Load prompts (including tool_prompts.yaml)
+    prompts = load_prompts(Path(config_path).parent)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    console.print(f"[cyan]Tools: {tools_path}[/cyan]")
+    console.print(f"[cyan]Provider: {llm_config.get('provider', 'ollama')}[/cyan]")
+    console.print(f"[cyan]Mode: {mode}[/cyan]")
+    console.print(f"[cyan]Target: {target_pairs} examples[/cyan]\n")
+    
+    # Load tools
+    tools = load_tools(tools_path)
+    console.print(f"[green]✓ Loaded {len(tools)} tools[/green]")
+    
+    # Calculate per-tool count
+    n_per_tool = max(1, target_pairs // len(tools))
+    
+    # Generate
+    generator = ToolGenerator(llm_config.copy(), prompts)
+    examples = generator.generate_examples(
+        tools=tools,
+        n_per_tool=n_per_tool,
+        mode=mode,
+        max_steps=max_steps,
+    )
+    
+    # Save
+    save_examples(examples, output)
+    
+    console.print(f"\n[bold green]✨ Generated {len(examples)} examples → {output}[/bold green]\n")
+
+
+@main.command("tool-execute")
+@click.argument("examples_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--tools", "tools_path", type=click.Path(exists=True), help="Tools JSON file")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--mode", type=click.Choice(["simulated", "real", "multi_agent"]),
+              default="simulated", help="Execution mode")
+@click.option("--timeout", type=int, default=30, help="Timeout for real execution")
+@click.option("--provider", help="LLM provider for simulation")
+@click.option("--model", help="LLM model for simulation")
+def tool_execute(examples_path, output, tools_path, config, mode, timeout, provider, model):
+    """
+    Execute and validate tool-use examples.
+    
+    \b
+    Examples:
+      uv run generator tool-execute examples.json -o validated.json --mode simulated
+      uv run generator tool-execute examples.json -o validated.json --mode real --tools tools.json
+    """
+    from pathlib import Path
+    from .tool_schemas import load_tools, load_examples, save_examples
+    from .tool_executor import ToolExecutor, create_executor_with_builtins
+    from .prompt_loader import load_prompts
+    
+    console.print(f"\n[bold]🔧 Executing tool examples ({mode})[/bold]\n")
+    
+    # Load config for LLM if needed
+    llm_config = None
+    prompts = {}
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    
+    if mode in ["simulated", "multi_agent"]:
+        with open(config_path, "r") as f:
+            cfg = yaml.safe_load(f)
+        llm_config = _extract_llm_config(cfg, provider, model)
+        
+        # Load prompts (includes tool_prompts.yaml)
+        prompts = load_prompts(config_path.parent)
+    
+    console.print(f"[cyan]Examples: {examples_path}[/cyan]")
+    console.print(f"[cyan]Mode: {mode}[/cyan]")
+    
+    # Load examples
+    examples = load_examples(examples_path)
+    console.print(f"[green]✓ Loaded {len(examples)} examples[/green]")
+    
+    # Load tools if provided
+    tools = []
+    if tools_path:
+        tools = load_tools(tools_path)
+        console.print(f"[green]✓ Loaded {len(tools)} tools[/green]")
+    
+    # Create executor
+    if mode == "real":
+        executor = create_executor_with_builtins(mode=mode, timeout=timeout)
+    else:
+        executor = ToolExecutor(mode=mode, timeout=timeout, llm_config=llm_config.copy() if llm_config else None, prompts=prompts)
+    
+    # Execute
+    examples = executor.execute_examples(examples, tools)
+    
+    # Save
+    save_examples(examples, output)
+    
+    console.print(f"\n[bold green]✨ Executed → {output}[/bold green]\n")
+
+
+@main.command("tool-curate")
+@click.argument("examples_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--tools", "tools_path", type=click.Path(exists=True), help="Tools JSON file")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--threshold", type=float, default=7.0, help="Minimum rating (1-10)")
+@click.option("--min-success-rate", type=float, default=1.0, help="Min execution success rate")
+@click.option("--balance-difficulty", is_flag=True, help="Balance by difficulty")
+@click.option("--provider", help="LLM provider for rating")
+@click.option("--model", help="LLM model for rating")
+def tool_curate(examples_path, output, tools_path, config, threshold, min_success_rate, balance_difficulty, provider, model):
+    """
+    Curate tool-use examples by quality.
+    
+    \b
+    Examples:
+      uv run generator tool-curate examples.json -o curated.json --threshold 7.0
+      uv run generator tool-curate examples.json -o curated.json --balance-difficulty
+    """
+    from pathlib import Path
+    from .tool_schemas import load_tools, load_examples, save_examples
+    from .tool_curator import ToolCurator
+    from .prompt_loader import load_prompts
+    
+    console.print("\n[bold]🔧 Curating tool-use examples[/bold]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Load prompts (includes tool_prompts.yaml)
+    prompts = load_prompts(Path(config_path).parent)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    console.print(f"[cyan]Examples: {examples_path}[/cyan]")
+    console.print(f"[cyan]Threshold: {threshold}[/cyan]")
+    
+    # Load examples
+    examples = load_examples(examples_path)
+    console.print(f"[green]✓ Loaded {len(examples)} examples[/green]")
+    
+    # Load tools if provided
+    tools = []
+    if tools_path:
+        tools = load_tools(tools_path)
+    
+    # Curate
+    curator = ToolCurator(llm_config=llm_config.copy(), prompts=prompts)
+    curated = curator.curate(
+        examples=examples,
+        tools=tools,
+        min_success_rate=min_success_rate,
+        rating_threshold=threshold,
+        balance=balance_difficulty,
+    )
+    
+    # Save
+    save_examples(curated, output)
+    
+    console.print(f"\n[bold green]✨ Curated {len(curated)}/{len(examples)} examples → {output}[/bold green]\n")
+
+
+@main.command("tool-pipeline")
+@click.argument("tools_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSONL file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--single-step", "mode", flag_value="single", help="Generate only single-step examples")
+@click.option("--multi-step", "mode", flag_value="multi", help="Generate only multi-step examples")
+@click.option("--target-pairs", type=int, default=100, help="Total examples to generate")
+@click.option("--threshold", type=float, default=7.0, help="Quality threshold")
+@click.option("--execution-mode", type=click.Choice(["simulated", "real"]),
+              default="simulated", help="Execution mode")
+@click.option("--format", "fmt", type=click.Choice(["chatml", "alpaca", "sharegpt"]),
+              default="chatml", help="Output training format")
+@click.option("--provider", help="LLM provider")
+@click.option("--model", help="LLM model")
+def tool_pipeline(tools_path, output, config, mode, target_pairs, threshold, execution_mode, fmt, provider, model):
+    """
+    Full tool-use training data pipeline.
+    
+    Runs: generate → execute → curate → export
+    
+    By default generates a balanced mix of single and multi-step examples.
+    
+    \b
+    Examples:
+      uv run generator tool-pipeline tools.json -o training.jsonl
+      uv run generator tool-pipeline tools.json -o training.jsonl --single-step
+      uv run generator tool-pipeline tools.json -o training.jsonl --target-pairs 1000
+    """
+    import json
+    from pathlib import Path
+    from .tool_schemas import load_tools, save_examples, ToolExample
+    from .tool_generator import ToolGenerator
+    from .tool_executor import ToolExecutor
+    from .tool_curator import ToolCurator
+    from .prompt_loader import load_prompts
+    
+    console.print("\n[bold]🔧 Running full tool-use pipeline[/bold]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Load prompts (includes tool_prompts.yaml)
+    prompts = load_prompts(Path(config_path).parent)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    # Default to auto mode
+    if mode is None:
+        mode = "auto"
+    
+    console.print(f"[cyan]Tools: {tools_path}[/cyan]")
+    console.print(f"[cyan]Mode: {mode}[/cyan]")
+    console.print(f"[cyan]Target: {target_pairs} examples[/cyan]")
+    console.print(f"[cyan]Execution: {execution_mode}[/cyan]")
+    console.print(f"[cyan]Format: {fmt}[/cyan]\n")
+    
+    # Load tools
+    tools = load_tools(tools_path)
+    console.print(f"[green]✓ Loaded {len(tools)} tools[/green]\n")
+    
+    # Step 1: Generate
+    console.print("[bold]Step 1/4: Generating examples...[/bold]")
+    n_per_tool = max(1, target_pairs // len(tools))
+    generator = ToolGenerator(llm_config.copy(), prompts)
+    examples = generator.generate_examples(tools, n_per_tool, mode)
+    
+    # Step 2: Execute
+    console.print("\n[bold]Step 2/4: Executing examples...[/bold]")
+    executor = ToolExecutor(mode=execution_mode, llm_config=llm_config.copy(), prompts=prompts)
+    examples = executor.execute_examples(examples, tools)
+    
+    # Step 3: Curate
+    console.print("\n[bold]Step 3/4: Curating examples...[/bold]")
+    curator = ToolCurator(llm_config=llm_config.copy(), prompts=prompts)
+    examples = curator.curate(examples, tools, rating_threshold=threshold)
+    
+    # Step 4: Export
+    console.print("\n[bold]Step 4/4: Exporting to training format...[/bold]")
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    with open(output_path, "w") as f:
+        for example in examples:
+            training_data = example.to_training_format(fmt)
+            f.write(json.dumps(training_data, ensure_ascii=False) + "\n")
+    
+    console.print(f"\n[bold green]✨ Pipeline complete! {len(examples)} examples → {output}[/bold green]\n")
+
+
 if __name__ == "__main__":
     main()
