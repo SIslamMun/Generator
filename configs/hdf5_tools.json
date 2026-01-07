@@ -1,0 +1,573 @@
+{
+  "name": "HDF5 MCP Tools",
+  "version": "2.0",
+  "description": "Tools for interacting with HDF5 files - based on iowarp/agent-toolkit MCP server",
+  "tools": [
+    {
+      "tool_id": "hdf5_open_file",
+      "name": "open_file",
+      "category": "file_operations",
+      "description": "Open an HDF5 file with lazy loading. Must be called before any other file operations.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the HDF5 file"
+        },
+        {
+          "name": "mode",
+          "type": "string",
+          "required": false,
+          "default": "r",
+          "description": "Access mode: 'r' (read-only), 'r+' (read/write), 'w' (write), 'a' (append)"
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Success message with filename and mode"
+      },
+      "examples": [
+        "open_file(path='/data/simulation.h5', mode='r')",
+        "open_file(path='/experiments/results.h5')"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_close_file",
+      "name": "close_file",
+      "category": "file_operations",
+      "description": "Close the currently open HDF5 file and release resources.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Confirmation message with filename"
+      },
+      "examples": ["close_file()"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_get_filename",
+      "name": "get_filename",
+      "category": "file_operations",
+      "description": "Get the path of the currently open HDF5 file.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Current filename or 'No file currently open'"
+      },
+      "examples": ["get_filename()"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_get_mode",
+      "name": "get_mode",
+      "category": "file_operations",
+      "description": "Get the access mode of the currently open HDF5 file.",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "description": "Access mode ('r', 'r+', 'w', 'a') or 'No file currently open'"
+      },
+      "examples": ["get_mode()"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_get_by_path",
+      "name": "get_by_path",
+      "category": "navigation",
+      "description": "Get a dataset or group by its path within the HDF5 file.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to object within the file (e.g., '/results/temperature')"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Object info including type, shape, dtype, and keys (for groups)"
+      },
+      "examples": [
+        "get_by_path(path='/results/temperature')",
+        "get_by_path(path='/experiment/metadata')"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_list_keys",
+      "name": "list_keys",
+      "category": "navigation",
+      "description": "List all keys (children) in the current group.",
+      "parameters": [],
+      "returns": {
+        "type": "array",
+        "description": "JSON list of keys"
+      },
+      "examples": ["list_keys()"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_visit",
+      "name": "visit",
+      "category": "navigation",
+      "description": "Visit all nodes in the file recursively, starting from root.",
+      "parameters": [
+        {
+          "name": "callback_fn",
+          "type": "string",
+          "required": true,
+          "description": "Callback function name to apply to each node"
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "JSON list of all paths with their types"
+      },
+      "examples": ["visit(callback_fn='print_info')"],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_read_full_dataset",
+      "name": "read_full_dataset",
+      "category": "dataset_operations",
+      "description": "Read an entire dataset with efficient chunked reading for large datasets. Automatically uses chunked reading for datasets >100MB.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset within the file"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Success message with data description and array contents"
+      },
+      "examples": [
+        "read_full_dataset(path='/experiment/data')",
+        "read_full_dataset(path='/results/measurements')"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_read_partial_dataset",
+      "name": "read_partial_dataset",
+      "category": "dataset_operations",
+      "description": "Read a portion of a dataset using slicing. Memory-efficient for large datasets.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset"
+        },
+        {
+          "name": "start",
+          "type": "array",
+          "required": false,
+          "description": "Starting indices for each dimension (e.g., [0, 0])"
+        },
+        {
+          "name": "count",
+          "type": "array",
+          "required": false,
+          "description": "Number of elements to read per dimension (e.g., [100, 50])"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Dataset slice with metadata (shape, dtype)"
+      },
+      "examples": [
+        "read_partial_dataset(path='/data', start=[0, 0], count=[100, 50])",
+        "read_partial_dataset(path='/images', start=[0], count=[10])"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_get_shape",
+      "name": "get_shape",
+      "category": "dataset_operations",
+      "description": "Get the shape (dimensions) of a dataset.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset"
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Shape tuple as string (e.g., '(1000, 500)')"
+      },
+      "examples": ["get_shape(path='/experiment/measurements')"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_get_dtype",
+      "name": "get_dtype",
+      "category": "dataset_operations",
+      "description": "Get the data type of a dataset.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset"
+        }
+      ],
+      "returns": {
+        "type": "string",
+        "description": "Data type as string (e.g., 'float64', 'int32')"
+      },
+      "examples": ["get_dtype(path='/results/values')"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_get_size",
+      "name": "get_size",
+      "category": "dataset_operations",
+      "description": "Get the total number of elements in a dataset.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset"
+        }
+      ],
+      "returns": {
+        "type": "integer",
+        "description": "Total number of elements"
+      },
+      "examples": ["get_size(path='/data/array')"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_get_chunks",
+      "name": "get_chunks",
+      "category": "dataset_operations",
+      "description": "Get chunk information for a dataset, useful for understanding I/O performance.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Chunk shape and size in KB"
+      },
+      "examples": ["get_chunks(path='/large_dataset')"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_read_attribute",
+      "name": "read_attribute",
+      "category": "attribute_operations",
+      "description": "Read a specific attribute from an HDF5 object (dataset or group).",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the object"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Name of the attribute to read"
+        }
+      ],
+      "returns": {
+        "type": "any",
+        "description": "Attribute value (string, number, or array)"
+      },
+      "examples": [
+        "read_attribute(path='/experiment', name='temperature')",
+        "read_attribute(path='/dataset', name='units')"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_list_attributes",
+      "name": "list_attributes",
+      "category": "attribute_operations",
+      "description": "List all attributes of an HDF5 object.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the object"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "JSON dictionary of all attributes with their values"
+      },
+      "examples": ["list_attributes(path='/experiment/metadata')"],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_parallel_scan",
+      "name": "hdf5_parallel_scan",
+      "category": "performance",
+      "description": "Fast multi-file scanning with parallel processing. 3-5x faster than sequential scanning.",
+      "parameters": [
+        {
+          "name": "directory",
+          "type": "string",
+          "required": true,
+          "description": "Directory to scan for HDF5 files"
+        },
+        {
+          "name": "pattern",
+          "type": "string",
+          "required": false,
+          "default": "*.h5",
+          "description": "File pattern to match (e.g., '*.h5', '**/*.hdf5')"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Summary with file count, dataset count, total size, and worker count"
+      },
+      "examples": [
+        "hdf5_parallel_scan(directory='/simulations', pattern='**/*.h5')",
+        "hdf5_parallel_scan(directory='/data')"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_batch_read",
+      "name": "hdf5_batch_read",
+      "category": "performance",
+      "description": "Read multiple datasets in one call with parallel processing. 4-8x faster than sequential reads.",
+      "parameters": [
+        {
+          "name": "paths",
+          "type": "array",
+          "required": true,
+          "description": "List of dataset paths to read"
+        },
+        {
+          "name": "slice_spec",
+          "type": "string",
+          "required": false,
+          "description": "Slice specification to apply to all datasets (e.g., '0:100')"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Summary of batch read with per-dataset info"
+      },
+      "examples": [
+        "hdf5_batch_read(paths=['/data1', '/data2', '/data3'], slice_spec='0:1000')",
+        "hdf5_batch_read(paths=['/exp1/results', '/exp2/results'])"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_stream_data",
+      "name": "hdf5_stream_data",
+      "category": "performance",
+      "description": "Stream large datasets efficiently with memory management. Only keeps one chunk in memory at a time.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the large dataset"
+        },
+        {
+          "name": "chunk_size",
+          "type": "integer",
+          "required": false,
+          "default": 1024,
+          "description": "Number of elements per chunk"
+        },
+        {
+          "name": "max_chunks",
+          "type": "integer",
+          "required": false,
+          "default": 100,
+          "description": "Maximum number of chunks to process"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Streaming report with per-chunk statistics"
+      },
+      "examples": [
+        "hdf5_stream_data(path='/massive_dataset', chunk_size=100000, max_chunks=500)"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "tool_id": "hdf5_aggregate_stats",
+      "name": "hdf5_aggregate_stats",
+      "category": "performance",
+      "description": "Parallel statistics computation across multiple datasets. Supports automatic sampling for datasets >500MB.",
+      "parameters": [
+        {
+          "name": "paths",
+          "type": "array",
+          "required": true,
+          "description": "List of dataset paths to compute statistics for"
+        },
+        {
+          "name": "stats",
+          "type": "array",
+          "required": false,
+          "description": "Statistics to compute: mean, std, min, max, sum, count"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Per-dataset statistics plus cross-dataset aggregation"
+      },
+      "examples": [
+        "hdf5_aggregate_stats(paths=['/exp1/data', '/exp2/data'], stats=['mean', 'std', 'min', 'max'])"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "tool_id": "hdf5_analyze_structure",
+      "name": "analyze_dataset_structure",
+      "category": "discovery",
+      "description": "Analyze and understand file organization and data patterns.",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": false,
+          "default": "/",
+          "description": "Path to analyze (defaults to root)"
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Structural analysis with group count, dataset count, and sizes"
+      },
+      "examples": [
+        "analyze_dataset_structure(path='/results')",
+        "analyze_dataset_structure()"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "tool_id": "hdf5_find_similar",
+      "name": "find_similar_datasets",
+      "category": "discovery",
+      "description": "Find datasets with similar characteristics to a reference. Compares shape, dtype, and size.",
+      "parameters": [
+        {
+          "name": "reference_path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the reference dataset"
+        },
+        {
+          "name": "similarity_threshold",
+          "type": "number",
+          "required": false,
+          "default": 0.8,
+          "description": "Similarity threshold from 0 to 1"
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Ranked list of similar datasets with similarity scores"
+      },
+      "examples": [
+        "find_similar_datasets(reference_path='/template/data', similarity_threshold=0.75)"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_suggest_exploration",
+      "name": "suggest_next_exploration",
+      "category": "discovery",
+      "description": "Suggest interesting data to explore based on current location. Scores based on size (1-100MB ideal), dimensionality, and naming patterns.",
+      "parameters": [
+        {
+          "name": "current_path",
+          "type": "string",
+          "required": false,
+          "default": "/",
+          "description": "Current location in the file"
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "Scored suggestions with shape and size information"
+      },
+      "examples": [
+        "suggest_next_exploration(current_path='/')",
+        "suggest_next_exploration(current_path='/experiments')"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_identify_bottlenecks",
+      "name": "identify_io_bottlenecks",
+      "category": "discovery",
+      "description": "Identify potential I/O bottlenecks and performance issues. Detects: large datasets without chunking, small chunk sizes, missing compression, high-dimensional arrays.",
+      "parameters": [
+        {
+          "name": "analysis_paths",
+          "type": "array",
+          "required": false,
+          "description": "Paths to analyze (auto-discovers if not provided)"
+        }
+      ],
+      "returns": {
+        "type": "array",
+        "description": "List of datasets with performance issues and warnings"
+      },
+      "examples": [
+        "identify_io_bottlenecks()",
+        "identify_io_bottlenecks(analysis_paths=['/data', '/results'])"
+      ],
+      "complexity": "medium"
+    },
+    {
+      "tool_id": "hdf5_optimize_access",
+      "name": "optimize_access_pattern",
+      "category": "discovery",
+      "description": "Suggest better approaches for data access based on usage patterns.",
+      "parameters": [
+        {
+          "name": "dataset_path",
+          "type": "string",
+          "required": true,
+          "description": "Path to the dataset to optimize"
+        },
+        {
+          "name": "access_pattern",
+          "type": "string",
+          "required": false,
+          "default": "sequential",
+          "description": "Pattern type: 'sequential', 'random', or 'batch'",
+          "enum": ["sequential", "random", "batch"]
+        }
+      ],
+      "returns": {
+        "type": "object",
+        "description": "Optimization recommendations specific to the access pattern"
+      },
+      "examples": [
+        "optimize_access_pattern(dataset_path='/large_dataset', access_pattern='random')",
+        "optimize_access_pattern(dataset_path='/timeseries', access_pattern='sequential')"
+      ],
+      "complexity": "medium"
+    }
+  ]
+}

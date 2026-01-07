@@ -1,0 +1,383 @@
+# ============================================================================
+# TOOL USE PROMPTS - Phase 3
+# Based on Toolformer, Gorilla, and ToolLLM methodologies
+# ============================================================================
+
+# ------------------------------------------------------------------------------
+# INSTRUCTION GENERATION
+# Generate diverse user instructions for tool usage
+# ------------------------------------------------------------------------------
+tool_instruction_generation: |
+  Generate diverse user instructions that would require this tool.
+
+  Tool: {tool_name}
+  Description: {tool_description}
+  Parameters: {parameters}
+  Examples: {examples}
+
+  Generate {n_instructions} diverse instructions including:
+  - Simple direct usage (e.g., "Calculate 15% of 200")
+  - Complex parameter combinations (e.g., "Find the square root of the sum of 144 and 256")
+  - Edge cases (e.g., "What happens if I divide by zero?")
+  - Real-world scenarios (e.g., "I need to split a $127.50 bill among 3 people")
+
+  Return JSON array:
+  [
+    {{
+      "instruction": "Natural language user request",
+      "difficulty": "simple|medium|complex",
+      "scenario": "Brief context explaining the use case"
+    }}
+  ]
+
+  Return ONLY valid JSON, no explanation.
+
+# ------------------------------------------------------------------------------
+# MULTI-TOOL INSTRUCTION GENERATION
+# Generate instructions requiring multiple tools
+# ------------------------------------------------------------------------------
+multi_tool_instruction_generation: |
+  Generate a realistic user instruction that requires using MULTIPLE tools together.
+
+  Available Tools:
+  {tools_documentation}
+
+  The instruction should:
+  1. Require 2-3 tools to complete
+  2. Have a logical flow where outputs chain together
+  3. Be a realistic task a user might actually need
+
+  Return JSON:
+  {{
+    "instruction": "Natural language user request",
+    "difficulty": "medium|complex",
+    "scenario": "Brief context",
+    "expected_tools": ["tool1", "tool2"]
+  }}
+
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# SOLUTION ANNOTATION - SINGLE STEP (Unified)
+# Single tool call with documentation grounding
+# ------------------------------------------------------------------------------
+tool_solution_single: |
+  Use this API documentation for reference:
+
+  {api_documentation}
+
+  ---
+
+  User Request: {instruction}
+
+  Generate the correct API call to fulfill this request.
+  Ground your answer in the documentation above.
+
+  Think step by step:
+  1. What is the user asking for?
+  2. Which tool can fulfill this request?
+  3. What arguments should be passed?
+
+  Respond with JSON:
+  {{
+    "thought": "Reasoning about which API to use and why",
+    "tool": "api_name",
+    "args": {{"param1": "value1", "param2": "value2"}},
+    "expected_result": "Expected output based on API description",
+    "final_answer": "Natural language answer to give the user"
+  }}
+
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# SOLUTION ANNOTATION - MULTI STEP (Unified)
+# Multi-step reasoning with documentation and chaining
+# ------------------------------------------------------------------------------
+tool_solution_multi: |
+  You are an expert at solving tasks using available tools.
+
+  API Documentation:
+  {api_documentation}
+
+  User Instruction: {instruction}
+
+  Available Tools (JSON Schema):
+  {tools_json}
+
+  Generate a step-by-step solution using the available tools.
+  For each step:
+  1. Think about what needs to be done next
+  2. Choose the appropriate tool from the documentation
+  3. Specify the arguments
+  4. Predict the expected result (which may feed into next step)
+
+  Return JSON:
+  {{
+    "reasoning_path": [
+      {{
+        "step": 1,
+        "thought": "Why this step is needed",
+        "tool": "tool_name",
+        "args": {{"param": "value"}},
+        "expected_result": "What we expect back"
+      }},
+      {{
+        "step": 2,
+        "thought": "Next step based on previous result",
+        "tool": "another_tool",
+        "args": {{}},
+        "expected_result": "..."
+      }}
+    ],
+    "final_answer": "Natural language answer that would be given to the user"
+  }}
+
+  Maximum {max_steps} steps. Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# LEGACY: SOLUTION ANNOTATION - TOOLFORMER STYLE
+# Single-step tool call with reasoning
+# ------------------------------------------------------------------------------
+tool_solution_toolformer: |
+  Given this user request, determine which tool to use and generate the tool call.
+
+  User Request: {instruction}
+
+  Available Tools:
+  {tools_list}
+
+  Think step by step:
+  1. What is the user asking for?
+  2. Which tool can fulfill this request?
+  3. What arguments should be passed?
+
+  Respond with JSON:
+  {{
+    "thought": "Reasoning about why this tool is needed",
+    "tool": "tool_name",
+    "args": {{"param1": "value1", "param2": "value2"}},
+    "expected_result": "Description of expected output"
+  }}
+
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# LEGACY: SOLUTION ANNOTATION - GORILLA STYLE
+# With API documentation context
+# ------------------------------------------------------------------------------
+tool_solution_gorilla: |
+  Use this API documentation for reference:
+
+  {api_documentation}
+
+  ---
+
+  User Request: {instruction}
+
+  Generate the correct API call to fulfill this request. Ground your answer in the documentation.
+
+  Respond with JSON:
+  {{
+    "thought": "Reasoning about which API to use and why, referencing the documentation",
+    "tool": "api_name",
+    "args": {{"param1": "value1"}},
+    "expected_result": "Expected output based on API description"
+  }}
+
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# LEGACY: SOLUTION ANNOTATION - TOOLLLM STYLE (DFSDT)
+# Multi-step reasoning with backtracking capability
+# ------------------------------------------------------------------------------
+tool_solution_toolllm: |
+  You are an expert at solving tasks using available tools.
+
+  User Instruction: {instruction}
+
+  Available Tools:
+  {tools_json}
+
+  Generate a step-by-step solution using the available tools.
+  For each step:
+  1. Think about what needs to be done next
+  2. Choose the appropriate tool
+  3. Specify the arguments
+  4. Predict the expected result
+
+  If a step might fail, consider alternatives (DFSDT approach).
+
+  Return JSON:
+  {{
+    "reasoning_path": [
+      {{
+        "step": 1,
+        "thought": "Why this step is needed",
+        "tool": "tool_name",
+        "args": {{"param": "value"}},
+        "expected_result": "What we expect back"
+      }},
+      {{
+        "step": 2,
+        "thought": "Next step based on previous result",
+        "tool": "another_tool",
+        "args": {{}},
+        "expected_result": "..."
+      }}
+    ],
+    "final_answer": "Natural language answer that would be given to the user"
+  }}
+
+  Maximum {max_steps} steps. Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# QUALITY RATING - LLM-as-Judge
+# Based on AlpaGasus methodology
+# ------------------------------------------------------------------------------
+tool_quality_rating: |
+  You are an expert evaluator of tool-calling examples for LLM training.
+
+  Rate this example on a scale of 1-10.
+
+  **Instruction:** {instruction}
+
+  **Tool Usage:**
+  {tool_calls}
+
+  **Execution Result:** {result}
+
+  **Final Answer:** {answer}
+
+  **Rating Criteria:**
+  - Tool Selection (0-3): Are the right tools chosen for the task?
+  - Parameter Correctness (0-3): Are arguments valid and appropriate?
+  - Reasoning Quality (0-2): Is the thought process clear and logical?
+  - Result Usefulness (0-2): Does the result actually solve the instruction?
+
+  **Scoring Guide:**
+  - 9-10: Perfect - correct tool, valid params, clear reasoning, useful result
+  - 7-8: Good - minor issues but fundamentally correct
+  - 5-6: Acceptable - works but has noticeable problems
+  - 3-4: Poor - significant issues with tool choice or parameters
+  - 1-2: Unusable - completely wrong or broken
+
+  Return JSON:
+  {{
+    "rating": 8,
+    "tool_selection": 3,
+    "parameter_correctness": 3,
+    "reasoning_quality": 1,
+    "result_usefulness": 2,
+    "reasoning": "Brief explanation of the rating"
+  }}
+
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# SEMANTIC VERIFICATION
+# Verify execution result semantically solves the instruction
+# ------------------------------------------------------------------------------
+tool_semantic_verification: |
+  Evaluate if this tool execution correctly solves the user's request.
+
+  **User Request:** {instruction}
+
+  **Execution Steps:**
+  {steps_summary}
+
+  **Final Answer:** {final_answer}
+
+  Consider:
+  1. Were the right tools selected for this task?
+  2. Are the execution results relevant to the request?
+  3. Does the final answer accurately address the user's need?
+  4. Is there any hallucination or made-up information?
+
+  Respond with JSON:
+  {{
+    "correct": true,
+    "confidence": 0.95,
+    "issues": [],
+    "reasoning": "Brief explanation"
+  }}
+
+  If NOT correct:
+  {{
+    "correct": false,
+    "confidence": 0.85,
+    "issues": ["Issue 1", "Issue 2"],
+    "reasoning": "Why this doesn't correctly solve the request"
+  }}
+
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
+# TOOL SIMULATION - Multi-Agent
+# For simulating tool responses when real execution isn't available
+# ------------------------------------------------------------------------------
+tool_simulation: |
+  You are simulating the {tool_name} API.
+
+  Your role is to act AS the API and return realistic responses.
+
+  API Specification:
+  - Name: {tool_name}
+  - Description: {tool_description}
+  - Expected return type: {return_type}
+
+  API Call: {tool_name}({args_json})
+
+  Context from previous calls: {context}
+
+  Generate a realistic response that this API would return.
+  The response should:
+  1. Be consistent with the API description
+  2. Use the provided arguments appropriately
+  3. Return the correct data type
+  4. Be plausible (not obviously fake data)
+
+  Return ONLY the API response (JSON format if object/array, plain value if primitive).
+
+# ------------------------------------------------------------------------------
+# ERROR HANDLING ANNOTATION
+# Generate examples with error recovery
+# ------------------------------------------------------------------------------
+tool_error_handling: |
+  Generate a tool-use example that includes error handling and recovery.
+
+  User Instruction: {instruction}
+
+  Available Tools:
+  {tools_list}
+
+  Create a scenario where:
+  1. The first approach encounters an error
+  2. The model recovers and tries an alternative
+  3. Eventually succeeds
+
+  Return JSON:
+  {{
+    "reasoning_path": [
+      {{
+        "step": 1,
+        "thought": "Initial approach",
+        "tool": "tool_name",
+        "args": {{}},
+        "expected_result": "...",
+        "actual_result": {{"error": "Error message"}},
+        "status": "failure"
+      }},
+      {{
+        "step": 2,
+        "thought": "Recovery: trying alternative approach",
+        "tool": "alternative_tool",
+        "args": {{}},
+        "expected_result": "...",
+        "actual_result": {{}},
+        "status": "success"
+      }}
+    ],
+    "final_answer": "Answer after recovery"
+  }}
+
+  Return ONLY valid JSON.
