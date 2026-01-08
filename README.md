@@ -1,13 +1,21 @@
-# Generator - Synthetic QA Pair Generator
+# Generator - Synthetic Training Data Generator
 
-Generate high-quality QA pairs from LanceDB chunks for LLM fine-tuning.
+Generate high-quality training data for LLM fine-tuning: QA pairs from documents and tool-use examples from API definitions.
 
 ## ✨ Features
 
+### QA Pipeline (Knowledge Training)
 **Pipeline**: Generate → Enrich → Curate → Export  
 **CoT Support**: Generate or enhance with Chain-of-Thought reasoning  
-**Providers**: Ollama, Claude, Gemini, vLLM, OpenAI, Anthropic  
 **Formats**: ChatML, Alpaca, ShareGPT, JSONL  
+
+### Tool-Use Pipeline (Agentic Training)
+**Pipeline**: Parse → Generate → Execute → Curate  
+**Modes**: Single-step, Multi-step, or Auto (complexity-based)  
+**Output**: Instruction → Reasoning → Tool Calls with API documentation  
+
+### Common
+**Providers**: Ollama, Claude, Gemini, vLLM, OpenAI, Anthropic  
 **Rating**: LLM-as-Judge with detailed criteria (clarity, accuracy, usefulness, difficulty)
 
 ## 📦 Installation
@@ -29,12 +37,17 @@ llm:
   temperature: 0.7
 ```
 
-**2. Run Pipeline** (recommended):
+**2. Run QA Pipeline** (for domain knowledge):
 ```bash
 uv run generator pipeline /path/to/lancedb -o training.jsonl
 ```
 
-**3. Or Run Steps**:
+**3. Run Tool-Use Pipeline** (for agentic capabilities):
+```bash
+uv run generator tool-pipeline configs/hdf5_tools.json -o tool_training.json
+```
+
+**4. Or Run Steps Individually**:
 ```bash
 # QA pairs
 uv run generator generate /path/to/lancedb -o qa.json --target-pairs 300
@@ -51,7 +64,7 @@ uv run generator export cot_curated.json -o cot_training.jsonl -f chatml
 uv run generator enhance-cot qa.json -o cot_enhanced.json
 ```
 
-## 📝 CLI Commands
+## 📝 QA Pipeline Commands
 
 ### `list-providers`
 List available LLM providers and setup instructions.
@@ -283,21 +296,178 @@ uv run generator pipeline /path/to/lancedb -o training.json -f alpaca --threshol
 ```
 
 **Pipeline Steps:** Generate (1/4) → Enrich (2/4) → Curate (3/4) → Export (4/4)
-    "original_answer": "Use `uv run phagocyte ingest file <path>`",
-    "chunk_id": "chunk_123"
+
+---
+
+## 🔧 Tool-Use Pipeline (Agentic Training)
+
+Generate training data for function-calling and tool-use capabilities. Teaches models to select and invoke APIs based on user instructions.
+
+### Tool Definition Format
+
+Create a JSON file with your tools (see [configs/hdf5_tools.json](configs/hdf5_tools.json) for a complete example):
+
+```json
+{
+  "name": "HDF5 MCP Tools",
+  "tools": [
+    {
+      "tool_id": "hdf5_open_file",
+      "name": "open_file",
+      "category": "file_operations",
+      "description": "Open an HDF5 file with lazy loading.",
+      "parameters": [
+        {"name": "path", "type": "string", "required": true, "description": "Path to the HDF5 file"},
+        {"name": "mode", "type": "string", "required": false, "default": "r", "description": "Access mode"}
+      ],
+      "returns": {"type": "string", "description": "Success message"},
+      "examples": ["open_file(path='/data/sim.h5', mode='r')"],
+      "complexity": "simple"
+    }
+  ]
+}
+```
+
+### `tool-generate` - Generate tool-use training examples
+
+```bash
+uv run generator tool-generate TOOLS.json -o OUTPUT.json [OPTIONS]
+```
+
+**Options:**
+- `--config PATH` - Config file
+- `--single-step` - Generate only single-tool examples
+- `--multi-step` - Generate only multi-tool examples  
+- `--target-pairs INT` - Total examples to generate
+- `--max-steps INT` - Max steps for multi-step (default: 5)
+- `--provider TEXT` - Override provider
+- `--model TEXT` - Override model
+
+**Modes:**
+- **Auto (default)**: Balanced mix based on instruction complexity
+- **Single-step**: One tool call per instruction
+- **Multi-step**: Multiple coordinated tool calls with reasoning
+
+**Examples:**
+```bash
+# Auto mode - balanced mix
+uv run generator tool-generate configs/hdf5_tools.json -o examples.json
+
+# Single-step only (simpler tasks)
+uv run generator tool-generate configs/hdf5_tools.json -o simple.json --single-step
+
+# Multi-step only (complex workflows)
+uv run generator tool-generate configs/hdf5_tools.json -o complex.json --multi-step
+
+# Target specific count
+uv run generator tool-generate configs/hdf5_tools.json -o examples.json --target-pairs 500
+```
+
+**Output:**
+```json
+{
+  "instruction": "Read the temperature data from my simulation file",
+  "solution": {
+    "reasoning_path": [
+      {
+        "step": 1,
+        "thought": "First, I need to open the HDF5 file...",
+        "tool": "open_file",
+        "args": {"path": "simulation.h5", "mode": "r"}
+      },
+      {
+        "step": 2,
+        "thought": "Now I can read the temperature dataset...",
+        "tool": "read_full_dataset",
+        "args": {"path": "/results/temperature"}
+      }
+    ],
+    "api_documentation": "open_file(path: string, mode: string = r)..."
+  },
+  "metadata": {
+    "difficulty": "medium",
+    "mode": "multi"
   }
-]
+}
 ```
 
 ---
 
-### curate
+### `tool-curate` - Filter tool-use examples by quality
 
-Filter QA pairs or CoT examples by quality using **LLM-as-Judge** with detailed rating criteria.
+```bash
+uv run generator tool-curate INPUT.json -o OUTPUT.json [OPTIONS]
+```
 
-**Format Support:**
-- ✅ QA pairs: `{"question": "...", "answer": "..."}`
-- ✅ CoT examples: `{"question": "...", "reasoning": "...", "answer": "..."}`
+**Options:**
+- `--threshold FLOAT` - Minimum rating (default: 7.0)
+- `--config PATH` - Config file
+- `--provider TEXT` - Override provider
+- `--model TEXT` - Override model
+
+**Examples:**
+```bash
+uv run generator tool-curate examples.json -o curated.json
+uv run generator tool-curate examples.json -o high_quality.json --threshold 8.0
+```
+
+---
+
+### `tool-pipeline` - Run full tool-use pipeline
+
+```bash
+uv run generator tool-pipeline TOOLS.json -o OUTPUT.json [OPTIONS]
+```
+
+**Options:**
+- `--config PATH` - Config file
+- `--single-step` - Single-tool examples only
+- `--multi-step` - Multi-tool examples only
+- `--target-pairs INT` - Total examples
+- `--threshold FLOAT` - Curation threshold (default: 7.0)
+- `--skip-curation` - Skip quality filtering
+
+**Examples:**
+```bash
+# Full pipeline
+uv run generator tool-pipeline configs/hdf5_tools.json -o training.json
+
+# Quick generation without curation
+uv run generator tool-pipeline configs/hdf5_tools.json -o draft.json --skip-curation
+
+# High-quality multi-step only
+uv run generator tool-pipeline configs/hdf5_tools.json -o complex.json --multi-step --threshold 8.0
+```
+
+---
+
+### `tool-parse` - Validate tool definitions
+
+```bash
+uv run generator tool-parse TOOLS.json
+```
+
+Validates JSON format and shows tool summary.
+
+---
+
+### Included Tool Definitions
+
+| File | Description | Tools |
+|------|-------------|-------|
+| [configs/hdf5_tools.json](configs/hdf5_tools.json) | HDF5 MCP Server tools | 25 tools (file, navigation, dataset, attributes, performance, discovery) |
+
+**HDF5 Tools Categories:**
+- **File Operations**: `open_file`, `close_file`, `get_filename`, `get_mode`
+- **Navigation**: `get_by_path`, `list_keys`, `visit`
+- **Dataset Operations**: `read_full_dataset`, `read_partial_dataset`, `get_shape`, `get_dtype`, `get_size`, `get_chunks`
+- **Attribute Operations**: `read_attribute`, `list_attributes`
+- **Performance**: `hdf5_parallel_scan`, `hdf5_batch_read`, `hdf5_stream_data`, `hdf5_aggregate_stats`
+- **Discovery**: `analyze_dataset_structure`, `find_similar_datasets`, `suggest_next_exploration`, `identify_io_bottlenecks`, `optimize_access_pattern`
+
+---
+
+## 📝 QA Pipeline Commands
 - 🔄 Automatic format detection and restoration
 
 ```bash
@@ -331,6 +501,8 @@ Get keys: [Claude](https://console.anthropic.com/) | [Gemini](https://aistudio.g
 
 ## 🔬 Methodology
 
+### QA Training (Domain Knowledge)
+
 **Instruction Backtranslation** ([arxiv:2308.06259](https://arxiv.org/abs/2308.06259))  
 Treats documents as answers, generates questions. More scalable than manual annotation, better long-tail coverage.
 
@@ -339,6 +511,16 @@ Rewrites answers for better clarity/structure while preserving all information. 
 
 **Chain-of-Thought** ([arxiv:2305.02301](https://arxiv.org/abs/2305.02301))  
 Generates or adds step-by-step reasoning to QA pairs. Enables smaller models to learn complex reasoning patterns from larger models.
+
+### Tool-Use Training (Agentic Capabilities)
+
+**Unified Tool Learning** (inspired by Toolformer, Gorilla, ToolLLM)  
+- Generates realistic user instructions for tool usage
+- Annotates solutions with step-by-step reasoning and tool calls
+- Always includes API documentation (Gorilla insight) for better generalization
+- Supports single-step (simple tasks) and multi-step (complex workflows)
+
+### Common
 
 **LLM-as-Judge**  
 Multi-criteria rating (clarity, accuracy, usefulness, difficulty) with reasoning explanations. Threshold filtering for high-quality training data.
@@ -354,7 +536,7 @@ Multi-criteria rating (clarity, accuracy, usefulness, difficulty) with reasoning
 ## 🧪 Testing
 
 ```bash
-uv run pytest tests/ -v                    # 11/11 tests passing ✅
+uv run pytest tests/ -v                    # 19/19 tests passing ✅
 uv run ruff check src/                     # All checks passed ✅
 ```
 
@@ -363,6 +545,7 @@ uv run ruff check src/                     # All checks passed ✅
 - [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Detailed status & planned features
 - [CHANGES.md](CHANGES.md) - Recent updates & implementation notes
 - [configs/prompts/](configs/prompts/) - Prompt templates
+- [configs/hdf5_tools.json](configs/hdf5_tools.json) - HDF5 MCP tool definitions
 
 ---
 
