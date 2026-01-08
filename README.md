@@ -2,6 +2,7 @@
 
 Generate high-quality training data for LLM fine-tuning: QA pairs from documents and tool-use examples from API definitions.
 
+
 ## ✨ Features
 
 ### QA Pipeline (Knowledge Training)
@@ -527,11 +528,7 @@ Multi-criteria rating (clarity, accuracy, usefulness, difficulty) with reasoning
 
 ## 📊 Example Results
 
-**Jarvis Dataset** ([output/jarvis_qa/](output/jarvis_qa/))  
-300 raw → 226 curated (75.3% retention) | Avg rating: 6.06/10 | Model: Claude Sonnet 4
-
-**HDF5 Dataset** ([output/hdf5_qa/gemini/](output/hdf5_qa/gemini/))  
-876 QA pairs | Model: Gemini 2.0 Flash | Source: HDF5 research papers
+Coming soon...
 
 ## 🧪 Testing
 
@@ -542,7 +539,23 @@ uv run ruff check src/                     # All checks passed ✅
 
 ## 📚 Documentation
 
-- [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Detailed status & planned features
+### Comprehensive Guides
+- **[docs/OVERVIEW.md](docs/OVERVIEW.md)** - Quick overview and key points
+- **[docs/DESIGN_DOCUMENTATION.md](docs/DESIGN_DOCUMENTATION.md)** - Complete design rationale (12,000+ words)
+- **[docs/EXTRACTION_METHODOLOGY.md](docs/EXTRACTION_METHODOLOGY.md)** - Data extraction explained (10,000+ words)
+- **[docs/PAPER_IMPLEMENTATIONS.md](docs/PAPER_IMPLEMENTATIONS.md)** - Paper → code mapping (5,000+ words)
+- **[docs/ARCHITECTURE_DIAGRAMS.md](docs/ARCHITECTURE_DIAGRAMS.md)** - Visual diagrams and flows
+- **[docs/DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md)** - Navigation guide
+
+
+### Research Papers
+- [Instruction Backtranslation (Meta AI, ICLR 2024)](https://arxiv.org/abs/2308.06259)
+- [LIMA (Meta AI, NeurIPS 2023)](https://arxiv.org/abs/2305.11206)
+- [Distilling Step-by-Step (Google, 2023)](https://arxiv.org/abs/2305.02301)
+- [AlpaGasus (UMD, ICLR 2024)](https://arxiv.org/abs/2307.08701)
+- [Toolformer (Meta AI, NeurIPS 2023)](https://arxiv.org/abs/2302.04761)
+- [Gorilla (UC Berkeley, NeurIPS 2024)](https://arxiv.org/abs/2305.15334)
+- [ToolLLM (Tsinghua, ICLR 2024)](https://arxiv.org/abs/2307.16789)
 - [CHANGES.md](CHANGES.md) - Recent updates & implementation notes
 - [configs/prompts/](configs/prompts/) - Prompt templates
 - [configs/hdf5_tools.json](configs/hdf5_tools.json) - HDF5 MCP tool definitions
