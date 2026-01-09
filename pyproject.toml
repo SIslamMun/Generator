@@ -51,6 +51,12 @@ dev = [
     "ruff>=0.1.0",
 ]
 
+# Coverage-based selection (optional, for semantic deduplication)
+coverage = [
+    "sentence-transformers>=2.2.0",
+    "scikit-learn>=1.3.0",
+]
+
 [project.scripts]
 generator = "generator.cli:main"
 

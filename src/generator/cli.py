@@ -296,6 +296,178 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
     )
 
 
+@main.command("select-coverage")
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--target-count", type=int, help="Exact number of examples to select")
+@click.option("--reduction-ratio", type=float, default=0.4, help="Target size as ratio (default: 0.4 = 40%)")
+@click.option("--strategy", type=click.Choice(["centroid", "diverse"]), default="centroid", 
+              help="Selection strategy: centroid (closest to cluster center) or diverse (spread)")
+@click.option("--model", default="all-MiniLM-L6-v2", help="Sentence transformer model for embeddings")
+def select_coverage(input_file, output, target_count, reduction_ratio, strategy, model):
+    """
+    Select diverse, representative examples using semantic coverage.
+    
+    Based on TOUCAN (Oct 2025): Reduces dataset size by ~60% with no 
+    performance degradation by selecting semantically diverse examples.
+    
+    Uses clustering to group similar examples and selects representatives
+    from each cluster, ensuring broad coverage of topics/patterns.
+    
+    Requires: uv pip install -e ".[coverage]"
+    
+    Examples:
+        # Keep top 40% most diverse (default)
+        generator select-coverage curated.json -o diverse.json
+        
+        # Select exactly 500 diverse examples
+        generator select-coverage curated.json -o diverse.json --target-count 500
+        
+        # Use diverse strategy (maximize spread)
+        generator select-coverage curated.json -o diverse.json --strategy diverse
+    """
+    console.print("\n[bold]🎯 Selecting diverse examples by coverage[/bold]\n")
+    
+    try:
+        from .coverage_selector import CoverageSelector
+    except ImportError as e:
+        console.print(
+            "[red]Error: Coverage selection requires additional dependencies.[/red]\n"
+            "[yellow]Install with: uv pip install -e \".[coverage]\"[/yellow]"
+        )
+        raise click.Abort()
+    
+    # Load input
+    import json
+    with open(input_file, "r") as f:
+        examples = json.load(f)
+    
+    if not isinstance(examples, list):
+        console.print("[red]Error: Input must be a JSON array of examples[/red]")
+        raise click.Abort()
+    
+    console.print(f"[cyan]Loaded {len(examples)} examples from {input_file}[/cyan]")
+    
+    # Select by coverage
+    selector = CoverageSelector(model_name=model)
+    selected = selector.select_by_coverage(
+        examples,
+        target_count=target_count,
+        reduction_ratio=reduction_ratio,
+        strategy=strategy,
+    )
+    
+    # Compute coverage score
+    coverage_score = selector.compute_coverage_score(selected, examples)
+    
+    # Save output
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w") as f:
+        json.dump(selected, f, indent=2)
+    
+    console.print(f"\n[green]✓ Saved {len(selected)} examples to {output}[/green]")
+    console.print(f"[dim]Coverage score: {coverage_score:.3f} (1.0 = perfect)[/dim]")
+    console.print(
+        f"[bold green]✨ Success! Reduced {len(examples)} → {len(selected)} "
+        f"({100*len(selected)/len(examples):.1f}%)[/bold green]\n"
+    )
+
+
+@main.command("multi-score")
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--min-score", type=float, default=5.0, help="Minimum combined score (0-10)")
+@click.option("--top-k", type=int, help="Select top-k pairs instead of threshold")
+@click.option("--strategy", type=click.Choice(["combined", "complexity", "quality", "diversity"]),
+              default="combined", help="Sorting/selection strategy")
+@click.option("--complexity-weight", type=float, default=0.3, help="Complexity weight (default: 0.3)")
+@click.option("--quality-weight", type=float, default=0.5, help="Quality weight (default: 0.5)")
+@click.option("--diversity-weight", type=float, default=0.2, help="Diversity weight (default: 0.2)")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+def multi_score(input_file, output, config, min_score, top_k, strategy, 
+                complexity_weight, quality_weight, diversity_weight, provider, model):
+    """
+    Score QA pairs on multiple dimensions (DEITA-style).
+    
+    Based on DEITA (2024): 3D scoring achieves 10x data efficiency by
+    selecting examples that are complex, high-quality, AND diverse.
+    
+    Dimensions:
+      - Complexity: How challenging is the question? (reasoning depth)
+      - Quality: How accurate/helpful is the answer?
+      - Diversity: How different from other pairs?
+    
+    \b
+    Examples:
+      # Filter by combined score threshold
+      uv run generator multi-score qa.json -o scored.json --min-score 6.0
+      
+      # Select top 100 by combined score
+      uv run generator multi-score qa.json -o top100.json --top-k 100
+      
+      # Select top 50 most complex questions
+      uv run generator multi-score qa.json -o complex.json --top-k 50 --strategy complexity
+      
+      # Custom weights (prefer complexity over diversity)
+      uv run generator multi-score qa.json -o weighted.json --complexity-weight 0.5 --diversity-weight 0.1
+    """
+    console.print("\n[bold]📊 Multi-Dimensional Scoring (DEITA)[/bold]\n")
+    
+    from .multi_scorer import MultiDimensionalScorer, ScoreWeights
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    # Load input
+    import json
+    with open(input_file, "r") as f:
+        pairs = json.load(f)
+    
+    if not isinstance(pairs, list):
+        console.print("[red]Error: Input must be a JSON array of QA pairs[/red]")
+        raise click.Abort()
+    
+    console.print(f"[cyan]Loaded {len(pairs)} pairs from {input_file}[/cyan]")
+    console.print(f"[cyan]Weights: complexity={complexity_weight}, quality={quality_weight}, diversity={diversity_weight}[/cyan]")
+    
+    # Create scorer
+    weights = ScoreWeights(
+        complexity=complexity_weight,
+        quality=quality_weight,
+        diversity=diversity_weight,
+    )
+    
+    scorer = MultiDimensionalScorer(
+        llm_config=llm_config.copy(),
+        weights=weights,
+    )
+    
+    # Score and filter
+    if top_k:
+        selected = scorer.select_top_k(pairs, k=top_k, strategy=strategy)
+    else:
+        selected = scorer.filter_by_combined_score(pairs, min_score=min_score)
+    
+    # Save output
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w") as f:
+        json.dump(selected, f, indent=2, ensure_ascii=False)
+    
+    console.print(f"\n[green]✓ Saved {len(selected)} scored pairs to {output}[/green]")
+    console.print(
+        f"[bold green]✨ Success! Selected {len(selected)}/{len(pairs)} pairs[/bold green]\n"
+    )
+
+
 @main.command()
 @click.argument("input_file", type=click.Path(exists=True))
 @click.option("-o", "--output", required=True, help="Output file path")
@@ -735,6 +907,107 @@ def tool_parse(input_path, output, fmt):
     console.print(f"\n[bold green]✨ Parsed {len(tools)} tools → {output}[/bold green]\n")
 
 
+@main.command("tool-deps")
+@click.argument("tools_path", type=click.Path(exists=True))
+@click.option("-o", "--output", help="Output JSON file path for graph data")
+@click.option("--tool", "tool_id", help="Show connections for specific tool")
+@click.option("--chains", is_flag=True, help="List valid tool chains")
+@click.option("--max-chain-length", type=int, default=4, help="Max chain length to search")
+@click.option("--validate", "chain_to_validate", help="Validate a specific chain (comma-separated tool IDs)")
+def tool_deps(tools_path, output, tool_id, chains, max_chain_length, chain_to_validate):
+    """
+    Analyze tool parameter dependencies.
+    
+    Based on In-N-Out (Sep 2025): Build parameter-level dependency graphs
+    showing which tool outputs can feed into which tool inputs.
+    
+    Use this to:
+    - Understand which tools can chain together
+    - Validate proposed tool chains
+    - Find compatible tool sequences
+    
+    \b
+    Examples:
+      # Show dependency summary
+      uv run generator tool-deps configs/hdf5_tools.json
+      
+      # Show connections for specific tool
+      uv run generator tool-deps configs/hdf5_tools.json --tool open_file
+      
+      # Export graph to JSON
+      uv run generator tool-deps configs/hdf5_tools.json -o deps.json
+      
+      # List all valid chains
+      uv run generator tool-deps configs/hdf5_tools.json --chains
+      
+      # Validate a chain
+      uv run generator tool-deps configs/hdf5_tools.json --validate "open_file,read_full_dataset,close_file"
+    """
+    from .tool_schemas import load_tools
+    from .dependency_graph import DependencyGraph
+    
+    console.print("\n[bold]🔗 Tool Dependency Analysis (In-N-Out)[/bold]\n")
+    
+    # Load tools
+    tools = load_tools(tools_path)
+    console.print(f"[green]✓ Loaded {len(tools)} tools[/green]\n")
+    
+    # Build graph
+    graph = DependencyGraph(tools)
+    
+    # Handle specific operations
+    if chain_to_validate:
+        # Validate a specific chain
+        chain_ids = [t.strip() for t in chain_to_validate.split(",")]
+        is_valid, issues = graph.validate_chain(chain_ids)
+        
+        if is_valid:
+            console.print(f"[green]✓ Chain is valid: {' → '.join(chain_ids)}[/green]")
+        else:
+            console.print(f"[red]✗ Chain is invalid:[/red]")
+            for issue in issues:
+                console.print(f"  - {issue}")
+        return
+    
+    if tool_id:
+        # Show connections for specific tool
+        graph.print_tool_connections(tool_id)
+        return
+    
+    if chains:
+        # List valid chains
+        console.print(f"[cyan]Finding valid chains (max length {max_chain_length})...[/cyan]\n")
+        
+        all_chains = []
+        entry_points = graph.get_entry_points()
+        
+        for entry in entry_points[:5]:  # Limit to avoid explosion
+            tool_chains = graph.get_compatible_chains(entry, max_length=max_chain_length)
+            all_chains.extend(tool_chains[:10])  # Limit per entry
+        
+        # Show chains by length
+        from collections import defaultdict
+        by_length = defaultdict(list)
+        for chain in all_chains:
+            by_length[len(chain)].append(chain)
+        
+        for length in sorted(by_length.keys()):
+            console.print(f"\n[bold]Chains of length {length}:[/bold]")
+            for chain in by_length[length][:5]:  # Show max 5 per length
+                chain_str = " → ".join(chain)
+                console.print(f"  {chain_str}")
+        
+        console.print(f"\n[dim]Total: {len(all_chains)} valid chains found[/dim]")
+        return
+    
+    # Default: show summary
+    graph.print_summary()
+    
+    # Save if output specified
+    if output:
+        graph.save(output)
+
+
 @main.command("tool-generate")
 @click.argument("tools_path", type=click.Path(exists=True))
 @click.option("-o", "--output", required=True, help="Output JSON file path")
@@ -802,6 +1075,92 @@ def tool_generate(tools_path, output, config, mode, target_pairs, max_steps, pro
         mode=mode,
         max_steps=max_steps,
     )
+    
+    # Save
+    save_examples(examples, output)
+    
+    console.print(f"\n[bold green]✨ Generated {len(examples)} examples → {output}[/bold green]\n")
+
+
+@main.command("tool-generate-chain")
+@click.argument("tools_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--target-pairs", type=int, default=50, help="Total examples to generate")
+@click.option("--min-steps", type=int, default=2, help="Min tools per chain")
+@click.option("--max-steps", type=int, default=4, help="Max tools per chain")
+@click.option("--hybrid/--no-hybrid", default=False, help="Use hybrid generation (chain-first + query-first)")
+@click.option("--chain-ratio", type=float, default=0.4, help="Chain-first ratio for hybrid mode")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+def tool_generate_chain(tools_path, output, config, target_pairs, min_steps, max_steps, 
+                        hybrid, chain_ratio, provider, model):
+    """
+    Generate tool-use examples using chain-first approach.
+    
+    Based on ToolGrad (Aug 2025): Build valid tool chains first, then synthesize
+    natural user queries. Reduces invalid samples by ~40% vs query-first.
+    
+    Use --hybrid for best results (combines chain-first and query-first).
+    
+    \b
+    Examples:
+      # Pure chain-first (complex multi-tool examples)
+      uv run generator tool-generate-chain tools.json -o examples.json
+      
+      # Hybrid mode (recommended)
+      uv run generator tool-generate-chain tools.json -o examples.json --hybrid
+      
+      # Customize chain length
+      uv run generator tool-generate-chain tools.json -o examples.json --min-steps 3 --max-steps 5
+    """
+    import json
+    from pathlib import Path
+    from .tool_schemas import load_tools, save_examples
+    from .tool_generator import ToolGenerator
+    from .prompt_loader import load_prompts
+    
+    console.print(f"\n[bold]🔗 Chain-First Tool Generation (ToolGrad)[/bold]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Load prompts
+    prompts = load_prompts(Path(config_path).parent)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    mode_str = "hybrid" if hybrid else "chain-first"
+    console.print(f"[cyan]Tools: {tools_path}[/cyan]")
+    console.print(f"[cyan]Provider: {llm_config.get('provider', 'ollama')}[/cyan]")
+    console.print(f"[cyan]Mode: {mode_str}[/cyan]")
+    console.print(f"[cyan]Target: {target_pairs} examples[/cyan]")
+    console.print(f"[cyan]Chain steps: {min_steps}-{max_steps}[/cyan]\n")
+    
+    # Load tools
+    tools = load_tools(tools_path)
+    console.print(f"[green]✓ Loaded {len(tools)} tools[/green]")
+    
+    # Generate
+    generator = ToolGenerator(llm_config.copy(), prompts)
+    
+    if hybrid:
+        examples = generator.generate_examples_hybrid(
+            tools=tools,
+            n_total=target_pairs,
+            chain_first_ratio=chain_ratio,
+            max_steps=max_steps,
+        )
+    else:
+        examples = generator.generate_chain_first(
+            tools=tools,
+            n_chains=target_pairs,
+            min_steps=min_steps,
+            max_steps=max_steps,
+        )
     
     # Save
     save_examples(examples, output)
@@ -939,6 +1298,83 @@ def tool_curate(examples_path, output, tools_path, config, threshold, min_succes
     save_examples(curated, output)
     
     console.print(f"\n[bold green]✨ Curated {len(curated)}/{len(examples)} examples → {output}[/bold green]\n")
+
+
+@main.command("tool-evaluate")
+@click.argument("examples_path", type=click.Path(exists=True))
+@click.option("-o", "--output", help="Output JSON file path (filtered examples)")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--min-score", type=float, default=0.7, help="Minimum outcome score (0.0-1.0)")
+@click.option("--strict", is_flag=True, help="Require ALL requirements satisfied")
+@click.option("--report-only", is_flag=True, help="Only report, don't filter")
+@click.option("--provider", help="LLM provider")
+@click.option("--model", help="LLM model")
+def tool_evaluate(examples_path, output, config, min_score, strict, report_only, provider, model):
+    """
+    Evaluate tool-use examples by task completion (outcome-oriented).
+    
+    Goes beyond execution success to verify actual task completion.
+    Based on MCP-AgentBench v2.
+    
+    \b
+    Examples:
+      uv run generator tool-evaluate examples.json -o verified.json --min-score 0.8
+      uv run generator tool-evaluate examples.json --report-only
+      uv run generator tool-evaluate examples.json -o strict.json --strict
+    """
+    from pathlib import Path
+    from .tool_schemas import load_examples, save_examples
+    from .outcome_evaluator import OutcomeEvaluator
+    from .prompt_loader import load_prompts
+    
+    console.print("\n[bold]📊 Outcome-Oriented Evaluation[/bold]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Load prompts
+    prompts = load_prompts(Path(config_path).parent)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    console.print(f"[cyan]Examples: {examples_path}[/cyan]")
+    console.print(f"[cyan]Min Score: {min_score}[/cyan]")
+    console.print(f"[cyan]Strict Mode: {strict}[/cyan]")
+    
+    # Load examples
+    examples = load_examples(examples_path)
+    console.print(f"[green]✓ Loaded {len(examples)} examples[/green]\n")
+    
+    # Evaluate
+    evaluator = OutcomeEvaluator(
+        llm_config=llm_config.copy(),
+        prompts=prompts,
+        strict_mode=strict,
+    )
+    
+    if report_only:
+        # Just evaluate and report
+        results = evaluator.evaluate_examples(examples)
+        console.print(f"\n[green]✓ Evaluated {len(results)} examples[/green]")
+    else:
+        # Filter by outcome
+        if not output:
+            console.print("[red]Error: -o/--output required unless --report-only is set[/red]")
+            return
+        
+        filtered = evaluator.filter_by_outcome(
+            examples,
+            min_score=min_score,
+            require_all_satisfied=strict,
+        )
+        
+        # Save
+        save_examples(filtered, output)
+        
+        console.print(f"\n[bold green]✨ Verified {len(filtered)}/{len(examples)} examples → {output}[/bold green]\n")
 
 
 @main.command("tool-pipeline")
