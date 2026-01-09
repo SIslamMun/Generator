@@ -998,19 +998,19 @@ User Configuration
 │  └─> Docs as answers ──> qa_generator.py (questions from chunks)   │
 │                                                                     │
 │  Distilling Step-by-Step (Google, 2023)                             │
-│  └─> CoT reasoning ──> cot_generator.py + cot_enhancer.py          │
+│  └─> CoT reasoning ──> cot/cot_generator.py + cot/cot_enhancer.py  │
 │                                                                     │
 │  AlpaGasus (UMD, 2024)                                              │
-│  └─> Multi-criteria ──> curate.py (detailed scoring)               │
+│  └─> Multi-criteria ──> qa/curate.py (detailed scoring)            │
 │                                                                     │
 │  Toolformer (Meta, 2023)                                            │
-│  └─> Single-step tools ──> tool_generator.py (single mode)         │
+│  └─> Single-step tools ──> tool/tool_generator.py (single mode)    │
 │                                                                     │
 │  Gorilla (Berkeley, 2024)                                           │
-│  └─> API docs ──> tool_generator.py (api_documentation field)      │
+│  └─> API docs ──> tool/tool_generator.py (api_documentation field) │
 │                                                                     │
 │  ToolLLM (Tsinghua, 2024)                                           │
-│  └─> Multi-step ──> tool_generator.py (multi mode, DFSDT)          │
+│  └─> Multi-step ──> tool/tool_generator.py (multi mode, DFSDT)     │
 │                                                                     │
 ├─────────────────────────────────────────────────────────────────────┤
 │                  NEW IMPLEMENTATIONS (Jan 2026) ⭐                   │
@@ -1018,27 +1018,27 @@ User Configuration
 │                                                                     │
 │  DEITA (2024)                                                       │
 │  └─> 3D scoring (complexity+quality+diversity)                     │
-│      ──> multi_scorer.py (10x data efficiency)                     │
+│      ──> qa/multi_scorer.py (10x data efficiency)                  │
 │                                                                     │
 │  TOUCAN (Oct 2024)                                                  │
 │  └─> Semantic clustering + coverage selection                      │
-│      ──> coverage_selector.py (40-60% reduction)                   │
+│      ──> tool/coverage_selector.py (40-60% reduction)              │
 │                                                                     │
 │  ToolMind (Nov 2025)                                                │
 │  └─> Turn-level filtering (per-step quality)                       │
-│      ──> tool_curator.py filter_by_turn_quality()                  │
+│      ──> tool/tool_curator.py filter_by_turn_quality()             │
 │                                                                     │
 │  ToolGrad (Aug 2025)                                                │
 │  └─> Chain-first generation (tools → query)                        │
-│      ──> tool_generator.py generate_chain_first()                  │
+│      ──> tool/tool_generator.py generate_chain_first()             │
 │                                                                     │
 │  In-N-Out (2025)                                                    │
 │  └─> Parameter dependency graphs                                    │
-│      ──> dependency_graph.py DependencyGraph class                 │
+│      ──> tool/dependency_graph.py DependencyGraph class            │
 │                                                                     │
 │  MCP-AgentBench (2025)                                              │
 │  └─> Outcome-oriented evaluation (task completion)                  │
-│      ──> outcome_evaluator.py OutcomeEvaluator class               │
+│      ──> tool/outcome_evaluator.py OutcomeEvaluator class          │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -1051,35 +1051,48 @@ User Configuration
 Generator/
 │
 ├── src/generator/               ← Core Implementation
+│   ├── __init__.py             ← Package exports
+│   ├── cli.py                  ← Command-line interface
+│   ├── formatters.py           ← Export (ChatML, Alpaca, ShareGPT, JSONL)
+│   ├── prompt_loader.py        ← Load prompt templates
+│   │
 │   ├── clients/                 ← Multi-provider LLM support
+│   │   ├── __init__.py
 │   │   ├── base.py             ← Abstract interface
 │   │   ├── ollama.py           ← Local Ollama
 │   │   ├── claude.py           ← Anthropic Claude
-│   │   ├── gemini.py           ← Google Gemini
+│   │   ├── google_adk.py       ← Google Gemini (ADK)
 │   │   ├── vllm.py             ← vLLM server
-│   │   └── openai.py           ← OpenAI
+│   │   ├── openai.py           ← OpenAI
+│   │   └── anthropic.py        ← Anthropic direct API
 │   │
-│   ├── qa_generator.py         ← QA generation (Instruction Backtranslation)
-│   ├── cot_generator.py        ← CoT generation (Distilling Step-by-Step)
-│   ├── cot_enhancer.py         ← Add CoT to existing QA
-│   ├── curate.py               ← LLM-as-Judge (LIMA + AlpaGasus)
-│   ├── enrich.py               ← Response rewriting
+│   ├── qa/                      ← QA Pipeline (Knowledge Training) ⭐
+│   │   ├── __init__.py
+│   │   ├── qa_generator.py     ← QA generation (Instruction Backtranslation)
+│   │   ├── curate.py           ← LLM-as-Judge (LIMA + AlpaGasus)
+│   │   ├── enrich.py           ← Response rewriting
+│   │   ├── compare.py          ← Dataset comparison
+│   │   └── multi_scorer.py     ← DEITA multi-dimensional scoring ⭐ NEW
 │   │
-│   ├── tool_parser.py          ← Parse API definitions
-│   ├── tool_generator.py       ← Generate tool examples (Toolformer + ToolLLM + Gorilla + ToolGrad)
-│   ├── tool_executor.py        ← Verify tool calls (APIGen)
-│   ├── tool_curator.py         ← Filter tool examples + turn-level filtering (ToolMind)
+│   ├── cot/                     ← CoT Pipeline (Reasoning Enhancement) ⭐
+│   │   ├── __init__.py
+│   │   ├── cot_generator.py    ← CoT generation (Distilling Step-by-Step)
+│   │   └── cot_enhancer.py     ← Add CoT to existing QA
 │   │
-│   ├── multi_scorer.py         ← Multi-dimensional scoring (DEITA) ⭐ NEW
-│   ├── coverage_selector.py    ← Semantic deduplication (TOUCAN) ⭐ NEW
-│   ├── dependency_graph.py     ← Parameter dependency graphs (In-N-Out) ⭐ NEW
-│   ├── outcome_evaluator.py    ← Outcome-oriented evaluation (MCP-AgentBench) ⭐ NEW
-│   │
-│   ├── formatters.py           ← Export (ChatML, Alpaca, ShareGPT, JSONL)
-│   └── cli.py                  ← Command-line interface
+│   └── tool/                    ← Tool-Use Pipeline (Agentic Training) ⭐
+│       ├── __init__.py
+│       ├── tool_schemas.py     ← Tool/Parameter dataclasses
+│       ├── tool_parser.py      ← Parse API definitions
+│       ├── tool_generator.py   ← Generate tool examples (Toolformer + ToolLLM + Gorilla + ToolGrad)
+│       ├── tool_executor.py    ← Verify tool calls (APIGen)
+│       ├── tool_curator.py     ← Filter tool examples + turn-level filtering (ToolMind) ⭐ NEW
+│       ├── coverage_selector.py ← Semantic deduplication (TOUCAN) ⭐ NEW
+│       ├── dependency_graph.py  ← Parameter dependency graphs (In-N-Out) ⭐ NEW
+│       └── outcome_evaluator.py ← Outcome-oriented evaluation (MCP-AgentBench) ⭐ NEW
 │
 ├── configs/                     ← Configuration
 │   ├── config.yaml             ← LLM providers
+│   ├── hdf5_tools.json         ← Tool definitions
 │   └── prompts/                ← Prompt templates
 │       ├── qa_generation.yaml
 │       ├── qa_rating.yaml
@@ -1087,11 +1100,14 @@ Generator/
 │       ├── cot_enhancement.yaml
 │       └── tool_prompts.yaml
 │
-├── tests/                       ← Test suite (91 new tests for Jan 2026 features)
+├── tests/                       ← Test suite (188 tests total)
+│   ├── conftest.py
 │   ├── test_qa_generator.py
-│   ├── test_cot_generator.py
 │   ├── test_curate.py
-│   ├── test_tool_generator.py
+│   ├── test_enrich.py
+│   ├── test_cot_generator.py
+│   ├── test_cot_enhancer.py
+│   ├── test_tool_use.py
 │   ├── test_multi_scorer.py     ← 22 tests ⭐ NEW
 │   ├── test_coverage_selector.py ← 16 tests ⭐ NEW
 │   ├── test_turn_level_filter.py ← 7 tests ⭐ NEW
@@ -1105,11 +1121,12 @@ Generator/
 │   └── jarvis_qa/
 │
 └── docs/                        ← Documentation
-    ├── README.md                          ← Quick start
     ├── OVERVIEW.md                        ← Quick overview
     ├── DESIGN_DOCUMENTATION.md            ← Design rationale
     ├── EXTRACTION_METHODOLOGY.md          ← How extraction works
-    └── PAPER_IMPLEMENTATIONS.md           ← Paper → code mapping
+    ├── PAPER_IMPLEMENTATIONS.md           ← Paper → code mapping
+    ├── ARCHITECTURE_DIAGRAMS.md           ← Visual diagrams (this file)
+    └── Papers_Analysis_and_Relationships.md ← 33 papers analysis
 ```
 
 ---

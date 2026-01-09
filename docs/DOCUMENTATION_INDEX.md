@@ -182,12 +182,12 @@
 - **4** export formats
 
 **New Implementations (Jan 2026):**
-- DEITA (2024) - Multi-dimensional scoring → `multi_scorer.py`
-- TOUCAN (2024) - Coverage-based selection → `coverage_selector.py`
-- ToolMind (2025) - Turn-level filtering → `tool_curator.py`
-- ToolGrad (2025) - Chain-first generation → `tool_generator.py`
-- In-N-Out (2025) - Parameter dependency graphs → `dependency_graph.py`
-- MCP-AgentBench (2025) - Outcome evaluation → `outcome_evaluator.py`
+- DEITA (2024) - Multi-dimensional scoring → `qa/multi_scorer.py`
+- TOUCAN (2024) - Coverage-based selection → `tool/coverage_selector.py`
+- ToolMind (2025) - Turn-level filtering → `tool/tool_curator.py`
+- ToolGrad (2025) - Chain-first generation → `tool/tool_generator.py`
+- In-N-Out (2025) - Parameter dependency graphs → `tool/dependency_graph.py`
+- MCP-AgentBench (2025) - Outcome evaluation → `tool/outcome_evaluator.py`
 
 **Coverage:**
 - ✅ Design rationale for every major decision
@@ -196,7 +196,7 @@
 - ✅ Complete command reference
 - ✅ Architecture diagrams
 - ✅ Code examples throughout
-- ✅ 91 new tests for new features
+- ✅ 188 tests total (91 new for Jan 2026 features)
 
 ---
 

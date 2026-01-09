@@ -794,8 +794,42 @@ Coming soon...
 ## 🧪 Testing
 
 ```bash
-uv run pytest tests/ -v                    # 19/19 tests passing ✅
+uv run pytest tests/ -v                    # 188 tests passing ✅
 uv run ruff check src/                     # All checks passed ✅
+```
+
+## 📁 Project Structure
+
+```
+Generator/
+├── src/generator/
+│   ├── cli.py             # CLI commands
+│   ├── formatters.py      # Export formats (ChatML, Alpaca, ShareGPT)
+│   ├── prompt_loader.py   # Load prompt templates
+│   ├── clients/           # LLM providers (Ollama, Claude, Gemini, vLLM, OpenAI)
+│   ├── qa/                # QA Pipeline ⭐
+│   │   ├── qa_generator.py    # Instruction Backtranslation
+│   │   ├── curate.py          # LLM-as-Judge filtering
+│   │   ├── enrich.py          # Response rewriting
+│   │   ├── compare.py         # Dataset comparison
+│   │   └── multi_scorer.py    # DEITA 3D scoring
+│   ├── cot/               # CoT Pipeline ⭐
+│   │   ├── cot_generator.py   # Generate with reasoning
+│   │   └── cot_enhancer.py    # Add reasoning to existing QA
+│   └── tool/              # Tool-Use Pipeline ⭐
+│       ├── tool_schemas.py        # Tool/Parameter dataclasses
+│       ├── tool_generator.py      # Generate tool examples
+│       ├── tool_curator.py        # ToolMind turn-level filtering
+│       ├── tool_executor.py       # Execute/verify tool calls
+│       ├── tool_parser.py         # Parse OpenAPI/JSON specs
+│       ├── coverage_selector.py   # TOUCAN coverage selection
+│       ├── dependency_graph.py    # In-N-Out parameter graphs
+│       └── outcome_evaluator.py   # MCP-AgentBench evaluation
+├── configs/
+│   ├── config.yaml        # Provider configuration
+│   ├── hdf5_tools.json    # Tool definitions
+│   └── prompts/           # Prompt templates
+└── tests/                 # 188 comprehensive tests
 ```
 
 ## 📚 Documentation
@@ -817,7 +851,6 @@ uv run ruff check src/                     # All checks passed ✅
 - [Toolformer (Meta AI, NeurIPS 2023)](https://arxiv.org/abs/2302.04761)
 - [Gorilla (UC Berkeley, NeurIPS 2024)](https://arxiv.org/abs/2305.15334)
 - [ToolLLM (Tsinghua, ICLR 2024)](https://arxiv.org/abs/2307.16789)
-- [CHANGES.md](CHANGES.md) - Recent updates & implementation notes
 - [configs/prompts/](configs/prompts/) - Prompt templates
 - [configs/hdf5_tools.json](configs/hdf5_tools.json) - HDF5 MCP tool definitions
 

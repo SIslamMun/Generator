@@ -198,42 +198,68 @@ QA Pairs (grounded in source documents)
 ```
 Generator/
 ├── src/generator/
+│   ├── __init__.py        # Package exports
+│   ├── cli.py             # Command-line interface
+│   ├── formatters.py      # Export to ChatML, Alpaca, ShareGPT, JSONL
+│   ├── prompt_loader.py   # Load prompt templates
+│   │
 │   ├── clients/           # Multi-provider LLM support
+│   │   ├── __init__.py
 │   │   ├── base.py        # Abstract interface
 │   │   ├── ollama.py      # Local Ollama
 │   │   ├── claude.py      # Anthropic Claude
-│   │   ├── gemini.py      # Google Gemini
+│   │   ├── google_adk.py  # Google Gemini (ADK)
 │   │   ├── vllm.py        # vLLM server
-│   │   └── openai.py      # OpenAI
+│   │   ├── openai.py      # OpenAI
+│   │   └── anthropic.py   # Anthropic direct API
 │   │
-│   ├── qa_generator.py    # QA pair generation (Instruction Backtranslation)
-│   ├── cot_generator.py   # CoT generation (Distilling Step-by-Step)
-│   ├── cot_enhancer.py    # Add CoT to existing QA
-│   ├── enrich.py          # Response rewriting for quality
-│   ├── curate.py          # LLM-as-Judge filtering
-│   ├── compare.py         # Side-by-side comparison UI
+│   ├── qa/                # QA Pipeline (Knowledge Training) ⭐ NEW
+│   │   ├── __init__.py
+│   │   ├── qa_generator.py   # QA pair generation (Instruction Backtranslation)
+│   │   ├── curate.py         # LLM-as-Judge filtering
+│   │   ├── enrich.py         # Response rewriting for quality
+│   │   ├── compare.py        # Dataset comparison
+│   │   └── multi_scorer.py   # DEITA multi-dimensional scoring
 │   │
-│   ├── tool_parser.py     # Parse API definitions (OpenAPI/JSON)
-│   ├── tool_generator.py  # Generate tool-use examples (Toolformer + ToolLLM)
-│   ├── tool_executor.py   # Verify tool calls (APIGen methodology)
-│   ├── tool_curator.py    # Filter tool examples
+│   ├── cot/               # CoT Pipeline (Reasoning Enhancement) ⭐ NEW
+│   │   ├── __init__.py
+│   │   ├── cot_generator.py  # CoT generation (Distilling Step-by-Step)
+│   │   └── cot_enhancer.py   # Add CoT to existing QA
 │   │
-│   ├── formatters.py      # Export to ChatML, Alpaca, ShareGPT, JSONL
-│   ├── prompt_loader.py   # Load prompt templates
-│   └── cli.py             # Command-line interface
+│   └── tool/              # Tool-Use Pipeline (Agentic Training) ⭐ NEW
+│       ├── __init__.py
+│       ├── tool_schemas.py      # Tool/Parameter dataclasses
+│       ├── tool_parser.py       # Parse API definitions (OpenAPI/JSON)
+│       ├── tool_generator.py    # Generate tool-use examples
+│       ├── tool_executor.py     # Verify tool calls
+│       ├── tool_curator.py      # Filter tool examples (ToolMind)
+│       ├── coverage_selector.py # TOUCAN coverage-based selection
+│       ├── dependency_graph.py  # In-N-Out parameter graphs
+│       └── outcome_evaluator.py # MCP-AgentBench evaluation
 │
 ├── configs/
 │   ├── config.yaml        # LLM provider configuration
+│   ├── hdf5_tools.json    # Tool definitions
 │   └── prompts/           # Prompt templates
 │       ├── qa_generation.yaml
 │       ├── qa_rating.yaml
 │       ├── cot_generation.yaml
+│       ├── cot_enhancement.yaml
 │       └── tool_prompts.yaml
 │
-└── tests/                 # Comprehensive test suite
+└── tests/                 # Comprehensive test suite (188 tests)
+    ├── conftest.py
     ├── test_clients.py
     ├── test_qa_generator.py
+    ├── test_curate.py
+    ├── test_enrich.py
     ├── test_cot_generator.py
+    ├── test_cot_enhancer.py
+    ├── test_tool_use.py
+    ├── test_coverage_selector.py
+    ├── test_dependency_graph.py
+    ├── test_outcome_evaluator.py
+    ├── test_multi_scorer.py
     └── ...
 ```
 

@@ -13,7 +13,7 @@
 **Key Contribution:** Quality > Quantity - 1K curated examples rival 100K+ low-quality examples
 
 **Implementation:**
-- **File:** `src/generator/curate.py`
+- **File:** `src/generator/qa/curate.py`
 - **Feature:** LLM-as-Judge with strict quality thresholds
 - **Config:** `configs/prompts/qa_rating.yaml`
 - **CLI:** `uv run generator curate <input> -o <output> --threshold 7.0`
@@ -47,7 +47,7 @@ rating_criteria = {
 **Key Contribution:** Treat documents as "answers," generate "questions" for them
 
 **Implementation:**
-- **File:** `src/generator/qa_generator.py`
+- **File:** `src/generator/qa/qa_generator.py`
 - **Feature:** Primary QA generation methodology
 - **Config:** `configs/prompts/qa_generation.yaml`
 - **CLI:** `uv run generator generate <lancedb> -o <output> --target-pairs N`
@@ -121,7 +121,7 @@ We implement BOTH methods from the paper:
 
 Generates QA pairs with reasoning from scratch, directly from source documents.
 
-- **File:** `src/generator/cot_generator.py`
+- **File:** `src/generator/cot/cot_generator.py`
 - **Config:** `configs/prompts/cot_generation.yaml`
 - **CLI:** `uv run generator generate-cot <lancedb> -o <output>`
 - **When to Use:** Starting fresh, want reasoning-focused questions
@@ -130,7 +130,7 @@ Generates QA pairs with reasoning from scratch, directly from source documents.
 
 Adds reasoning steps to existing high-quality QA pairs.
 
-- **File:** `src/generator/cot_enhancer.py`
+- **File:** `src/generator/cot/cot_enhancer.py`
 - **Config:** `configs/prompts/cot_enhancement.yaml`
 - **CLI:** `uv run generator enhance-cot <qa_file> -o <output>`
 - **When to Use:** Already have good QA, want to add reasoning efficiently
@@ -239,7 +239,7 @@ def enhance_with_cot(input_path, output_path, llm_config, batch_size=5):
 **Key Contribution:** LLM-as-Judge with detailed criteria beats automated filtering
 
 **Implementation:**
-- **File:** `src/generator/curate.py` (integrated with LIMA)
+- **File:** `src/generator/qa/curate.py` (integrated with LIMA)
 - **Feature:** Detailed per-criteria scoring and reasoning
 - **Config:** `configs/prompts/qa_rating.yaml`
 
@@ -295,7 +295,7 @@ qa_rating: |
 **Key Contribution:** Self-supervised tool learning with simple single-step calls
 
 **Implementation:**
-- **File:** `src/generator/tool_generator.py`
+- **File:** `src/generator/tool/tool_generator.py`
 - **Feature:** Single-step mode for simple tool calls
 - **CLI:** `uv run generator tool-generate <tools> -o <output> --mode single`
 
@@ -349,7 +349,7 @@ def generate_single_step_example(tool, llm):
 **Key Contribution:** Always include API documentation to reduce hallucination <7%
 
 **Implementation:**
-- **File:** `src/generator/tool_generator.py`
+- **File:** `src/generator/tool/tool_generator.py`
 - **Feature:** API documentation grounding in every example
 - **Field:** `api_documentation` in all tool examples
 
@@ -405,7 +405,7 @@ example = {
 **Key Contribution:** DFSDT (Depth-First Search Decision Tree) for multi-step reasoning
 
 **Implementation:**
-- **File:** `src/generator/tool_generator.py`
+- **File:** `src/generator/tool/tool_generator.py`
 - **Feature:** Multi-step mode with reasoning chains
 - **CLI:** `uv run generator tool-generate <tools> -o <output> --mode multi`
 
@@ -478,7 +478,7 @@ def generate_multi_step_example(tools, llm):
 ### APIGen (Salesforce, 2024)
 **What Was Used:** Triple verification pipeline (Format → Execution → Semantic)
 
-**Implementation:** `src/generator/tool_executor.py`
+**Implementation:** `src/generator/tool/tool_executor.py`
 ```python
 def verify_tool_example(example):
     # 1. Format verification
@@ -532,7 +532,7 @@ def verify_tool_example(example):
 
 ```bash
 # 1. Read the implementation
-cat src/generator/qa_generator.py | head -30
+cat src/generator/qa/qa_generator.py | head -30
 
 # 2. Check the prompt template
 cat configs/prompts/qa_generation.yaml
@@ -583,7 +583,7 @@ jq '.[0] | {q: .question, rating: .rating, reasoning: .reasoning}' rated.json
 **Key Contribution:** Multi-dimensional scoring achieves 10x data efficiency - 6K examples match 100K randomly selected
 
 **Implementation:**
-- **File:** `src/generator/multi_scorer.py`
+- **File:** `src/generator/qa/multi_scorer.py`
 - **Feature:** 3D scoring (complexity, quality, diversity)
 - **CLI:** `uv run generator multi-score <input> -o <output> --top-k N`
 
@@ -613,7 +613,7 @@ selected = scorer.select_top_k(all_pairs, k=500)
 **Key Contribution:** Coverage-based selection reduces dataset by 40-60% with minimal information loss
 
 **Implementation:**
-- **File:** `src/generator/coverage_selector.py`
+- **File:** `src/generator/tool/coverage_selector.py`
 - **Feature:** Semantic clustering + representative selection
 - **CLI:** `uv run generator select-coverage <input> -o <output>`
 
@@ -640,7 +640,7 @@ selected = selector.select(pairs, target_count=500, strategy="diverse")
 **Key Contribution:** Turn-level filtering removes poor-quality steps even in otherwise good examples
 
 **Implementation:**
-- **File:** `src/generator/tool_curator.py`
+- **File:** `src/generator/tool/tool_curator.py`
 - **Feature:** Per-step quality rating and filtering
 - **Method:** `filter_by_turn_quality()`
 
@@ -664,7 +664,7 @@ filtered = curator.curate(examples, turn_level_filter=True, min_step_quality=0.7
 **Key Contribution:** Chain-first generation creates more coherent multi-tool examples
 
 **Implementation:**
-- **File:** `src/generator/tool_generator.py`
+- **File:** `src/generator/tool/tool_generator.py`
 - **Feature:** Generate tool chain first, then synthesize query
 - **CLI:** `uv run generator tool-generate-chain <tools> -o <output>`
 
@@ -690,7 +690,7 @@ examples = generator.generate_examples_hybrid(n_examples=100)
 **Key Contribution:** Model parameter dependencies as graphs for better tool chaining
 
 **Implementation:**
-- **File:** `src/generator/dependency_graph.py`
+- **File:** `src/generator/tool/dependency_graph.py`
 - **Feature:** Build and query parameter dependency graphs
 - **Class:** `DependencyGraph`
 
@@ -718,7 +718,7 @@ order = graph.get_execution_order(["read_dataset", "calculate_stats"])
 **Key Contribution:** Evaluate by task completion, not just individual tool calls
 
 **Implementation:**
-- **File:** `src/generator/outcome_evaluator.py`
+- **File:** `src/generator/tool/outcome_evaluator.py`
 - **Feature:** Outcome-based success metrics
 - **Class:** `OutcomeEvaluator`
 

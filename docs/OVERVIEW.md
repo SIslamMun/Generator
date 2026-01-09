@@ -27,7 +27,7 @@ A production-ready system for generating high-quality synthetic training data fo
 - LLM-as-Judge methodology
 - Quality-over-quantity philosophy throughout
 
-**Where:** `src/generator/curate.py`, `configs/prompts/qa_rating.yaml`
+**Where:** `src/generator/qa/curate.py`, `configs/prompts/qa_rating.yaml`
 
 ---
 
@@ -40,7 +40,7 @@ A production-ready system for generating high-quality synthetic training data fo
 - Preserves expert knowledge without hallucination
 - Target-based generation (specify total pairs, auto-calculate per-chunk)
 
-**Where:** `src/generator/qa_generator.py`, `configs/prompts/qa_generation.yaml`
+**Where:** `src/generator/qa/qa_generator.py`, `configs/prompts/qa_generation.yaml`
 
 **Why This Approach:**
 - Documents already contain expert knowledge
@@ -78,7 +78,7 @@ A production-ready system for generating high-quality synthetic training data fo
   - CLI: `uv run generator enhance-cot qa_pairs.json -o cot_pairs.json`
 
 **Where:** 
-- Files: `src/generator/cot_generator.py`, `src/generator/cot_enhancer.py`
+- Files: `src/generator/cot/cot_generator.py`, `src/generator/cot/cot_enhancer.py`
 - Prompts: `configs/prompts/cot_generation.yaml`, `configs/prompts/cot_enhancement.yaml`
 - Tests: `tests/test_cot_generator.py`, `tests/test_cot_enhancer.py`
 
@@ -105,7 +105,7 @@ A production-ready system for generating high-quality synthetic training data fo
 - Reasoning explanations for each rating
 - Format detection (QA vs CoT) with preservation
 
-**Where:** Integrated into `src/generator/curate.py`
+**Where:** Integrated into `src/generator/qa/curate.py`
 
 ---
 
@@ -116,7 +116,7 @@ A production-ready system for generating high-quality synthetic training data fo
 - Single-step tool calling mode
 - Simple instruction → single tool → result workflow
 
-**Where:** `src/generator/tool_generator.py` (single-step mode)
+**Where:** `src/generator/tool/tool_generator.py` (single-step mode)
 
 ---
 
@@ -128,7 +128,7 @@ A production-ready system for generating high-quality synthetic training data fo
 - Documentation grounding prevents invented APIs
 - `api_documentation` field in all tool examples
 
-**Where:** `src/generator/tool_generator.py` (auto-included in all examples)
+**Where:** `src/generator/tool/tool_generator.py` (auto-included in all examples)
 
 ---
 
@@ -140,7 +140,7 @@ A production-ready system for generating high-quality synthetic training data fo
 - Step-by-step: thought → action → result → next step
 - Tool chaining with 2-4 tools in sequence
 
-**Where:** `src/generator/tool_generator.py` (multi-step mode)
+**Where:** `src/generator/tool/tool_generator.py` (multi-step mode)
 
 ---
 
