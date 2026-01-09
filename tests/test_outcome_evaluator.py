@@ -4,13 +4,13 @@ import pytest
 import json
 from unittest.mock import Mock, patch, MagicMock
 
-from generator.outcome_evaluator import (
+from generator.tool.outcome_evaluator import (
     OutcomeEvaluator,
     OutcomeEvaluation,
     OutcomeStatus,
     evaluate_tool_examples,
 )
-from generator.tool_schemas import (
+from generator.tool.tool_schemas import (
     ToolExample,
     Solution,
     ReasoningStep,
@@ -126,7 +126,7 @@ class TestOutcomeEvaluator:
         assert result.status == OutcomeStatus.CANNOT_EVALUATE
         assert result.score == 0.5
     
-    @patch("generator.outcome_evaluator.get_client")
+    @patch("generator.tool.outcome_evaluator.get_client")
     def test_evaluate_fully_satisfied(self, mock_get_client, sample_example):
         """Test evaluation with fully satisfied outcome."""
         mock_llm = Mock()
@@ -153,7 +153,7 @@ class TestOutcomeEvaluator:
         assert len(result.satisfied_requirements) == 2
         assert len(result.missing_requirements) == 0
     
-    @patch("generator.outcome_evaluator.get_client")
+    @patch("generator.tool.outcome_evaluator.get_client")
     def test_evaluate_partially_satisfied(self, mock_get_client, sample_example):
         """Test evaluation with partially satisfied outcome."""
         mock_llm = Mock()
@@ -177,7 +177,7 @@ class TestOutcomeEvaluator:
         assert result.score == 0.6
         assert len(result.missing_requirements) == 2
     
-    @patch("generator.outcome_evaluator.get_client")
+    @patch("generator.tool.outcome_evaluator.get_client")
     def test_evaluate_not_satisfied(self, mock_get_client, sample_example):
         """Test evaluation with not satisfied outcome."""
         mock_llm = Mock()
@@ -201,7 +201,7 @@ class TestOutcomeEvaluator:
         assert result.score == 0.2
         assert result.instruction_understood is False
     
-    @patch("generator.outcome_evaluator.get_client")
+    @patch("generator.tool.outcome_evaluator.get_client")
     def test_strict_mode_reduces_score(self, mock_get_client, sample_example):
         """Test strict mode reduces score when requirements missing."""
         mock_llm = Mock()
@@ -228,7 +228,7 @@ class TestOutcomeEvaluator:
         assert result.status == OutcomeStatus.NOT_SATISFIED
         assert result.score <= 0.5  # Score capped at 0.5 in strict mode with missing reqs
     
-    @patch("generator.outcome_evaluator.get_client")
+    @patch("generator.tool.outcome_evaluator.get_client")
     def test_filter_by_outcome(self, mock_get_client, sample_example):
         """Test filtering examples by outcome score."""
         mock_llm = Mock()
@@ -370,7 +370,7 @@ class TestRequirementExtraction:
         assert requirements[0]["requirement"] == "Read the temperature data"
         assert requirements[0]["priority"] == "high"
     
-    @patch("generator.outcome_evaluator.get_client")
+    @patch("generator.tool.outcome_evaluator.get_client")
     def test_extract_requirements_with_llm(self, mock_get_client):
         """Test extraction with LLM parses response."""
         mock_llm = Mock()

@@ -2,7 +2,7 @@
 
 import pytest
 import json
-from src.generator.formatters import (
+from generator.formatters import (
     _to_chatml,
     _to_alpaca,
     _to_sharegpt,

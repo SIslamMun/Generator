@@ -4,7 +4,7 @@ import pytest
 import json
 from pathlib import Path
 from unittest.mock import Mock, patch
-from src.generator.enrich import enrich_qa_pairs
+from generator.qa.enrich import enrich_qa_pairs
 
 
 class TestEnrichIntegration:
@@ -64,7 +64,7 @@ class TestEnrichIntegration:
     def test_enrich_preserves_metadata(self, sample_qa_data, llm_config, mock_llm_client, prompts_dir):
         """Test that enrichment preserves all metadata."""
         
-        with patch('src.generator.enrich.get_client', return_value=mock_llm_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_llm_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -80,7 +80,7 @@ class TestEnrichIntegration:
     def test_enrich_batch_processing(self, sample_qa_data, llm_config, mock_llm_client, prompts_dir):
         """Test batch processing in enrichment."""
         
-        with patch('src.generator.enrich.get_client', return_value=mock_llm_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_llm_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -96,7 +96,7 @@ class TestEnrichIntegration:
     def test_enrich_with_preserve_original(self, sample_qa_data, llm_config, mock_llm_client, prompts_dir):
         """Test enrichment with preserve_original flag."""
         
-        with patch('src.generator.enrich.get_client', return_value=mock_llm_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_llm_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -112,7 +112,7 @@ class TestEnrichIntegration:
     def test_enrich_without_preserve_original(self, sample_qa_data, llm_config, mock_llm_client, prompts_dir):
         """Test enrichment without preserving original."""
         
-        with patch('src.generator.enrich.get_client', return_value=mock_llm_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_llm_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -130,7 +130,7 @@ class TestEnrichIntegration:
         mock_client = Mock()
         mock_client.generate = Mock(return_value="Not valid JSON")
         
-        with patch('src.generator.enrich.get_client', return_value=mock_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -145,7 +145,7 @@ class TestEnrichIntegration:
     def test_enrich_temperature_parameter(self, sample_qa_data, llm_config, mock_llm_client, prompts_dir):
         """Test that temperature parameter is used."""
         
-        with patch('src.generator.enrich.get_client', return_value=mock_llm_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_llm_client):
             enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -167,7 +167,7 @@ class TestEnrichIntegration:
             "changes": "Made it better"
         }))
         
-        with patch('src.generator.enrich.get_client', return_value=mock_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
                 llm_config=llm_config,
@@ -183,7 +183,7 @@ class TestEnrichIntegration:
         
         mock_client = Mock()
         
-        with patch('src.generator.enrich.get_client', return_value=mock_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=[],
                 llm_config=llm_config,

@@ -17,7 +17,7 @@ class TestChainFirstGeneration:
     @pytest.fixture
     def sample_tools(self):
         """Create sample tools for testing."""
-        from generator.tool_schemas import Tool, Parameter
+        from generator.tool.tool_schemas import Tool, Parameter
         
         return [
             Tool(
@@ -76,9 +76,9 @@ Return JSON with query field.""",
 
     def test_generator_initialization(self, sample_prompts):
         """Test that ToolGenerator initializes correctly."""
-        from generator.tool_generator import ToolGenerator
+        from generator.tool.tool_generator import ToolGenerator
         
-        with patch('generator.tool_generator.get_client') as mock_get_client:
+        with patch('generator.tool.tool_generator.get_client') as mock_get_client:
             mock_get_client.return_value = MagicMock()
             generator = ToolGenerator(
                 {"provider": "ollama", "model": "test"},
@@ -88,7 +88,7 @@ Return JSON with query field.""",
 
     def test_generate_valid_chain(self, mock_llm, sample_tools, sample_prompts):
         """Test generating a valid tool chain."""
-        from generator.tool_generator import ToolGenerator
+        from generator.tool.tool_generator import ToolGenerator
         
         # Mock LLM response for chain generation
         chain_response = json.dumps({
@@ -112,7 +112,7 @@ Return JSON with query field.""",
         })
         mock_llm.generate.return_value = chain_response
         
-        with patch('generator.tool_generator.get_client') as mock_get_client:
+        with patch('generator.tool.tool_generator.get_client') as mock_get_client:
             mock_get_client.return_value = mock_llm
             generator = ToolGenerator(
                 {"provider": "ollama", "model": "test"},
@@ -129,7 +129,7 @@ Return JSON with query field.""",
 
     def test_synthesize_query_for_chain(self, mock_llm, sample_prompts):
         """Test synthesizing a query for a chain."""
-        from generator.tool_generator import ToolGenerator
+        from generator.tool.tool_generator import ToolGenerator
         
         chain = {
             "steps": [
@@ -144,7 +144,7 @@ Return JSON with query field.""",
         })
         mock_llm.generate.return_value = query_response
         
-        with patch('generator.tool_generator.get_client') as mock_get_client:
+        with patch('generator.tool.tool_generator.get_client') as mock_get_client:
             mock_get_client.return_value = mock_llm
             generator = ToolGenerator(
                 {"provider": "ollama", "model": "test"},
@@ -158,7 +158,7 @@ Return JSON with query field.""",
 
     def test_generate_chain_first_full(self, mock_llm, sample_tools, sample_prompts):
         """Test full chain-first generation."""
-        from generator.tool_generator import ToolGenerator
+        from generator.tool.tool_generator import ToolGenerator
         
         # Mock chain generation response
         chain_response = json.dumps({
@@ -181,7 +181,7 @@ Return JSON with query field.""",
         responses = [chain_response, query_response]
         mock_llm.generate.side_effect = responses * 5  # Enough for multiple attempts
         
-        with patch('generator.tool_generator.get_client') as mock_get_client:
+        with patch('generator.tool.tool_generator.get_client') as mock_get_client:
             mock_get_client.return_value = mock_llm
             generator = ToolGenerator(
                 {"provider": "ollama", "model": "test"},
@@ -206,7 +206,7 @@ Return JSON with query field.""",
 
     def test_hybrid_generation(self, mock_llm, sample_tools, sample_prompts):
         """Test hybrid generation combining chain-first and query-first."""
-        from generator.tool_generator import ToolGenerator
+        from generator.tool.tool_generator import ToolGenerator
         
         # Mock responses
         chain_response = json.dumps({
@@ -242,7 +242,7 @@ Return JSON with query field.""",
             single_solution,  # Query-first solution
         ] * 10  # Repeat to ensure enough responses
         
-        with patch('generator.tool_generator.get_client') as mock_get_client:
+        with patch('generator.tool.tool_generator.get_client') as mock_get_client:
             mock_get_client.return_value = mock_llm
             generator = ToolGenerator(
                 {"provider": "ollama", "model": "test"},
@@ -264,7 +264,7 @@ class TestChainValidation:
 
     def test_chain_with_too_few_steps_rejected(self):
         """Test that chains with too few steps are rejected."""
-        from generator.tool_generator import ToolGenerator
+        from generator.tool.tool_generator import ToolGenerator
         from unittest.mock import patch, MagicMock
         
         mock_llm = MagicMock()
@@ -277,7 +277,7 @@ class TestChainValidation:
             "chain_generation": "Generate {min_steps}-{max_steps} steps from {tools_json}",
         }
         
-        with patch('generator.tool_generator.get_client') as mock_get_client:
+        with patch('generator.tool.tool_generator.get_client') as mock_get_client:
             mock_get_client.return_value = mock_llm
             generator = ToolGenerator({"provider": "ollama"}, prompts)
             

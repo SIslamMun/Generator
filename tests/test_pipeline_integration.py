@@ -50,7 +50,7 @@ class TestPipelineIntegration:
 
     def test_curate_to_enrich_pipeline(self, sample_qa_data, llm_config, prompts_dir, tmp_path):
         """Test pipeline from curation to enrichment."""
-        from src.generator.enrich import enrich_qa_pairs
+        from generator.qa.enrich import enrich_qa_pairs
         
         # Add rating to simulate curated data
         curated_data = [
@@ -64,7 +64,7 @@ class TestPipelineIntegration:
             "changes": "Added full name"
         })
         
-        with patch('src.generator.enrich.get_client', return_value=mock_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_client):
             enriched = enrich_qa_pairs(
                 qa_pairs=curated_data,
                 llm_config=llm_config,
@@ -79,7 +79,7 @@ class TestPipelineIntegration:
 
     def test_export_pipeline(self, sample_qa_data, tmp_path):
         """Test exporting to different formats."""
-        from src.generator.formatters import export_to_format
+        from generator.formatters import export_to_format
         
         # Add ratings for export
         qa_with_ratings = [
@@ -105,9 +105,10 @@ class TestPipelineIntegration:
             assert "messages" in data
             assert len(data["messages"]) >= 2  # user + assistant
 
-    def test_compare_datasets_pipeline(self, sample_qa_data, tmp_path, llm_config):
+    @patch('generator.qa.compare.load_prompts', return_value={})
+    def test_compare_datasets_pipeline(self, mock_prompts, sample_qa_data, tmp_path, llm_config):
         """Test comparing multiple datasets."""
-        from src.generator.compare import DatasetComparator
+        from generator.qa.compare import DatasetComparator
         
         # Create two dataset files
         dataset1 = tmp_path / "dataset1.json"
@@ -141,7 +142,7 @@ class TestPipelineIntegration:
 
     def test_enrichment_workflow(self, sample_qa_data, llm_config, prompts_dir):
         """Test complete enrichment workflow with different parameters."""
-        from src.generator.enrich import enrich_qa_pairs
+        from generator.qa.enrich import enrich_qa_pairs
         
         mock_client = Mock()
         mock_client.generate.return_value = json.dumps({
@@ -149,7 +150,7 @@ class TestPipelineIntegration:
             "changes": "Improved clarity"
         })
         
-        with patch('src.generator.enrich.get_client', return_value=mock_client):
+        with patch('generator.qa.enrich.get_client', return_value=mock_client):
             # Test with preserve_original=True
             enriched = enrich_qa_pairs(
                 qa_pairs=sample_qa_data,
@@ -166,7 +167,7 @@ class TestPipelineIntegration:
         
     def test_export_multiple_formats(self, sample_qa_data, tmp_path):
         """Test exporting to multiple formats."""
-        from src.generator.formatters import export_to_format
+        from generator.formatters import export_to_format
         
         qa_with_ratings = [
             {**item, "rating": 8}

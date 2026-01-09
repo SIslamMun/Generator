@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from src.generator.prompt_loader import load_prompts
+from generator.prompt_loader import load_prompts
 
 
 class TestPromptLoader:

@@ -3,7 +3,8 @@
 import pytest
 import json
 from pathlib import Path
-from src.generator.compare import DatasetComparator
+from unittest.mock import patch
+from generator.qa.compare import DatasetComparator
 
 
 class TestCompare:
@@ -17,7 +18,9 @@ class TestCompare:
             "model": "gemini-2.0-flash-exp",
             "api_key": "test-key"
         }
-        return DatasetComparator(llm_config)
+        # Mock load_prompts to avoid FileNotFoundError during testing
+        with patch('generator.qa.compare.load_prompts', return_value={}):
+            return DatasetComparator(llm_config)
 
     @pytest.fixture
     def sample_datasets(self, tmp_path):

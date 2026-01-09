@@ -1,7 +1,7 @@
 """Unit tests for CoT enhancer module."""
 
 import pytest
-from src.generator.cot_enhancer import (
+from generator.cot.cot_enhancer import (
     _qa_to_conversations,
     _conversations_to_cot,
     _extract_reasoning,

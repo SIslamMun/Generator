@@ -7,13 +7,13 @@ import pytest
 from pathlib import Path
 
 # Import modules to test
-from generator.tool_schemas import (
+from generator.tool.tool_schemas import (
     Parameter, Tool, ToolCall, ReasoningStep, Solution, 
     ExecutionResult, ToolExample, load_tools, save_tools
 )
-from generator.tool_parser import ToolParser
-from generator.tool_executor import ToolExecutor, BUILTIN_TOOLS, calculator
-from generator.tool_curator import format_check
+from generator.tool.tool_parser import ToolParser
+from generator.tool.tool_executor import ToolExecutor, BUILTIN_TOOLS, calculator
+from generator.tool.tool_curator import format_check
 
 
 # =============================================================================

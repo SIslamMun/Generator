@@ -112,7 +112,7 @@ class TestCoverageSelector:
 
     def test_selector_initialization(self, mock_sentence_transformer):
         """Test that selector initializes correctly."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector(model_name="test-model")
         # Model not loaded yet (lazy)
         assert selector._encoder is None
@@ -120,7 +120,7 @@ class TestCoverageSelector:
 
     def test_text_extraction_qa(self, mock_sentence_transformer, sample_examples):
         """Test text extraction from QA examples."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         
         texts = selector._extract_texts(sample_examples)
@@ -131,7 +131,7 @@ class TestCoverageSelector:
 
     def test_text_extraction_tool_use(self, mock_sentence_transformer, sample_tool_examples):
         """Test text extraction from tool-use examples."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         
         texts = selector._extract_texts(sample_tool_examples)
@@ -141,7 +141,7 @@ class TestCoverageSelector:
 
     def test_select_by_target_count(self, mock_sentence_transformer, sample_examples):
         """Test selection with exact target count."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -156,7 +156,7 @@ class TestCoverageSelector:
 
     def test_select_by_reduction_ratio(self, mock_sentence_transformer, sample_examples):
         """Test selection with reduction ratio."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -168,7 +168,7 @@ class TestCoverageSelector:
 
     def test_centroid_strategy(self, mock_sentence_transformer, sample_examples):
         """Test centroid selection strategy."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -181,7 +181,7 @@ class TestCoverageSelector:
 
     def test_diverse_strategy(self, mock_sentence_transformer, sample_examples):
         """Test diverse selection strategy."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -194,7 +194,7 @@ class TestCoverageSelector:
 
     def test_coverage_score_computation(self, mock_sentence_transformer, sample_examples):
         """Test coverage score computation."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -212,7 +212,7 @@ class TestCoverageSelector:
 
     def test_empty_input(self, mock_sentence_transformer):
         """Test handling of empty input."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -221,7 +221,7 @@ class TestCoverageSelector:
 
     def test_target_larger_than_input(self, mock_sentence_transformer, sample_examples):
         """Test when target is larger than input size."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_sentence_transformer
         
@@ -234,7 +234,7 @@ class TestCoverageSelector:
 
     def test_determinism(self, mock_sentence_transformer, sample_examples):
         """Test that selection count is deterministic."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         
         selector1 = CoverageSelector()
         selector1._encoder = mock_sentence_transformer
@@ -274,7 +274,7 @@ class TestCoverageScoring:
 
     def test_full_coverage(self, mock_embedder):
         """Test coverage score when selecting all examples."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_embedder
         
@@ -286,7 +286,7 @@ class TestCoverageScoring:
 
     def test_partial_coverage(self, mock_embedder):
         """Test coverage score with partial selection."""
-        from generator.coverage_selector import CoverageSelector
+        from generator.tool.coverage_selector import CoverageSelector
         selector = CoverageSelector()
         selector._encoder = mock_embedder
         
@@ -334,7 +334,7 @@ class TestCLIIntegration:
         mock_selector.select_by_coverage.return_value = examples[:5]
         mock_selector.compute_coverage_score.return_value = 0.85
         
-        with patch('generator.coverage_selector.CoverageSelector', return_value=mock_selector):
+        with patch('generator.tool.coverage_selector.CoverageSelector', return_value=mock_selector):
             result = runner.invoke(main, [
                 "select-coverage",
                 str(input_file),
@@ -362,7 +362,7 @@ class TestCLIIntegration:
         
         # Mock to avoid import errors
         mock_selector = MagicMock()
-        with patch('generator.coverage_selector.CoverageSelector', return_value=mock_selector):
+        with patch('generator.tool.coverage_selector.CoverageSelector', return_value=mock_selector):
             result = runner.invoke(main, [
                 "select-coverage",
                 str(input_file),

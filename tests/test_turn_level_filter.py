@@ -9,8 +9,8 @@ import json
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from generator.tool_curator import ToolCurator
-from generator.tool_schemas import (
+from generator.tool.tool_curator import ToolCurator
+from generator.tool.tool_schemas import (
     Tool, Parameter, ToolExample, Solution, 
     ReasoningStep, ExecutionResult
 )

@@ -4,7 +4,7 @@ import pytest
 import json
 from unittest.mock import Mock, patch
 
-from generator.multi_scorer import (
+from generator.qa.multi_scorer import (
     MultiDimensionalScorer,
     MultiScore,
     ScoreWeights,
@@ -181,7 +181,7 @@ class TestMultiDimensionalScorer:
         assert 0 <= score.quality <= 10
         assert 0 <= score.combined <= 10
     
-    @patch("generator.multi_scorer.get_client")
+    @patch("generator.qa.multi_scorer.get_client")
     def test_score_complexity_with_llm(self, mock_get_client):
         """Test complexity scoring with LLM."""
         mock_llm = Mock()
@@ -202,7 +202,7 @@ class TestMultiDimensionalScorer:
         assert result["complexity"] == 8
         assert result["reasoning_depth"] == 4
     
-    @patch("generator.multi_scorer.get_client")
+    @patch("generator.qa.multi_scorer.get_client")
     def test_score_quality_with_llm(self, mock_get_client):
         """Test quality scoring with LLM."""
         mock_llm = Mock()

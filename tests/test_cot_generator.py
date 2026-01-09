@@ -1,7 +1,7 @@
 """Unit tests for CoT generator module."""
 
 import pytest
-from src.generator.cot_generator import _parse_cot_response
+from generator.cot.cot_generator import _parse_cot_response
 
 
 class TestCoTGenerator:

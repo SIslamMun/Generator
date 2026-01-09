@@ -10,7 +10,7 @@ class TestDependencyGraph:
     @pytest.fixture
     def sample_tools(self):
         """Create sample tools for testing."""
-        from generator.tool_schemas import Tool, Parameter
+        from generator.tool.tool_schemas import Tool, Parameter
         
         return [
             Tool(
@@ -70,7 +70,7 @@ class TestDependencyGraph:
 
     def test_graph_initialization(self):
         """Test that graph initializes correctly."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph()
         assert len(graph.nodes) == 0
@@ -78,7 +78,7 @@ class TestDependencyGraph:
 
     def test_build_from_tools(self, sample_tools):
         """Test building graph from tools."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -89,7 +89,7 @@ class TestDependencyGraph:
 
     def test_adjacency_created(self, sample_tools):
         """Test that adjacency lists are created."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -101,7 +101,7 @@ class TestDependencyGraph:
 
     def test_reverse_adjacency(self, sample_tools):
         """Test reverse adjacency (predecessors)."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -111,7 +111,7 @@ class TestDependencyGraph:
 
     def test_validate_valid_chain(self, sample_tools):
         """Test validating a valid tool chain."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -124,7 +124,7 @@ class TestDependencyGraph:
 
     def test_validate_invalid_chain(self, sample_tools):
         """Test validating an invalid tool chain."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -137,7 +137,7 @@ class TestDependencyGraph:
 
     def test_get_compatible_chains(self, sample_tools):
         """Test finding compatible chains."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -153,7 +153,7 @@ class TestDependencyGraph:
 
     def test_find_bridges(self, sample_tools):
         """Test finding bridge tools between incompatible tools."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         
@@ -167,7 +167,7 @@ class TestDependencyGraph:
 
     def test_statistics(self, sample_tools):
         """Test graph statistics."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         stats = graph.get_statistics()
@@ -179,7 +179,7 @@ class TestDependencyGraph:
 
     def test_to_dict(self, sample_tools):
         """Test exporting graph to dictionary."""
-        from generator.dependency_graph import DependencyGraph
+        from generator.tool.dependency_graph import DependencyGraph
         
         graph = DependencyGraph(sample_tools)
         data = graph.to_dict()
@@ -196,7 +196,7 @@ class TestTypeCompatibility:
 
     def test_exact_match(self):
         """Test exact type matches."""
-        from generator.dependency_graph import is_type_compatible
+        from generator.tool.dependency_graph import is_type_compatible
         
         assert is_type_compatible("string", "string")
         assert is_type_compatible("integer", "integer")
@@ -204,7 +204,7 @@ class TestTypeCompatibility:
 
     def test_any_type(self):
         """Test 'any' type compatibility."""
-        from generator.dependency_graph import is_type_compatible
+        from generator.tool.dependency_graph import is_type_compatible
         
         assert is_type_compatible("string", "any")
         assert is_type_compatible("integer", "any")
@@ -212,21 +212,21 @@ class TestTypeCompatibility:
 
     def test_number_compatibility(self):
         """Test number type compatibility."""
-        from generator.dependency_graph import is_type_compatible
+        from generator.tool.dependency_graph import is_type_compatible
         
         assert is_type_compatible("integer", "number")
         assert is_type_compatible("number", "number")
 
     def test_incompatible_types(self):
         """Test incompatible types."""
-        from generator.dependency_graph import is_type_compatible
+        from generator.tool.dependency_graph import is_type_compatible
         
         assert not is_type_compatible("string", "integer")
         assert not is_type_compatible("array", "string")
 
     def test_compatibility_score(self):
         """Test compatibility scoring."""
-        from generator.dependency_graph import compute_compatibility_score
+        from generator.tool.dependency_graph import compute_compatibility_score
         
         # Exact match = 1.0
         assert compute_compatibility_score("string", "string") == 1.0
@@ -298,7 +298,7 @@ class TestToolNodeOperations:
 
     def test_accepts_type(self):
         """Test ToolNode.accepts_type method."""
-        from generator.dependency_graph import ToolNode
+        from generator.tool.dependency_graph import ToolNode
         
         node = ToolNode(
             tool_id="test",
@@ -318,7 +318,7 @@ class TestToolNodeOperations:
 
     def test_input_types_property(self):
         """Test ToolNode.input_types property."""
-        from generator.dependency_graph import ToolNode
+        from generator.tool.dependency_graph import ToolNode
         
         node = ToolNode(
             tool_id="test",

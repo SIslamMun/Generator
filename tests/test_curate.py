@@ -1,7 +1,7 @@
 """Unit tests for curate module."""
 
 import pytest
-from src.generator.curate import (
+from generator.qa.curate import (
     _detect_format,
     _convert_to_conversation_format,
     _extract_qa_from_conversation,
