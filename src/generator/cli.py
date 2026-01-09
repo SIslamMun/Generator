@@ -11,14 +11,20 @@ import click
 import yaml
 from pathlib import Path
 from rich.console import Console
-from .qa_generator import generate_qa_from_lancedb
-from .curate import curate_qa_pairs
+
+# QA Pipeline
+from .qa.qa_generator import generate_qa_from_lancedb
+from .qa.curate import curate_qa_pairs
+from .qa.enrich import enrich_qa_pairs, load_qa_pairs, save_qa_pairs
+from .qa.compare import compare_datasets
+
+# CoT Pipeline
+from .cot.cot_generator import generate_cot_pairs
+from .cot.cot_enhancer import enhance_with_cot
+
+# Common utilities
 from .formatters import export_to_format
 from .prompt_loader import load_prompts
-from .enrich import enrich_qa_pairs, load_qa_pairs, save_qa_pairs
-from .cot_generator import generate_cot_pairs
-from .cot_enhancer import enhance_with_cot
-from .compare import compare_datasets
 from .clients import get_client
 
 console = Console()
@@ -329,7 +335,7 @@ def select_coverage(input_file, output, target_count, reduction_ratio, strategy,
     console.print("\n[bold]🎯 Selecting diverse examples by coverage[/bold]\n")
     
     try:
-        from .coverage_selector import CoverageSelector
+        from .tool.coverage_selector import CoverageSelector
     except ImportError as e:
         console.print(
             "[red]Error: Coverage selection requires additional dependencies.[/red]\n"
@@ -416,7 +422,7 @@ def multi_score(input_file, output, config, min_score, top_k, strategy,
     """
     console.print("\n[bold]📊 Multi-Dimensional Scoring (DEITA)[/bold]\n")
     
-    from .multi_scorer import MultiDimensionalScorer, ScoreWeights
+    from .qa.multi_scorer import MultiDimensionalScorer, ScoreWeights
     
     # Load config
     config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
@@ -866,8 +872,8 @@ def tool_parse(input_path, output, fmt):
       uv run generator tool-parse tools.py -o tools.json --format python
     """
     from pathlib import Path
-    from .tool_parser import ToolParser
-    from .tool_schemas import save_tools
+    from .tool.tool_parser import ToolParser
+    from .tool.tool_schemas import save_tools
     
     console.print("\n[bold]🔧 Parsing tool definitions[/bold]\n")
     
@@ -943,8 +949,8 @@ def tool_deps(tools_path, output, tool_id, chains, max_chain_length, chain_to_va
       # Validate a chain
       uv run generator tool-deps configs/hdf5_tools.json --validate "open_file,read_full_dataset,close_file"
     """
-    from .tool_schemas import load_tools
-    from .dependency_graph import DependencyGraph
+    from .tool.tool_schemas import load_tools
+    from .tool.dependency_graph import DependencyGraph
     
     console.print("\n[bold]🔗 Tool Dependency Analysis (In-N-Out)[/bold]\n")
     
@@ -1034,8 +1040,8 @@ def tool_generate(tools_path, output, config, mode, target_pairs, max_steps, pro
     """
     import json
     from pathlib import Path
-    from .tool_schemas import load_tools, save_examples
-    from .tool_generator import ToolGenerator
+    from .tool.tool_schemas import load_tools, save_examples
+    from .tool.tool_generator import ToolGenerator
     from .prompt_loader import load_prompts
     
     # Default to auto mode
@@ -1116,8 +1122,8 @@ def tool_generate_chain(tools_path, output, config, target_pairs, min_steps, max
     """
     import json
     from pathlib import Path
-    from .tool_schemas import load_tools, save_examples
-    from .tool_generator import ToolGenerator
+    from .tool.tool_schemas import load_tools, save_examples
+    from .tool.tool_generator import ToolGenerator
     from .prompt_loader import load_prompts
     
     console.print(f"\n[bold]🔗 Chain-First Tool Generation (ToolGrad)[/bold]\n")
@@ -1188,8 +1194,8 @@ def tool_execute(examples_path, output, tools_path, config, mode, timeout, provi
       uv run generator tool-execute examples.json -o validated.json --mode real --tools tools.json
     """
     from pathlib import Path
-    from .tool_schemas import load_tools, load_examples, save_examples
-    from .tool_executor import ToolExecutor, create_executor_with_builtins
+    from .tool.tool_schemas import load_tools, load_examples, save_examples
+    from .tool.tool_executor import ToolExecutor, create_executor_with_builtins
     from .prompt_loader import load_prompts
     
     console.print(f"\n[bold]🔧 Executing tool examples ({mode})[/bold]\n")
@@ -1255,8 +1261,8 @@ def tool_curate(examples_path, output, tools_path, config, threshold, min_succes
       uv run generator tool-curate examples.json -o curated.json --balance-difficulty
     """
     from pathlib import Path
-    from .tool_schemas import load_tools, load_examples, save_examples
-    from .tool_curator import ToolCurator
+    from .tool.tool_schemas import load_tools, load_examples, save_examples
+    from .tool.tool_curator import ToolCurator
     from .prompt_loader import load_prompts
     
     console.print("\n[bold]🔧 Curating tool-use examples[/bold]\n")
@@ -1323,8 +1329,8 @@ def tool_evaluate(examples_path, output, config, min_score, strict, report_only,
       uv run generator tool-evaluate examples.json -o strict.json --strict
     """
     from pathlib import Path
-    from .tool_schemas import load_examples, save_examples
-    from .outcome_evaluator import OutcomeEvaluator
+    from .tool.tool_schemas import load_examples, save_examples
+    from .tool.outcome_evaluator import OutcomeEvaluator
     from .prompt_loader import load_prompts
     
     console.print("\n[bold]📊 Outcome-Oriented Evaluation[/bold]\n")
@@ -1407,10 +1413,10 @@ def tool_pipeline(tools_path, output, config, mode, target_pairs, threshold, exe
     """
     import json
     from pathlib import Path
-    from .tool_schemas import load_tools, save_examples, ToolExample
-    from .tool_generator import ToolGenerator
-    from .tool_executor import ToolExecutor
-    from .tool_curator import ToolCurator
+    from .tool.tool_schemas import load_tools, save_examples, ToolExample
+    from .tool.tool_generator import ToolGenerator
+    from .tool.tool_executor import ToolExecutor
+    from .tool.tool_curator import ToolCurator
     from .prompt_loader import load_prompts
     
     console.print("\n[bold]🔧 Running full tool-use pipeline[/bold]\n")
