@@ -4,6 +4,7 @@ Tool example curation using LLM-as-Judge.
 Implements quality filtering based on:
 - ToolACE: Dual-layer verification
 - APIGen: Format + Execution + Semantic checks
+- ToolMind (Nov 2025): Turn-level filtering for step quality
 """
 
 import json
@@ -99,6 +100,148 @@ class ToolCurator:
             f"(min_success_rate={min_success_rate})[/cyan]"
         )
         return filtered
+    
+    def filter_by_turn_quality(
+        self,
+        examples: List[ToolExample],
+        min_step_quality: float = 0.7,
+    ) -> List[ToolExample]:
+        """
+        Filter examples by individual turn/step quality (ToolMind approach).
+        
+        Unlike filter_by_execution which only checks final success,
+        this method rates each reasoning step independently to catch
+        cases where bad intermediate steps compound errors.
+        
+        Args:
+            examples: List of tool examples
+            min_step_quality: Minimum average quality per step (0-1)
+            
+        Returns:
+            Examples where all steps meet quality threshold
+        """
+        if not self.llm:
+            logger.warning("No LLM configured for turn-level rating, skipping")
+            return examples
+        
+        filtered = []
+        failed_count = 0
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task(
+                "[cyan]Turn-level quality check...", 
+                total=len(examples)
+            )
+            
+            for example in examples:
+                step_ratings = self._rate_individual_steps(example)
+                
+                if not step_ratings:
+                    progress.advance(task)
+                    continue
+                
+                # Check if all steps meet minimum quality
+                avg_quality = sum(step_ratings) / len(step_ratings)
+                all_pass = all(r >= min_step_quality for r in step_ratings)
+                
+                if all_pass:
+                    # Store step ratings in metadata
+                    example.metadata["step_ratings"] = step_ratings
+                    example.metadata["avg_step_quality"] = avg_quality
+                    filtered.append(example)
+                else:
+                    # Log which steps failed for analysis
+                    failed_steps = [
+                        i + 1 for i, r in enumerate(step_ratings) 
+                        if r < min_step_quality
+                    ]
+                    logger.debug(
+                        f"Example failed turn filter at steps: {failed_steps}"
+                    )
+                    failed_count += 1
+                
+                progress.advance(task)
+        
+        console.print(
+            f"[cyan]Turn-level filter: {len(filtered)}/{len(examples)} passed "
+            f"(min_step_quality={min_step_quality})[/cyan]"
+        )
+        if failed_count > 0:
+            console.print(
+                f"  [dim]({failed_count} examples had problematic intermediate steps)[/dim]"
+            )
+        
+        return filtered
+    
+    def _rate_individual_steps(self, example: ToolExample) -> List[float]:
+        """
+        Rate each reasoning step independently.
+        
+        Args:
+            example: Tool example with reasoning path
+            
+        Returns:
+            List of ratings (0-1) for each step
+        """
+        if not example.solution.reasoning_path:
+            return []
+        
+        ratings = []
+        prompt_template = self._get_prompt("step_quality_rating")
+        
+        for i, step in enumerate(example.solution.reasoning_path):
+            # Build context from previous steps
+            previous_context = self._get_previous_context(example, i)
+            
+            prompt = prompt_template.format(
+                instruction=example.instruction,
+                step_number=i + 1,
+                total_steps=len(example.solution.reasoning_path),
+                thought=step.thought,
+                tool=step.tool,
+                args=json.dumps(step.args, indent=2),
+                result=json.dumps(step.actual_result) if step.actual_result else "N/A",
+                previous_context=previous_context,
+            )
+            
+            try:
+                response = self.llm.generate(prompt, temperature=0.1)
+                result = self._parse_json_response(response)
+                
+                if result and isinstance(result, dict):
+                    rating = result.get("rating", 0.5)
+                    # Ensure rating is in 0-1 range
+                    rating = max(0.0, min(1.0, float(rating)))
+                    ratings.append(rating)
+                else:
+                    ratings.append(0.5)  # Default to neutral if parsing fails
+                    
+            except Exception as e:
+                logger.warning(f"Failed to rate step {i + 1}: {e}")
+                ratings.append(0.5)
+        
+        return ratings
+    
+    def _get_previous_context(self, example: ToolExample, current_idx: int) -> str:
+        """Build context string from previous steps."""
+        if current_idx == 0:
+            return "This is the first step."
+        
+        context_parts = []
+        for i in range(current_idx):
+            step = example.solution.reasoning_path[i]
+            context_parts.append(
+                f"Step {i + 1}: Used {step.tool}({json.dumps(step.args)}) → "
+                f"{json.dumps(step.actual_result) if step.actual_result else 'pending'}"
+            )
+        
+        return "\n".join(context_parts)
     
     def rate_examples(
         self,
@@ -328,6 +471,8 @@ class ToolCurator:
         balance: bool = True,
         min_per_tool: int = 10,
         deduplicate: bool = True,
+        turn_level_filter: bool = False,
+        min_step_quality: float = 0.7,
     ) -> List[ToolExample]:
         """
         Full curation pipeline.
@@ -340,6 +485,8 @@ class ToolCurator:
             balance: Whether to balance difficulty
             min_per_tool: Minimum examples per tool
             deduplicate: Whether to remove duplicates
+            turn_level_filter: Whether to apply turn-level quality filtering
+            min_step_quality: Minimum quality per step (0-1) if turn_level_filter is True
             
         Returns:
             Curated examples
@@ -349,19 +496,23 @@ class ToolCurator:
         # Step 1: Filter by execution
         curated = self.filter_by_execution(examples, min_success_rate)
         
-        # Step 2: Rate and filter
+        # Step 2: Turn-level quality filter (ToolMind approach)
+        if turn_level_filter and self.llm:
+            curated = self.filter_by_turn_quality(curated, min_step_quality)
+        
+        # Step 3: Rate and filter
         if self.llm:
             curated = self.rate_examples(curated, rating_threshold)
         
-        # Step 3: Deduplicate
+        # Step 4: Deduplicate
         if deduplicate:
             curated = self.deduplicate(curated)
         
-        # Step 4: Balance difficulty
+        # Step 5: Balance difficulty
         if balance:
             curated = self.balance_difficulty(curated)
         
-        # Step 5: Check coverage
+        # Step 6: Check coverage
         curated = self.ensure_coverage(curated, tools, min_per_tool)
         
         console.print(f"\n[green]✓ Curation complete: {len(curated)} examples[/green]")

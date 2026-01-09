@@ -274,6 +274,49 @@ tool_quality_rating: |
   Return ONLY valid JSON.
 
 # ------------------------------------------------------------------------------
+# STEP QUALITY RATING (Turn-Level Filtering)
+# Based on ToolMind (Nov 2025): Rate individual reasoning steps
+# Paper: https://arxiv.org/abs/2511.15718
+# ------------------------------------------------------------------------------
+step_quality_rating: |
+  Rate this individual reasoning step for tool-use training data quality.
+  
+  **User Instruction:** {instruction}
+  
+  **Step {step_number} of {total_steps}:**
+  - Thought: {thought}
+  - Tool: {tool}
+  - Arguments: {args}
+  - Result: {result}
+  
+  **Previous Context:**
+  {previous_context}
+  
+  **Evaluation Criteria:**
+  1. Is the thought logically sound given the instruction and previous context?
+  2. Is the tool choice appropriate for this step?
+  3. Are the arguments correct, complete, and properly typed?
+  4. Does the result make sense for the given arguments?
+  5. Does this step advance toward the goal without introducing errors?
+  
+  **Rating Guide:**
+  - 0.9-1.0: Excellent - perfect reasoning, correct tool and args
+  - 0.7-0.8: Good - minor issues but fundamentally sound
+  - 0.5-0.6: Acceptable - works but has noticeable problems
+  - 0.3-0.4: Poor - significant issues that compound errors
+  - 0.0-0.2: Bad - wrong tool, invalid args, or misleading
+  
+  Return JSON:
+  {{
+    "rating": 0.85,
+    "issues": ["list", "of", "problems", "if any"],
+    "is_misleading": false,
+    "reasoning": "Brief explanation of the rating"
+  }}
+  
+  Return ONLY valid JSON.
+
+# ------------------------------------------------------------------------------
 # SEMANTIC VERIFICATION
 # Verify execution result semantically solves the instruction
 # ------------------------------------------------------------------------------
@@ -337,6 +380,80 @@ tool_simulation: |
   4. Be plausible (not obviously fake data)
 
   Return ONLY the API response (JSON format if object/array, plain value if primitive).
+
+# ------------------------------------------------------------------------------
+# CHAIN-FIRST GENERATION (ToolGrad Aug 2025)
+# Generate valid tool chains first, then synthesize queries
+# Reduces invalid samples by 40%+ compared to query-first
+# ------------------------------------------------------------------------------
+
+chain_generation: |
+  Generate a VALID tool chain where each step builds on previous results.
+
+  Available Tools:
+  {tools_json}
+
+  Requirements:
+  - Generate {min_steps} to {max_steps} steps
+  - Each step must use a real tool from the list
+  - Arguments must be valid for that tool
+  - Steps should chain together logically (output from one feeds into next)
+  - Use $step_N_result notation to reference previous results
+
+  Example chain structure:
+  - Step 1: Get some data → result is available as $step_1_result
+  - Step 2: Process $step_1_result → result is $step_2_result
+  - Step 3: Use $step_2_result to produce final output
+
+  Return JSON:
+  {{
+    "steps": [
+      {{
+        "step": 1,
+        "thought": "Why this tool and these arguments",
+        "tool": "tool_name",
+        "args": {{"param": "value"}},
+        "expected_result": "What this step produces"
+      }},
+      {{
+        "step": 2,
+        "thought": "Using result from step 1 to do X",
+        "tool": "another_tool",
+        "args": {{"input": "$step_1_result", "other": "value"}},
+        "expected_result": "What this produces"
+      }}
+    ],
+    "final_answer": "What the complete chain accomplishes"
+  }}
+
+  IMPORTANT:
+  - Use only tools from the list above
+  - Arguments must match tool parameter names exactly
+  - The chain must be executable in sequence
+
+  Return ONLY valid JSON.
+
+query_synthesis: |
+  Create a natural user query that would require this tool chain.
+
+  Tool Chain:
+  {chain_steps}
+
+  Tools Used: {tools_used}
+  Final Result: {final_result}
+
+  Generate a realistic user request that:
+  1. Would naturally lead to this sequence of tool calls
+  2. Sounds like something a real user would ask
+  3. Does NOT mention the specific tools or steps
+  4. Is clear about what the user wants to accomplish
+
+  Return JSON:
+  {{
+    "query": "Natural language user request"
+  }}
+
+  Return ONLY valid JSON.
 
 # ------------------------------------------------------------------------------
 # ERROR HANDLING ANNOTATION
