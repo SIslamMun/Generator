@@ -46,7 +46,7 @@ llm:
   # │      - gemini-1.5-pro: 2 RPM, 50 RPD (avoid for bulk)               │
   # └─────────────────────────────────────────────────────────────────────┘
   gemini:
-    model: gemini-1.5-flash  # Changed from gemini-2.0-flash-exp for better rate limits (15 RPM vs 10 RPM)
+    model: gemini-2.0-flash
     api_key: ${GOOGLE_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐
