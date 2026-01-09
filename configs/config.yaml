@@ -36,14 +36,17 @@ llm:
     api_key: ${ANTHROPIC_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐
-  # │ 3. GEMINI - Google Gemini API (FREE tier: 10 req/min) ⭐            │
+  # │ 3. GEMINI - Google Gemini API (FREE tier: 15 req/min) ⭐            │
   # │    Setup: pip install google-generativeai                           │
   # │    Get Key: https://aistudio.google.com/apikey (FREE)               │
   # │    Set Key: export GOOGLE_API_KEY="your-key"                        │
-  # │    Note: Rate limited to 10 requests/minute on free tier            │
+  # │    Rate Limits (Free):                                               │
+  # │      - gemini-1.5-flash: 15 RPM, 1500 RPD (BEST for bulk)           │
+  # │      - gemini-2.0-flash-exp: 10 RPM, 1500 RPD                       │
+  # │      - gemini-1.5-pro: 2 RPM, 50 RPD (avoid for bulk)               │
   # └─────────────────────────────────────────────────────────────────────┘
   gemini:
-    model: gemini-2.0-flash-exp  # Options: gemini-2.0-flash-exp, gemini-1.5-flash, gemini-1.5-pro
+    model: gemini-1.5-flash  # Changed from gemini-2.0-flash-exp for better rate limits (15 RPM vs 10 RPM)
     api_key: ${GOOGLE_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐
@@ -182,10 +185,10 @@ cot:
 # RATE LIMITING (Prevent API Quota Issues)
 # ============================================================================
 rate_limit:
-  delay_between_requests: 3   # Seconds between API calls (0.5 for local Ollama, 3-6 for Gemini free tier)
-  save_every_n_pairs: 50      # Save intermediate results every N pairs
-  max_retries: 3              # Retry attempts for rate limit errors
-  backoff_base: 60            # Base seconds for exponential backoff (60, 120, 240...)
+  delay_between_requests: 4   # Seconds between API calls (15 RPM = 4s delay for safety)
+  save_every_n_pairs: 100     # Save intermediate results every N pairs
+  max_retries: 5              # Retry attempts for rate limit errors
+  backoff_base: 65            # Base seconds for exponential backoff (65, 130, 260...)
 
 # ============================================================================
 # OUTPUT SETTINGS

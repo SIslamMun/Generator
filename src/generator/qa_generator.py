@@ -96,6 +96,21 @@ def generate_qa_from_lancedb(
     all_qa_pairs = []
     output_file = Path(output_path)
     output_file.parent.mkdir(parents=True, exist_ok=True)
+    
+    # Resume from intermediate file if exists
+    intermediate_file = output_file.parent / f"{output_file.stem}_intermediate.json"
+    processed_chunk_ids = set()
+    if intermediate_file.exists():
+        try:
+            import json
+            with open(intermediate_file) as f:
+                existing_pairs = json.load(f)
+            if existing_pairs:
+                all_qa_pairs = existing_pairs
+                processed_chunk_ids = {p.get("chunk_id") for p in existing_pairs if p.get("chunk_id")}
+                console.print(f"[yellow]⚡ Resuming: Found {len(all_qa_pairs)} existing pairs from {len(processed_chunk_ids)} chunks[/yellow]")
+        except Exception as e:
+            console.print(f"[yellow]⚠ Could not load intermediate file: {e}[/yellow]")
 
     # Process chunks in batches
     with Progress(
@@ -119,6 +134,12 @@ def generate_qa_from_lancedb(
                 chunk_id = row.get("id", f"chunk_{offset + idx}")
                 content = row.get("content", "")
                 source_file = row.get("source_file", "unknown")
+
+                # Skip already processed chunks (resume support)
+                if chunk_id in processed_chunk_ids:
+                    progress.advance(task)
+                    processed += 1
+                    continue
 
                 # Skip filtered source files (logs, login pages, metadata)
                 if any(pattern in source_file for pattern in skip_patterns):
