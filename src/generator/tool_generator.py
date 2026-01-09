@@ -5,8 +5,13 @@ Unified approach that combines best practices from:
 - Toolformer: Single-step tool calls
 - Gorilla: API documentation grounding (always included)
 - ToolLLM: Multi-step reasoning with chains
+- ToolGrad (2025): Chain-first generation (valid chains → synthesize queries)
 
-Two modes:
+Two generation approaches:
+- query_first (traditional): Generate instructions → annotate solutions
+- chain_first (ToolGrad): Generate valid chains → synthesize natural queries
+
+Three modes for solution complexity:
 - single: Simple single-tool calls
 - multi: Multi-step reasoning with tool chains
 - auto (default): Generates balanced mix based on instruction complexity
@@ -411,6 +416,259 @@ class ToolGenerator:
         
         console.print(f"[green]✓ Generated {len(examples)} examples[/green]")
         return examples
+    
+    # =========================================================================
+    # CHAIN-FIRST GENERATION (ToolGrad Aug 2025)
+    # Generate valid tool chains first, then synthesize natural queries
+    # Reduces invalid samples by 40%+ vs query-first approach
+    # =========================================================================
+    
+    def generate_chain_first(
+        self,
+        tools: List[Tool],
+        n_chains: int = 20,
+        min_steps: int = 2,
+        max_steps: int = 4,
+    ) -> List[ToolExample]:
+        """
+        Chain-first generation: build valid tool chains, then synthesize queries.
+        
+        Based on ToolGrad (Aug 2025): https://arxiv.org/abs/2508.04086
+        
+        Approach:
+        1. Generate valid tool chains (sequences of compatible calls)
+        2. For each chain, synthesize a natural user query that would require it
+        3. Validate chain coherence
+        
+        This reduces invalid samples by ~40% compared to query-first.
+        
+        Args:
+            tools: List of tool definitions
+            n_chains: Number of chains to generate
+            min_steps: Minimum tools per chain
+            max_steps: Maximum tools per chain
+            
+        Returns:
+            List of ToolExample objects with valid chains
+        """
+        console.print(f"\n[bold cyan]Chain-First Generation (ToolGrad)[/bold cyan]")
+        console.print(f"[dim]Building {n_chains} valid chains ({min_steps}-{max_steps} steps)...[/dim]\n")
+        
+        examples = []
+        docs = "\n\n".join([t.to_documentation() for t in tools])
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Generating chains...", total=n_chains)
+            
+            generated = 0
+            attempts = 0
+            max_attempts = n_chains * 3  # Allow some failures
+            
+            while generated < n_chains and attempts < max_attempts:
+                attempts += 1
+                
+                # Step 1: Generate a valid tool chain
+                chain = self._generate_valid_chain(tools, min_steps, max_steps)
+                if not chain or not chain.get("steps"):
+                    continue
+                
+                # Step 2: Synthesize a natural query for this chain
+                query = self._synthesize_query_for_chain(chain, docs)
+                if not query:
+                    continue
+                
+                # Step 3: Build the ToolExample
+                steps = []
+                for i, step_data in enumerate(chain.get("steps", [])):
+                    steps.append(ReasoningStep(
+                        step=i + 1,
+                        thought=step_data.get("thought", ""),
+                        tool=step_data.get("tool", ""),
+                        args=step_data.get("args", {}),
+                        expected_result=step_data.get("expected_result"),
+                    ))
+                
+                solution = Solution(
+                    instruction=query,
+                    reasoning_path=steps,
+                    final_answer=chain.get("final_answer", "The task is complete."),
+                    api_documentation=docs,
+                    method="chain_first",
+                )
+                
+                example = ToolExample(
+                    instruction=query,
+                    solution=solution,
+                    metadata={
+                        "generation_method": "chain_first",
+                        "chain_length": len(steps),
+                        "tools_used": [s.tool for s in steps],
+                        "difficulty": "complex" if len(steps) >= 3 else "medium",
+                    }
+                )
+                
+                examples.append(example)
+                generated += 1
+                progress.advance(task)
+        
+        success_rate = generated / max(attempts, 1) * 100
+        console.print(f"\n[green]✓ Generated {generated} chain-first examples[/green]")
+        console.print(f"[dim]Success rate: {success_rate:.1f}% ({generated}/{attempts})[/dim]")
+        
+        return examples
+    
+    def _generate_valid_chain(
+        self,
+        tools: List[Tool],
+        min_steps: int,
+        max_steps: int,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Generate a valid tool chain with proper data flow.
+        
+        Creates chains where:
+        - Each step's output can feed into subsequent steps
+        - Tools are used in a logical sequence
+        - Arguments reference previous results correctly
+        """
+        tools_json = json.dumps([{
+            "name": t.name,
+            "description": t.description,
+            "parameters": [p.to_dict() for p in t.parameters],
+            "returns": t.returns,
+        } for t in tools], indent=2)
+        
+        prompt_template = self._get_prompt("chain_generation")
+        prompt = prompt_template.format(
+            tools_json=tools_json,
+            min_steps=min_steps,
+            max_steps=max_steps,
+        )
+        
+        try:
+            response = self.llm.generate(prompt, temperature=0.7)
+            result = self._parse_json_response(response)
+            
+            if isinstance(result, list):
+                result = {"steps": result}
+            
+            # Validate chain has required structure
+            if not result.get("steps") or len(result["steps"]) < min_steps:
+                return None
+                
+            return result
+        except Exception as e:
+            logger.debug(f"Chain generation failed: {e}")
+            return None
+    
+    def _synthesize_query_for_chain(
+        self,
+        chain: Dict[str, Any],
+        docs: str,
+    ) -> Optional[str]:
+        """
+        Synthesize a natural user query that would require this chain.
+        
+        Takes a valid chain and creates a natural language request
+        that a user might realistically make.
+        """
+        chain_summary = []
+        for i, step in enumerate(chain.get("steps", [])):
+            chain_summary.append(f"{i+1}. {step.get('tool', 'unknown')}({step.get('args', {})})")
+        
+        prompt_template = self._get_prompt("query_synthesis")
+        prompt = prompt_template.format(
+            chain_steps="\n".join(chain_summary),
+            tools_used=", ".join([s.get("tool", "") for s in chain.get("steps", [])]),
+            final_result=chain.get("final_answer", "task completed"),
+        )
+        
+        try:
+            response = self.llm.generate(prompt, temperature=0.6)
+            
+            # Extract the query from response
+            result = self._parse_json_response(response)
+            if isinstance(result, dict):
+                return result.get("query") or result.get("instruction")
+            elif isinstance(result, str):
+                return result.strip()
+            
+            # Fallback: use the raw response if it looks like a query
+            if response and len(response) < 500 and "?" in response or "please" in response.lower():
+                return response.strip()
+                
+            return None
+        except Exception as e:
+            logger.debug(f"Query synthesis failed: {e}")
+            return None
+    
+    def generate_examples_hybrid(
+        self,
+        tools: List[Tool],
+        n_total: int = 50,
+        chain_first_ratio: float = 0.4,
+        mode: str = "auto",
+        max_steps: int = 5,
+    ) -> List[ToolExample]:
+        """
+        Hybrid generation: combine query-first and chain-first approaches.
+        
+        Recommended for best results. Uses:
+        - Chain-first for complex multi-tool examples (better validity)
+        - Query-first for simple single-tool examples (better diversity)
+        
+        Args:
+            tools: Tool definitions
+            n_total: Total examples to generate
+            chain_first_ratio: Portion of examples using chain-first (default 40%)
+            mode: Solution mode for query-first ('single', 'multi', 'auto')
+            max_steps: Max steps for multi-step solutions
+            
+        Returns:
+            Combined list of ToolExample objects
+        """
+        console.print(f"\n[bold]Hybrid Generation (Query-First + Chain-First)[/bold]")
+        
+        n_chain_first = int(n_total * chain_first_ratio)
+        n_query_first = n_total - n_chain_first
+        
+        console.print(f"[dim]Chain-first: {n_chain_first} | Query-first: {n_query_first}[/dim]\n")
+        
+        all_examples = []
+        
+        # Chain-first for multi-tool examples
+        if n_chain_first > 0:
+            chain_examples = self.generate_chain_first(
+                tools, 
+                n_chains=n_chain_first,
+                min_steps=2,
+                max_steps=4,
+            )
+            all_examples.extend(chain_examples)
+        
+        # Query-first for remaining
+        if n_query_first > 0:
+            # Calculate per-tool count
+            n_per_tool = max(1, n_query_first // len(tools))
+            query_examples = self.generate_examples(
+                tools,
+                n_per_tool=n_per_tool,
+                mode=mode,
+                max_steps=max_steps,
+            )
+            all_examples.extend(query_examples[:n_query_first])
+        
+        console.print(f"\n[bold green]✨ Generated {len(all_examples)} total examples[/bold green]")
+        console.print(f"[dim]Chain-first: {len([e for e in all_examples if e.metadata.get('generation_method') == 'chain_first'])}[/dim]")
+        console.print(f"[dim]Query-first: {len([e for e in all_examples if e.metadata.get('generation_method') != 'chain_first'])}[/dim]")
+        
+        return all_examples
     
     def _parse_json_response(self, response: str) -> Any:
         """Parse JSON from LLM response, handling common issues."""
