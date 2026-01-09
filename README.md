@@ -219,6 +219,61 @@ uv run generator curate qa.json -o python_curated.json --topic "Python programmi
 
 ---
 
+### `multi-score` - Multi-dimensional quality scoring (DEITA-style) ⭐ NEW
+
+```bash
+uv run generator multi-score INPUT.json -o OUTPUT.json [OPTIONS]
+```
+
+**What it does:**
+Based on DEITA (2024): Uses 3-dimensional scoring (complexity, quality, diversity) to select optimal training examples. DEITA showed this approach achieves 10x data efficiency - 6K examples trained with multi-dimensional selection match 100K randomly selected examples.
+
+**Scoring Dimensions:**
+- **Complexity** (0-10): Reasoning depth, multi-step thinking, domain knowledge required
+- **Quality** (0-10): Clarity, accuracy, formatting, usefulness of answer
+- **Diversity** (0-10): Semantic uniqueness compared to existing selections (requires embeddings)
+
+**Options:**
+- `--config PATH` - Config file
+- `--min-score FLOAT` - Minimum combined score threshold (default: 5.0)
+- `--top-k INT` - Select top K examples after scoring
+- `--strategy CHOICE` - `threshold` (filter by min-score), `top-k` (select best), `combined` (both)
+- `--complexity-weight FLOAT` - Weight for complexity (default: 0.4)
+- `--quality-weight FLOAT` - Weight for quality (default: 0.4)
+- `--diversity-weight FLOAT` - Weight for diversity (default: 0.2)
+- `--use-llm / --no-llm` - Use LLM for scoring (default: no-llm uses heuristics)
+- `--provider TEXT` - Override provider for LLM scoring
+- `--model TEXT` - Override model for LLM scoring
+
+**Requires for diversity scoring:** `uv pip install -e ".[coverage]"` (adds sentence-transformers)
+
+**Examples:**
+```bash
+# Basic scoring with heuristics (fast, no LLM cost)
+uv run generator multi-score curated.json -o scored.json
+
+# Filter by minimum score
+uv run generator multi-score curated.json -o scored.json --min-score 6.0
+
+# Select top 500 examples
+uv run generator multi-score curated.json -o top500.json --top-k 500 --strategy top-k
+
+# Use LLM for higher accuracy scoring
+uv run generator multi-score curated.json -o scored.json --use-llm --provider claude
+
+# Custom weights - prioritize complexity for reasoning training
+uv run generator multi-score curated.json -o scored.json --complexity-weight 0.6 --quality-weight 0.3 --diversity-weight 0.1
+
+# Combined: filter to min 5.0 score, then select top 300
+uv run generator multi-score curated.json -o best300.json --min-score 5.0 --top-k 300 --strategy combined
+```
+
+**Output:** Adds `_multi_score` field with `complexity`, `quality`, `diversity`, `combined`, `weights` to each example
+
+**Use Case:** After curating 2000 QA pairs, use multi-score to select the 500 best examples that balance difficulty, answer quality, and topic diversity - achieving better model performance with less data.
+
+---
+
 ### `compare` - Compare multiple QA datasets (LLM Judge)
 
 ```bash
@@ -251,6 +306,44 @@ uv run generator compare phase4_curate/*.json -o winner.json --sample-size 15
 - LLM quality judgments
 - Recommended winner with reasoning
 - Alternative suggestions (merge/hybrid)
+
+---
+
+### `select-coverage` - Reduce dataset while maximizing diversity ⭐ NEW
+
+```bash
+uv run generator select-coverage INPUT.json -o OUTPUT.json [OPTIONS]
+```
+
+**What it does:**
+Based on TOUCAN (Oct 2025): Uses semantic clustering to select diverse, representative examples. Reduces dataset size by 40-60% with minimal information loss.
+
+**Options:**
+- `--target-count INT` - Exact number of examples to select
+- `--reduction-ratio FLOAT` - Target size as ratio (default: 0.4 = keep 40%)
+- `--strategy CHOICE` - Selection strategy: `centroid` (closest to cluster center) or `diverse` (maximize spread)
+- `--model TEXT` - Sentence transformer model (default: `all-MiniLM-L6-v2`)
+
+**Requires:** `uv pip install -e ".[coverage]"` (adds sentence-transformers and scikit-learn)
+
+**Examples:**
+```bash
+# Keep top 40% most diverse (default)
+uv run generator select-coverage curated.json -o diverse.json
+
+# Select exactly 500 diverse examples
+uv run generator select-coverage curated.json -o diverse.json --target-count 500
+
+# Use diverse strategy (maximize spread across clusters)
+uv run generator select-coverage curated.json -o diverse.json --strategy diverse --reduction-ratio 0.3
+
+# Different embedding model (for specialized domains)
+uv run generator select-coverage curated.json -o diverse.json --model all-mpnet-base-v2
+```
+
+**Output:** Selected examples with `_coverage_metadata` (cluster_id, original_index, strategy)
+
+**Use Case:** After curating 1000+ QA pairs, reduce to 400 diverse examples that still cover all topics, removing redundant similar questions.
 
 ---
 
@@ -397,6 +490,43 @@ uv run generator tool-generate configs/hdf5_tools.json -o examples.json --target
 
 ---
 
+### `tool-generate-chain` - Chain-first generation (ToolGrad) ⭐ NEW
+
+```bash
+uv run generator tool-generate-chain TOOLS.json -o OUTPUT.json [OPTIONS]
+```
+
+**What it does:**
+Based on ToolGrad (Aug 2025): Generates valid tool chains first, then synthesizes natural user queries. Reduces invalid samples by ~40% compared to query-first approach.
+
+**Options:**
+- `--target-pairs INT` - Total examples to generate (default: 50)
+- `--min-steps INT` - Minimum tools per chain (default: 2)
+- `--max-steps INT` - Maximum tools per chain (default: 4)
+- `--hybrid/--no-hybrid` - Use hybrid generation (chain-first + query-first)
+- `--chain-ratio FLOAT` - Chain-first ratio for hybrid mode (default: 0.4)
+- `--provider TEXT` - Override provider
+- `--model TEXT` - Override model
+
+**Examples:**
+```bash
+# Pure chain-first (complex multi-tool examples)
+uv run generator tool-generate-chain configs/hdf5_tools.json -o examples.json
+
+# Hybrid mode (recommended - combines both approaches)
+uv run generator tool-generate-chain configs/hdf5_tools.json -o examples.json --hybrid
+
+# Longer chains (3-5 tools)
+uv run generator tool-generate-chain configs/hdf5_tools.json -o examples.json --min-steps 3 --max-steps 5
+
+# Override provider
+uv run generator tool-generate-chain configs/hdf5_tools.json -o examples.json --provider ollama --model mistral:latest
+```
+
+**Use Case:** Generate high-quality multi-tool training examples where tools chain together logically (output from one feeds into the next).
+
+---
+
 ### `tool-curate` - Filter tool-use examples by quality
 
 ```bash
@@ -414,6 +544,84 @@ uv run generator tool-curate INPUT.json -o OUTPUT.json [OPTIONS]
 uv run generator tool-curate examples.json -o curated.json
 uv run generator tool-curate examples.json -o high_quality.json --threshold 8.0
 ```
+
+---
+
+### `select-coverage` - Semantic deduplication ⭐ NEW
+
+```bash
+uv run generator select-coverage INPUT.json -o OUTPUT.json [OPTIONS]
+```
+
+**What it does:**
+Based on TOUCAN (Dec 2024): Clusters similar examples semantically and selects representative samples. Reduces redundancy while maintaining dataset diversity.
+
+**Options:**
+- `--target INT` - Target number of examples to select
+- `--strategy TEXT` - Selection strategy: "centroid" (default) or "diverse"
+- `--text-key TEXT` - JSON key for text content (default: "instruction")
+
+**Strategies:**
+- **centroid**: Pick examples closest to cluster centers (most representative)
+- **diverse**: Pick most diverse examples from each cluster (maximum coverage)
+
+**Examples:**
+```bash
+# Select 50 representative examples
+uv run generator select-coverage examples.json -o selected.json --target 50
+
+# Use diversity-based selection
+uv run generator select-coverage examples.json -o diverse.json --target 100 --strategy diverse
+
+# Custom text key (for different JSON formats)
+uv run generator select-coverage qa_pairs.json -o selected.json --target 50 --text-key "question"
+```
+
+**Use Case:** Reduce large generated datasets (e.g., 1000 → 100 examples) while preserving semantic coverage. Eliminates near-duplicate examples that waste training compute.
+
+---
+
+### `tool-evaluate` - Outcome-oriented evaluation ⭐ NEW
+
+```bash
+uv run generator tool-evaluate INPUT.json -o OUTPUT.json [OPTIONS]
+```
+
+**What it does:**
+Based on MCP-AgentBench v2 (Sep 2025): Goes beyond execution success to verify actual task completion. Checks if the solution satisfies all requirements from the user instruction.
+
+**Options:**
+- `--min-score FLOAT` - Minimum outcome score to keep (default: 0.7)
+- `--strict` - Require ALL requirements satisfied
+- `--report-only` - Only report evaluation, don't filter
+- `--provider TEXT` - Override provider
+- `--model TEXT` - Override model
+
+**Evaluation Criteria:**
+- **Instruction Understanding:** Did the model understand what was asked?
+- **Requirement Coverage:** Are all requirements addressed?
+- **Output Correctness:** Do the outputs satisfy the request?
+- **Completeness:** Is the solution complete?
+
+**Outcome Status:**
+- `fully_satisfied` - All requirements met (score ≥ 0.9)
+- `partially_satisfied` - Some requirements met (score 0.5-0.9)
+- `not_satisfied` - Task not completed (score < 0.5)
+- `execution_failed` - Technical failure during execution
+
+**Examples:**
+```bash
+# Filter examples by outcome score
+uv run generator tool-evaluate examples.json -o verified.json --min-score 0.8
+
+# Strict mode (require ALL requirements)
+uv run generator tool-evaluate examples.json -o strict.json --strict
+
+# Report-only (evaluate without filtering)
+uv run generator tool-evaluate examples.json --report-only
+```
+
+**Use Case:** Verify that generated examples actually complete their stated tasks, not just execute without errors. Critical for training data quality.
 
 ---
 
@@ -452,6 +660,56 @@ uv run generator tool-parse TOOLS.json
 ```
 
 Validates JSON format and shows tool summary.
+
+---
+
+### `tool-deps` - Analyze parameter dependencies ⭐ NEW
+
+```bash
+uv run generator tool-deps TOOLS.json [OPTIONS]
+```
+
+**What it does:**
+Based on In-N-Out (Feb 2025): Builds parameter-level dependency graphs and validates tool chains. Identifies which tools can feed outputs to other tools' inputs.
+
+**Options:**
+- `--tool TEXT` - Show dependencies for a specific tool
+- `--chains` - List all valid 2-step chains
+- `--validate TEXT` - Validate a specific chain (tool1->tool2->...)
+- `-o, --output PATH` - Export graph to JSON file
+
+**Examples:**
+```bash
+# Show full dependency analysis
+uv run generator tool-deps configs/hdf5_tools.json
+
+# Show what depends on a specific tool
+uv run generator tool-deps configs/hdf5_tools.json --tool open_file
+
+# List all valid 2-step tool chains
+uv run generator tool-deps configs/hdf5_tools.json --chains
+
+# Validate a specific chain
+uv run generator tool-deps configs/hdf5_tools.json --validate "open_file->get_by_path->read_full_dataset"
+
+# Export graph for external analysis
+uv run generator tool-deps configs/hdf5_tools.json -o graph.json
+```
+
+**Output (graph.json):**
+```json
+{
+  "nodes": [
+    {"tool_id": "open_file", "inputs": ["path", "mode"], "outputs": [{"name": "file_handle", "type": "string"}]}
+  ],
+  "edges": [
+    {"from_tool": "open_file", "from_output": "file_handle", "to_tool": "get_by_path", "to_input": "file_id", "confidence": 1.0}
+  ],
+  "valid_chains": [["open_file", "get_by_path", "read_full_dataset"]]
+}
+```
+
+**Use Case:** Plan valid tool chains before generation, identify bridge tools that connect different tool categories, validate that multi-step examples are executable.
 
 ---
 
