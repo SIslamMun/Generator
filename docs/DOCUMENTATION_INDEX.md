@@ -149,6 +149,22 @@
 - [PHASE3_TOOL_USE_SPEC.md](PHASE3_TOOL_USE_SPEC.md)
 - [PAPER_IMPLEMENTATIONS.md](PAPER_IMPLEMENTATIONS.md) → Sections 5-7
 
+**Multi-Dimensional Scoring (DEITA):**
+- [PAPER_IMPLEMENTATIONS.md](PAPER_IMPLEMENTATIONS.md) → Section 8
+- [README.md](../README.md) → `multi-score` command
+
+**Coverage Selection (TOUCAN):**
+- [PAPER_IMPLEMENTATIONS.md](PAPER_IMPLEMENTATIONS.md) → Section 9
+- [README.md](../README.md) → `select-coverage` command
+
+**Turn-Level Filtering (ToolMind):**
+- [PAPER_IMPLEMENTATIONS.md](PAPER_IMPLEMENTATIONS.md) → Section 10
+- [IMPROVEMENT_PLAN.md](../IMPROVEMENT_PLAN.md) → Gap #1
+
+**Chain-First Generation (ToolGrad):**
+- [PAPER_IMPLEMENTATIONS.md](PAPER_IMPLEMENTATIONS.md) → Section 11
+- [README.md](../README.md) → `tool-generate-chain` command
+
 **LLM Providers:**
 - [DESIGN_DOCUMENTATION.md](DESIGN_DOCUMENTATION.md) → Section 7
 - [README.md](README.md) → Cloud Providers section
@@ -160,10 +176,18 @@
 **Total Documentation:**
 - **27,000+** words across comprehensive guides
 - **8** main documents
-- **7** research papers fully documented
+- **13** research papers fully documented (7 original + 6 new in Jan 2026)
 - **2** major pipelines (QA + Tool-Use)
 - **6** LLM providers supported
 - **4** export formats
+
+**New Implementations (Jan 2026):**
+- DEITA (2024) - Multi-dimensional scoring → `multi_scorer.py`
+- TOUCAN (2024) - Coverage-based selection → `coverage_selector.py`
+- ToolMind (2025) - Turn-level filtering → `tool_curator.py`
+- ToolGrad (2025) - Chain-first generation → `tool_generator.py`
+- In-N-Out (2025) - Parameter dependency graphs → `dependency_graph.py`
+- MCP-AgentBench (2025) - Outcome evaluation → `outcome_evaluator.py`
 
 **Coverage:**
 - ✅ Design rationale for every major decision
@@ -172,6 +196,7 @@
 - ✅ Complete command reference
 - ✅ Architecture diagrams
 - ✅ Code examples throughout
+- ✅ 91 new tests for new features
 
 ---
 

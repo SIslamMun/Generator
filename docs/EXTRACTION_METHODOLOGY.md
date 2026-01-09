@@ -1633,8 +1633,24 @@ uv run generator generate ./lancedb -o qa.json --target-pairs 500
 # Starts from pair 301
 ```
 
+### 5. Use Advanced Selection (Jan 2026)
+
+For optimal training data selection, use the new DEITA and TOUCAN implementations:
+
+```bash
+# Multi-dimensional scoring - select top 500 by complexity+quality+diversity
+uv run generator multi-score curated.json -o scored.json --top-k 500 --strategy top-k
+
+# Coverage-based selection - semantic deduplication
+uv run generator select-coverage curated.json -o diverse.json --target-count 500
+
+# Combined approach: score first, then select diverse
+uv run generator multi-score curated.json -o scored.json --min-score 6.0
+uv run generator select-coverage scored.json -o final.json --target-count 300
+```
+
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** January 8, 2026  
+**Document Version:** 2.0  
+**Last Updated:** January 9, 2026  
 **Maintained By:** Shazzadul

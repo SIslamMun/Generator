@@ -509,6 +509,12 @@ def verify_tool_example(example):
 | Toolformer | `tool_generator.py` | Single-step tools | `tool-generate --mode single` |
 | Gorilla | `tool_generator.py` | API documentation | (auto-included) |
 | ToolLLM | `tool_generator.py` | Multi-step chains | `tool-generate --mode multi` |
+| **DEITA (2024)** | `multi_scorer.py` | 3D quality scoring | `multi-score --top-k N` |
+| **TOUCAN (2024)** | `coverage_selector.py` | Semantic deduplication | `select-coverage` |
+| **ToolMind (2025)** | `tool_curator.py` | Turn-level filtering | `tool-curate --turn-level-filter` |
+| **ToolGrad (2025)** | `tool_generator.py` | Chain-first generation | `tool-generate-chain` |
+| **In-N-Out (2025)** | `dependency_graph.py` | Parameter dependency graphs | (library API) |
+| **MCP-AgentBench (2025)** | `outcome_evaluator.py` | Outcome-oriented evaluation | (library API) |
 
 ---
 
@@ -568,6 +574,171 @@ jq '.[0] | {q: .question, rating: .rating, reasoning: .reasoning}' rated.json
 
 ---
 
+## New Paper Implementations (Jan 2026)
+
+### 8. DEITA (2024)
+**Citation:** Liu et al., 2024  
+**ArXiv:** https://arxiv.org/abs/2312.15685
+
+**Key Contribution:** Multi-dimensional scoring achieves 10x data efficiency - 6K examples match 100K randomly selected
+
+**Implementation:**
+- **File:** `src/generator/multi_scorer.py`
+- **Feature:** 3D scoring (complexity, quality, diversity)
+- **CLI:** `uv run generator multi-score <input> -o <output> --top-k N`
+
+**What Was Extracted:**
+- Complexity scoring: Reasoning depth, multi-step thinking required
+- Quality scoring: Clarity, accuracy, formatting, usefulness
+- Diversity scoring: Semantic uniqueness via embeddings
+- Weighted combination for optimal selection
+
+**Code Example:**
+```python
+from generator import MultiDimensionalScorer
+
+scorer = MultiDimensionalScorer()
+scored = scorer.score_pair(qa_pair, existing_pairs)
+# Returns: MultiScore(complexity=7.5, quality=8.2, diversity=6.0, combined=7.3)
+
+# Select top 500 most valuable examples
+selected = scorer.select_top_k(all_pairs, k=500)
+```
+
+---
+
+### 9. TOUCAN (Oct 2024)
+**Citation:** arXiv:2510.01179
+
+**Key Contribution:** Coverage-based selection reduces dataset by 40-60% with minimal information loss
+
+**Implementation:**
+- **File:** `src/generator/coverage_selector.py`
+- **Feature:** Semantic clustering + representative selection
+- **CLI:** `uv run generator select-coverage <input> -o <output>`
+
+**What Was Extracted:**
+- Sentence transformer embeddings for semantic similarity
+- K-means clustering to group similar examples
+- Two strategies: centroid (closest to center) or diverse (maximize spread)
+- Coverage metrics to measure information retention
+
+**Code Example:**
+```python
+from generator import CoverageSelector
+
+selector = CoverageSelector(embedding_model="all-MiniLM-L6-v2")
+selected = selector.select(pairs, target_count=500, strategy="diverse")
+# Returns 500 diverse examples covering all semantic clusters
+```
+
+---
+
+### 10. ToolMind (Nov 2025)
+**Citation:** arXiv:2511.15718
+
+**Key Contribution:** Turn-level filtering removes poor-quality steps even in otherwise good examples
+
+**Implementation:**
+- **File:** `src/generator/tool_curator.py`
+- **Feature:** Per-step quality rating and filtering
+- **Method:** `filter_by_turn_quality()`
+
+**What Was Extracted:**
+- Per-turn quality assessment (not just overall example quality)
+- Minimum step quality threshold (default 0.7)
+- Remove entire example if any step falls below threshold
+- Detailed step-level feedback for debugging
+
+**Code Example:**
+```python
+curator = ToolCurator(client)
+filtered = curator.curate(examples, turn_level_filter=True, min_step_quality=0.7)
+```
+
+---
+
+### 11. ToolGrad (Aug 2025)
+**Citation:** arXiv:2508.04086
+
+**Key Contribution:** Chain-first generation creates more coherent multi-tool examples
+
+**Implementation:**
+- **File:** `src/generator/tool_generator.py`
+- **Feature:** Generate tool chain first, then synthesize query
+- **CLI:** `uv run generator tool-generate-chain <tools> -o <output>`
+
+**What Was Extracted:**
+- Reverse generation order: Tools → Query (not Query → Tools)
+- More logical tool chains with proper data flow
+- Query synthesis that naturally requires the generated chain
+- Hybrid mode combining both approaches
+
+**Code Example:**
+```python
+generator = ToolGenerator(client, tools)
+examples = generator.generate_chain_first(n_examples=100, min_steps=2, max_steps=5)
+# Or hybrid mode (recommended)
+examples = generator.generate_examples_hybrid(n_examples=100)
+```
+
+---
+
+### 12. In-N-Out (2025)
+**Citation:** Parameter dependency graphs for tool orchestration
+
+**Key Contribution:** Model parameter dependencies as graphs for better tool chaining
+
+**Implementation:**
+- **File:** `src/generator/dependency_graph.py`
+- **Feature:** Build and query parameter dependency graphs
+- **Class:** `DependencyGraph`
+
+**What Was Extracted:**
+- Parameter-level dependency tracking between tools
+- Automatic dependency inference from tool definitions
+- Topological ordering for execution planning
+- Visualization support (DOT format)
+
+**Code Example:**
+```python
+from generator import DependencyGraph
+
+graph = DependencyGraph()
+graph.add_tools(tools)
+order = graph.get_execution_order(["read_dataset", "calculate_stats"])
+# Returns: ["open_file", "read_dataset", "calculate_stats"]
+```
+
+---
+
+### 13. MCP-AgentBench (2025)
+**Citation:** Outcome-oriented evaluation for agentic tasks
+
+**Key Contribution:** Evaluate by task completion, not just individual tool calls
+
+**Implementation:**
+- **File:** `src/generator/outcome_evaluator.py`
+- **Feature:** Outcome-based success metrics
+- **Class:** `OutcomeEvaluator`
+
+**What Was Extracted:**
+- Task-completion evaluation (did the example achieve its goal?)
+- Constraint checking (were all requirements met?)
+- Partial credit scoring for multi-step tasks
+- Detailed evaluation breakdown
+
+**Code Example:**
+```python
+from generator import OutcomeEvaluator
+
+evaluator = OutcomeEvaluator(client)
+result = evaluator.evaluate(example, expected_outcomes=["file opened", "data loaded"])
+# Returns: OutcomeResult(success=True, score=0.95, constraint_violations=[])
+```
+
+---
+
 ## Future Paper Implementations (Planned)
 
 ### Self-Instruct (Stanford)
@@ -584,6 +755,6 @@ jq '.[0] | {q: .question, rating: .rating, reasoning: .reasoning}' rated.json
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** January 8, 2026  
+**Document Version:** 2.0  
+**Last Updated:** January 9, 2026  
 **Maintained By:** Shazzadul

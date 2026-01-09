@@ -1,7 +1,7 @@
 # Generator: Design and Implementation Overview
 
 **Author:** Shazzadul  
-**TL;DR:** Comprehensive synthetic training data generator based on 7 research papers, with full documentation of design decisions and extraction methodology.
+**TL;DR:** Comprehensive synthetic training data generator based on 13 research papers (Dec 2022 - Dec 2025), with full documentation of design decisions and extraction methodology.
 
 ---
 
@@ -11,6 +11,8 @@ A production-ready system for generating high-quality synthetic training data fo
 
 1. **QA Pipeline** - Teaches domain knowledge from documents
 2. **Tool-Use Pipeline** - Teaches agentic capabilities (API calling)
+
+**Key Updates (Jan 2026):** Added 6 new paper implementations for advanced data selection and tool-use generation.
 
 ---
 
@@ -379,8 +381,14 @@ pytest tests/
 - `src/generator/cot_generator.py` - CoT generation (Distilling Step-by-Step)
 - `src/generator/cot_enhancer.py` - Add CoT to existing QA
 - `src/generator/curate.py` - LLM-as-Judge filtering (LIMA + AlpaGasus)
-- `src/generator/tool_generator.py` - Tool-use examples (Toolformer + ToolLLM + Gorilla)
+- `src/generator/enrich.py` - Response improvement
+- `src/generator/tool_generator.py` - Tool-use examples (Toolformer + ToolLLM + Gorilla + ToolGrad)
 - `src/generator/tool_executor.py` - Verification (APIGen)
+- `src/generator/tool_curator.py` - Tool curation + turn-level filtering (ToolMind)
+- `src/generator/multi_scorer.py` - Multi-dimensional scoring (DEITA) ⭐ NEW
+- `src/generator/coverage_selector.py` - Semantic deduplication (TOUCAN) ⭐ NEW
+- `src/generator/dependency_graph.py` - Parameter dependency graphs (In-N-Out) ⭐ NEW
+- `src/generator/outcome_evaluator.py` - Outcome-oriented evaluation (MCP-AgentBench) ⭐ NEW
 
 ### Configuration
 - `configs/config.yaml` - LLM provider settings
@@ -397,18 +405,24 @@ pytest tests/
 
 **What:** Production-ready synthetic training data generator
 
-**Based On:** 7 research papers (LIMA, Instruction Backtranslation, Distilling Step-by-Step, AlpaGasus, Toolformer, Gorilla, ToolLLM)
+**Based On:** 13 research papers (LIMA, Instruction Backtranslation, Distilling Step-by-Step, AlpaGasus, Toolformer, Gorilla, ToolLLM, DEITA, TOUCAN, ToolMind, ToolGrad, In-N-Out, MCP-AgentBench)
 
 **Capabilities:**
 - Generate QA pairs from documents (knowledge)
 - Generate tool-use examples from APIs (agentic)
+- Multi-dimensional scoring for optimal selection (DEITA)
+- Semantic deduplication for diversity (TOUCAN)
+- Turn-level filtering for quality (ToolMind)
+- Chain-first generation for coherent tool chains (ToolGrad)
+- Parameter dependency graphs for tool orchestration (In-N-Out)
+- Outcome-oriented evaluation (MCP-AgentBench)
 - Multi-provider LLM support (6 providers)
 - Quality assurance (LLM-as-Judge with detailed criteria)
 - Multiple export formats (ChatML, Alpaca, ShareGPT, JSONL)
 
 **Documentation:** 27,000+ words across 3 comprehensive docs
 
-**Status:** Fully functional, datasets generated, ready for fine-tuning experiments
+**Status:** Fully functional, all 13 papers implemented, 91 new tests added (Jan 2026)
 
 ---
 

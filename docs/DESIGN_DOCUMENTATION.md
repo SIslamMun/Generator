@@ -2,6 +2,7 @@
 
 **Author:** Shazzadul  
 **Date:** January 8, 2026  
+**Last Updated:** January 9, 2026  
 **Purpose:** Comprehensive documentation of design decisions, research foundations, and implementation methodology
 
 ---
@@ -16,6 +17,7 @@
 6. [Quality Assurance](#6-quality-assurance)
 7. [Multi-Provider LLM Support](#7-multi-provider-llm-support)
 8. [Implementation Decisions](#8-implementation-decisions)
+9. [New Paper Implementations (Jan 2026)](#9-new-paper-implementations-jan-2026)
 
 ---
 
@@ -23,7 +25,7 @@
 
 ### 1.1 Core Papers and Their Contributions
 
-The Generator is designed based on a curated progression of research papers, each addressing specific challenges in synthetic training data generation:
+The Generator is designed based on 13 research papers (Dec 2022 - Dec 2025), each addressing specific challenges in synthetic training data generation:
 
 #### **Paper 1: LIMA - Less Is More for Alignment**
 - **Reference:** Zhou et al., Meta AI, NeurIPS 2023
@@ -1593,12 +1595,106 @@ The Generator is designed as a research-driven, production-ready system for gene
 
 **Key Achievements:**
 
-1. **Research-Based:** Every major component traces to peer-reviewed papers
+1. **Research-Based:** Every major component traces to peer-reviewed papers (13 papers total)
 2. **Quality-Focused:** LIMA principles throughout (quality > quantity)
 3. **Flexible:** Modular design allows experimentation
 4. **Production-Ready:** Error handling, checkpoints, multi-provider support
 5. **Well-Documented:** Comprehensive documentation and examples
+6. **Advanced Selection:** Multi-dimensional scoring (DEITA) and semantic deduplication (TOUCAN)
+7. **Tool-Use Excellence:** Turn-level filtering (ToolMind), chain-first generation (ToolGrad), dependency graphs (In-N-Out), outcome evaluation (MCP-AgentBench)
 
+---
+
+## 9. New Paper Implementations (Jan 2026)
+
+### 9.1 DEITA - Multi-Dimensional Scoring
+
+**Paper:** Liu et al., 2024 - https://arxiv.org/abs/2312.15685
+
+**Key Insight:** 3D scoring (complexity, quality, diversity) achieves 10x data efficiency - 6K examples match 100K randomly selected.
+
+**Implementation:** `src/generator/multi_scorer.py`
+
+**Features:**
+- Complexity scoring: Reasoning depth, multi-step thinking
+- Quality scoring: Clarity, accuracy, formatting
+- Diversity scoring: Semantic uniqueness via embeddings
+- Weighted combination for optimal selection
+
+**CLI:** `uv run generator multi-score input.json -o output.json --top-k 500`
+
+### 9.2 TOUCAN - Coverage-Based Selection
+
+**Paper:** arXiv:2510.01179 (Oct 2024)
+
+**Key Insight:** Semantic clustering reduces dataset by 40-60% with minimal information loss.
+
+**Implementation:** `src/generator/coverage_selector.py`
+
+**Features:**
+- Sentence transformer embeddings
+- K-means clustering
+- Two strategies: centroid or diverse
+- Coverage metrics
+
+**CLI:** `uv run generator select-coverage input.json -o output.json --target-count 500`
+
+### 9.3 ToolMind - Turn-Level Filtering
+
+**Paper:** arXiv:2511.15718 (Nov 2025)
+
+**Key Insight:** Per-turn quality assessment identifies weak steps in otherwise good examples.
+
+**Implementation:** `src/generator/tool_curator.py` - `filter_by_turn_quality()`
+
+**Features:**
+- Per-step quality rating
+- Minimum step quality threshold
+- Detailed step-level feedback
+
+### 9.4 ToolGrad - Chain-First Generation
+
+**Paper:** arXiv:2508.04086 (Aug 2025)
+
+**Key Insight:** Generate tool chain first, then synthesize query for more coherent multi-tool examples.
+
+**Implementation:** `src/generator/tool_generator.py` - `generate_chain_first()`
+
+**Features:**
+- Reverse generation order: Tools → Query
+- More logical tool chains
+- Query synthesis
+- Hybrid mode
+
+**CLI:** `uv run generator tool-generate-chain tools.json -o output.json`
+
+### 9.5 In-N-Out - Parameter Dependency Graphs
+
+**Paper:** Parameter dependency graphs for tool orchestration (2025)
+
+**Key Insight:** Model parameter dependencies as graphs for better tool chaining.
+
+**Implementation:** `src/generator/dependency_graph.py`
+
+**Features:**
+- Parameter-level dependency tracking
+- Automatic dependency inference
+- Topological ordering
+- DOT visualization
+
+### 9.6 MCP-AgentBench - Outcome-Oriented Evaluation
+
+**Paper:** Outcome-oriented evaluation for agentic tasks (2025)
+
+**Key Insight:** Evaluate by task completion, not just individual tool calls.
+
+**Implementation:** `src/generator/outcome_evaluator.py`
+
+**Features:**
+- Task-completion evaluation
+- Constraint checking
+- Partial credit scoring
+- Detailed evaluation breakdown
 
 ---
 
@@ -1611,9 +1707,15 @@ The Generator is designed as a research-driven, production-ready system for gene
 5. Schick et al. "Toolformer" NeurIPS 2023
 6. Patil et al. "Gorilla" NeurIPS 2024
 7. Qin et al. "ToolLLM" ICLR 2024
+8. Liu et al. "DEITA" 2024
+9. "TOUCAN" arXiv:2510.01179 Oct 2024
+10. "ToolMind" arXiv:2511.15718 Nov 2025
+11. "ToolGrad" arXiv:2508.04086 Aug 2025
+12. "In-N-Out" Parameter Dependency Graphs 2025
+13. "MCP-AgentBench" Outcome-Oriented Evaluation 2025
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** January 8, 2026  
+**Document Version:** 2.0  
+**Last Updated:** January 9, 2026  
 **Maintained By:** Shazzadul
