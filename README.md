@@ -78,7 +78,7 @@ uv run generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 
 **Options:**
 - `--config PATH` - Config file (default: `configs/config.yaml`)
-- `--table TEXT` - LanceDB table (default: `text_chunks`)
+- `--table TEXT` - LanceDB table (default: `text_chunks`) - **can specify multiple times for unified output** ⭐
 - `--n-pairs INT` - Fixed pairs per chunk
 - `--target-pairs INT` - Total target pairs (auto-calculates per chunk) ⭐
 - `--batch-size INT` - Chunks per batch (default: 50)
@@ -91,6 +91,9 @@ uv run generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 ```bash
 # Recommended: Target-based generation
 uv run generator generate /path/to/lancedb -o qa.json --target-pairs 300
+
+# Generate from multiple tables (unified output) - text + code chunks ⭐ NEW
+uv run generator generate /path/to/lancedb --table text_chunks --table code_chunks -o qa_unified.json --target-pairs 1500
 
 # Test with limited data
 uv run generator generate /path/to/lancedb -o qa.json --max-chunks 10 --target-pairs 50

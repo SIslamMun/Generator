@@ -43,7 +43,7 @@ llm:
   # │    Note: Rate limited to 10 requests/minute on free tier            │
   # └─────────────────────────────────────────────────────────────────────┘
   gemini:
-    model: gemini-2.0-flash  # Options: gemini-2.5-flash-image, gemini-2.0-flash-exp, gemini-1.5-pro-002
+    model: gemini-2.0-flash-exp  # Options: gemini-2.0-flash-exp, gemini-1.5-flash, gemini-1.5-pro
     api_key: ${GOOGLE_API_KEY}
   
   # ┌─────────────────────────────────────────────────────────────────────┐
@@ -96,10 +96,59 @@ generation:
   retry_delay: 1.0            # Seconds to wait between retries
 
 # ============================================================================
+# FILTERING SETTINGS (Pre-filtering before curation)
+# ============================================================================
+filtering:
+  # Source files to skip during generation (metadata, logs, UI pages)
+  skip_source_patterns:
+    - "_log.md"              # Paper retrieval logs
+    - "login.md"             # Login/authentication pages
+    - "retrieval_progress"   # Retrieval progress tracking
+    - "signup"               # Signup pages
+  
+  # Question patterns to filter out during curation
+  skip_question_patterns:
+    # Author/affiliation metadata
+    - "email.*address"
+    - '@.*\.edu'
+    - '@.*\.com'
+    - '@.*\.org'
+    - "affiliated with"
+    - "affiliation"
+    - "department.*work"
+    - "university.*located"
+    - "laboratory.*located"
+    
+    # UI/website-specific
+    - "cookie"
+    - "password.*reset"
+    - "login.*url"
+    - "signup"
+    - "atlassian.*cookie"
+    - "jira.*service"
+    - "helpdesk.*support.*hours"
+    - "business.*week"
+    
+    # Document metadata (not technical content)
+    - "DOI.*completed.*item"
+    - "retrieval.*status"
+    - "paper.*being.*retrieved"
+    - "successfully.*downloaded"
+  
+  # Minimum content length for chunks (characters)
+  min_chunk_length: 300          # Increased from 200 to filter short/problematic chunks
+  
+  # Enable/disable filtering
+  enabled: true
+
+# ============================================================================
 # CURATION SETTINGS (LLM-as-Judge Quality Filtering)
 # Based on: AlpaGasus (2023) + LIMA (2023) papers
 # ============================================================================
 curate:
+  provider: claude            # LLM judge provider (claude recommended for quality assessment)
+                              # Options: ollama, claude, gemini, vllm, openai, anthropic
+  
   threshold: 7.0              # Minimum rating to keep (1-10 scale)
                               # Recommended ranges:
                               #   - 6.0-6.5: More pairs, moderate quality (60-80% retention)
@@ -133,7 +182,7 @@ cot:
 # RATE LIMITING (Prevent API Quota Issues)
 # ============================================================================
 rate_limit:
-  delay_between_requests: 6   # Seconds between API calls (Gemini free: 10/min)
+  delay_between_requests: 3   # Seconds between API calls (0.5 for local Ollama, 3-6 for Gemini free tier)
   save_every_n_pairs: 50      # Save intermediate results every N pairs
   max_retries: 3              # Retry attempts for rate limit errors
   backoff_base: 60            # Base seconds for exponential backoff (60, 120, 240...)

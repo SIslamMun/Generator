@@ -75,6 +75,15 @@ def generate_qa_from_lancedb(
 
     # Initialize LLM client
     console.print(f"[bold cyan]🤖 Initializing LLM: {llm_config['provider']}[/bold cyan]")
+    
+    # Store config values before popping
+    skip_patterns = llm_config.get('skip_source_patterns', ['_log.md', 'login.md', 'retrieval_progress', 'signup'])
+    min_length = llm_config.get('min_chunk_length', 200)
+    delay = llm_config.get('rate_limit', {}).get('delay_between_requests', 6)
+    save_freq = llm_config.get('rate_limit', {}).get('save_every_n_pairs', 50)
+    backoff_base = llm_config.get('rate_limit', {}).get('backoff_base', 60)
+    max_retries = llm_config.get('max_retries', 3)
+    
     provider = llm_config.pop("provider")
     llm = get_client(provider, llm_config)
     console.print(f"[green]✓ LLM ready: {llm.model}[/green]\n")
@@ -97,6 +106,7 @@ def generate_qa_from_lancedb(
         console=console,
     ) as progress:
         task = progress.add_task("[cyan]Generating QA pairs...", total=total_chunks)
+        processed = 0
 
         # Read chunks in batches
         offset = 0
@@ -110,13 +120,13 @@ def generate_qa_from_lancedb(
                 content = row.get("content", "")
                 source_file = row.get("source_file", "unknown")
 
-                # Skip log files (paper retrieval metadata)
-                if "_log.md" in source_file:
+                # Skip filtered source files (logs, login pages, metadata)
+                if any(pattern in source_file for pattern in skip_patterns):
                     progress.advance(task)
                     continue
 
                 # Skip very short chunks (headers, citations, etc.)
-                if not content or len(content.strip()) < 200:
+                if not content or len(content.strip()) < min_length:
                     progress.advance(task)
                     continue
 
@@ -129,22 +139,25 @@ def generate_qa_from_lancedb(
                         llm=llm,
                         prompt_template=qa_prompt_template,
                         n_pairs=n_pairs_per_chunk,
+                        max_retries=max_retries,
+                        backoff_base=backoff_base,
                     )
 
                     all_qa_pairs.extend(pairs)
 
                     # Rate limiting: configurable delay between requests
-                    delay = llm_config.get('rate_limit', {}).get('delay_between_requests', 6)
                     time.sleep(delay)
 
                     # Save intermediate results periodically
-                    save_freq = llm_config.get('rate_limit', {}).get('save_every_n_pairs', 50)
                     if len(all_qa_pairs) % save_freq == 0:
                         _save_intermediate(all_qa_pairs, output_file)
 
                 except Exception as e:
                     console.print(f"[yellow]⚠ Error on chunk {chunk_id}: {e}[/yellow]")
 
+                processed += 1
+                remaining = total_chunks - processed
+                progress.update(task, description=f"[cyan]Generating QA pairs... ({len(all_qa_pairs)} generated, {remaining} chunks left)")
                 progress.advance(task)
 
             offset += limit
@@ -166,6 +179,7 @@ def _generate_pairs_for_chunk(
     prompt_template: str,
     n_pairs: int,
     max_retries: int = 3,
+    backoff_base: int = 60,
 ) -> List[Dict]:
     """Generate QA pairs for a single chunk with retry logic."""
     # Fill in prompt template
@@ -197,7 +211,6 @@ def _generate_pairs_for_chunk(
             # Check if it's a per-minute rate limit error (429) - these can be retried
             elif '429' in error_msg or 'quota' in error_msg or 'rate limit' in error_msg:
                 # Exponential backoff using config or default (60s, 120s, 240s...)
-                backoff_base = llm_config.get('rate_limit', {}).get('backoff_base', 60)
                 wait_time = backoff_base * (2 ** attempt)
                 console.print(f"[yellow]⚠ Rate limit hit, waiting {wait_time}s (attempt {attempt+1}/{max_retries})...[/yellow]")
                 time.sleep(wait_time)
@@ -208,6 +221,10 @@ def _generate_pairs_for_chunk(
         # All retries exhausted
         raise last_error
 
+    # Check for empty or invalid response
+    if not response or not response.strip():
+        raise ValueError(f"Empty response from LLM for chunk {chunk_id}")
+    
     # Parse JSON response (lenient with json5)
     try:
         pairs = json5.loads(response)
@@ -215,10 +232,24 @@ def _generate_pairs_for_chunk(
         # Try to extract JSON from markdown code blocks
         if "```json" in response:
             json_str = response.split("```json")[1].split("```")[0].strip()
-            pairs = json5.loads(json_str)
+            if not json_str:
+                raise ValueError(f"Empty JSON in markdown code block for chunk {chunk_id}")
+            # Escape backticks in extracted JSON to prevent parsing errors
+            json_str = json_str.replace('`', '\\`')
+            try:
+                pairs = json5.loads(json_str)
+            except Exception as e2:
+                raise ValueError(f"Failed to parse JSON from markdown: {e2}\nJSON: {json_str[:200]}")
         elif "```" in response:
             json_str = response.split("```")[1].split("```")[0].strip()
-            pairs = json5.loads(json_str)
+            if not json_str:
+                raise ValueError(f"Empty JSON in code block for chunk {chunk_id}")
+            # Escape backticks in extracted JSON
+            json_str = json_str.replace('`', '\\`')
+            try:
+                pairs = json5.loads(json_str)
+            except Exception as e2:
+                raise ValueError(f"Failed to parse JSON from code block: {e2}\nJSON: {json_str[:200]}")
         else:
             # Try to extract JSON array from response with extra text
             # Find first [ and last ]
@@ -226,12 +257,19 @@ def _generate_pairs_for_chunk(
             end_idx = response.rfind(']')
             if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                 json_str = response[start_idx:end_idx+1]
+                # Escape backticks in extracted JSON
+                json_str = json_str.replace('`', '\\`')
                 try:
                     pairs = json5.loads(json_str)
                 except Exception as e2:
-                    raise ValueError(f"Failed to parse JSON response: {e}\nExtraction also failed: {e2}\nResponse: {response[:200]}")
+                    # Last attempt: try standard json parser which is stricter
+                    import json
+                    try:
+                        pairs = json.loads(json_str)
+                    except Exception as e3:
+                        raise ValueError(f"Failed to parse JSON response: {e}\nExtraction failed: {e2}\nStandard JSON failed: {e3}\nExtracted JSON: {json_str[:300]}")
             else:
-                raise ValueError(f"Failed to parse JSON response: {e}\nResponse: {response[:200]}")
+                raise ValueError(f"Failed to parse JSON response: {e}\nNo JSON array found in response: {response[:200]}")
 
     # Add metadata to each pair
     for pair in pairs:

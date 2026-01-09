@@ -18,6 +18,8 @@ prompt: |
   - Questions about grant numbers or funding sources
   - Questions about publication titles or references
   - Meta-information about the document itself
+  - Simple factual questions like "What programming language?", "What license?", "What version?"
+  - Questions answerable with single words or numbers without reasoning
 
   **FOCUS ON:**
   - Technical concepts and methodologies
@@ -25,6 +27,14 @@ prompt: |
   - Problem-solving approaches
   - Performance analysis and optimization
   - Domain-specific knowledge and applications
+
+  **PREFER questions that require:**
+  - Multi-step reasoning about HOW systems work
+  - Analysis of WHY certain design choices were made
+  - Evaluating trade-offs between different approaches
+  - Connecting multiple concepts together
+  - Reasoning about cause and effect
+  - Problem-solving with multiple considerations
 
   Return JSON format only:
 

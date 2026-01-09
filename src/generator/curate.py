@@ -9,6 +9,7 @@ Implements quality filtering based on:
 import json
 import json5
 import logging
+import re
 from pathlib import Path
 from typing import List, Dict, Any
 from datetime import datetime
@@ -159,6 +160,7 @@ def curate_qa_pairs(
     threshold: float = 7.0,
     batch_size: int = 5,
     topic_filter: str = None,
+    skip_question_patterns: List[str] = None,
 ) -> Dict[str, Any]:
     """
     Filter QA pairs by quality using LLM-as-Judge.
@@ -188,6 +190,14 @@ def curate_qa_pairs(
     # Convert to conversation format for uniform processing
     console.print("[cyan]→ Converting to conversation format...[/cyan]")
     conversations = _convert_to_conversation_format(data, original_format)
+
+    # Pre-filter by question patterns (before LLM rating)
+    if skip_question_patterns:
+        original_count = len(conversations)
+        conversations = _filter_by_patterns(conversations, skip_question_patterns)
+        filtered_count = original_count - len(conversations)
+        if filtered_count > 0:
+            console.print(f"[yellow]→ Pre-filtered {filtered_count} pairs by question patterns[/yellow]")
 
     total_pairs = len(conversations)
     console.print(f"[green]✓ Loaded {total_pairs} pairs[/green]\n")
@@ -360,6 +370,28 @@ def _rate_batch(
         result.append(pair)
 
     return result
+
+
+def _filter_by_patterns(conversations: List[Dict], patterns: List[str]) -> List[Dict]:
+    """Filter out conversations with questions matching problematic patterns."""
+    import re
+    filtered = []
+    
+    for conv in conversations:
+        qa = _extract_qa_from_conversation(conv)
+        question = qa.get("question", "").lower()
+        
+        # Check if question matches any skip pattern
+        should_skip = False
+        for pattern in patterns:
+            if re.search(pattern.lower(), question, re.IGNORECASE):
+                should_skip = True
+                break
+        
+        if not should_skip:
+            filtered.append(conv)
+    
+    return filtered
 
 
 def _save_curated_results(

@@ -19,8 +19,17 @@ prompt: |
      - Grant numbers or funding sources
      - Publication titles or references
      - Meta-information about the document itself
+     - Simple factual questions like "What programming language?", "What license?", "What version?"
+     - Questions answerable with single words or numbers
   7. **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
-  8. Return ONLY valid JSON array format (no markdown, no explanation, no comments):
+  8. **PREFER** questions that require:
+     - Explaining HOW something works
+     - Explaining WHY a design choice was made
+     - Describing relationships between components
+     - Comparing/contrasting different approaches
+     - Explaining use cases or applications
+     - Understanding technical trade-offs
+  9. Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
   [
     {{

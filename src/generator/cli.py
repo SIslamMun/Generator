@@ -136,7 +136,7 @@ def list_providers():
 @click.argument("lancedb_path", type=click.Path(exists=True))
 @click.option("-o", "--output", required=True, help="Output JSON file path")
 @click.option("--config", type=click.Path(exists=True), help="Config YAML file")
-@click.option("--table", default="text_chunks", help="LanceDB table name")
+@click.option("--table", default="text_chunks", multiple=True, help="LanceDB table name(s) - can specify multiple times")
 @click.option("--n-pairs", type=int, help="QA pairs per chunk (fixed)")
 @click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
@@ -159,22 +159,39 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
     # Extract LLM config
     llm_config = _extract_llm_config(cfg, provider, model)
     
+    # Add filtering configuration to llm_config
+    filtering_config = cfg.get("filtering", {})
+    if filtering_config.get("enabled", True):
+        llm_config["skip_source_patterns"] = filtering_config.get("skip_source_patterns", [])
+        llm_config["min_chunk_length"] = filtering_config.get("min_chunk_length", 200)
+    
     # Add rate limiting config
     if "rate_limit" in cfg:
         llm_config["rate_limit"] = cfg["rate_limit"]
 
-    # Generate QA pairs
-    qa_pairs = generate_qa_from_lancedb(
-        db_path=lancedb_path,
-        output_path=output,
-        prompts=prompts,
-        llm_config=llm_config,
-        table_name=table,
-        n_pairs_per_chunk=n_pairs,
-        target_pairs=target_pairs,
-        batch_size=batch_size,
-        max_chunks=max_chunks,
-    )
+    # Handle multiple tables
+    tables = table if table else ("text_chunks",)
+    all_qa_pairs = []
+    
+    for table_name in tables:
+        console.print(f"\n[bold cyan]📊 Processing table: {table_name}[/bold cyan]")
+        
+        # Generate QA pairs from this table
+        qa_pairs = generate_qa_from_lancedb(
+            db_path=lancedb_path,
+            output_path=output,
+            prompts=prompts,
+            llm_config=llm_config.copy(),  # Copy to avoid mutation
+            table_name=table_name,
+            n_pairs_per_chunk=n_pairs,
+            target_pairs=target_pairs // len(tables) if target_pairs else None,  # Split target across tables
+            batch_size=batch_size,
+            max_chunks=max_chunks,
+        )
+        
+        all_qa_pairs.extend(qa_pairs)
+    
+    console.print(f"\n[bold green]✓ Total pairs from all tables: {len(all_qa_pairs)}[/bold green]\n")
 
     # Apply topic filtering if requested
     if topic:
@@ -191,12 +208,12 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
             filter_llm = get_client(provider, llm_config)
             
             # Rate pairs with topic filter
-            original_count = len(qa_pairs)
+            original_count = len(all_qa_pairs)
             filtered_pairs = []
             batch_size_filter = 10
             
-            for i in range(0, len(qa_pairs), batch_size_filter):
-                batch = qa_pairs[i:i + batch_size_filter]
+            for i in range(0, len(all_qa_pairs), batch_size_filter):
+                batch = all_qa_pairs[i:i + batch_size_filter]
                 rated_batch = _rate_batch(
                     pairs=batch,
                     llm=filter_llm,
@@ -210,16 +227,16 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
                     if pair.get('topic_relevant', True):
                         filtered_pairs.append(pair)
             
-            qa_pairs = filtered_pairs
-            removed = original_count - len(qa_pairs)
-            console.print(f"[green]✓ Filtered: kept {len(qa_pairs)}/{original_count} pairs (removed {removed} off-topic)[/green]\n")
+            all_qa_pairs = filtered_pairs
+            removed = original_count - len(all_qa_pairs)
+            console.print(f"[green]✓ Filtered: kept {len(all_qa_pairs)}/{original_count} pairs (removed {removed} off-topic)[/green]\n")
             
             # Save filtered pairs
             import json
             with open(output, 'w', encoding='utf-8') as f:
-                json.dump(qa_pairs, f, indent=2, ensure_ascii=False)
+                json.dump(all_qa_pairs, f, indent=2, ensure_ascii=False)
 
-    console.print(f"[bold green]✨ Success! Generated {len(qa_pairs)} QA pairs[/bold green]\n")
+    console.print(f"[bold green]✨ Success! Generated {len(all_qa_pairs)} QA pairs[/bold green]\n")
 
 
 @main.command()
@@ -248,13 +265,18 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
     # Load prompts from individual files
     prompts = load_prompts(Path(config_path).parent)
 
-    # Extract LLM config
-    llm_config = _extract_llm_config(cfg, provider, model)
+    # Extract LLM config - use curate.provider if specified, otherwise fallback to main provider
+    curate_config = cfg.get("curate", {})
+    curate_provider = curate_config.get("provider") or provider  # curate.provider > --provider flag > main llm.provider
+    llm_config = _extract_llm_config(cfg, curate_provider, model)
     
     # Merge curate temperature into llm_config
-    curate_config = cfg.get("curate", {})
     if "temperature" in curate_config:
         llm_config["temperature"] = curate_config["temperature"]
+    
+    # Get filtering patterns from config
+    filtering_config = cfg.get("filtering", {})
+    skip_patterns = filtering_config.get("skip_question_patterns", []) if filtering_config.get("enabled", True) else []
 
     # Curate QA pairs
     metrics = curate_qa_pairs(
@@ -265,6 +287,7 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
         threshold=threshold,
         batch_size=batch_size,
         topic_filter=topic,
+        skip_question_patterns=skip_patterns,
     )
 
     console.print(
@@ -358,6 +381,11 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
 
     # Extract LLM config
     llm_config = _extract_llm_config(cfg, provider, model)
+    
+    # Add filtering configuration
+    filtering_config = cfg.get("filtering", {})
+    if filtering_config.get("enabled", True):
+        llm_config["filtering"] = filtering_config
 
     # Generate CoT pairs
     result = generate_cot_pairs(
@@ -562,6 +590,10 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks, skip_e
     step_label = f"{2 + step_offset}/4" if not skip_enrichment else "2/3"
     console.print(f"\n[bold cyan]Step {step_label}: Curating with LLM-as-Judge...[/bold cyan]\n")
     qa_curated = temp_dir / "qa_curated.json"
+    
+    # Get filtering patterns from config
+    filtering_config = cfg.get("filtering", {})
+    skip_patterns = filtering_config.get("skip_question_patterns", []) if filtering_config.get("enabled", True) else []
 
     curate_qa_pairs(
         input_path=str(next_input),
@@ -569,6 +601,7 @@ def pipeline(lancedb_path, output, config, threshold, format, max_chunks, skip_e
         prompts=prompts,
         llm_config=cfg["llm"],
         threshold=threshold,
+        skip_question_patterns=skip_patterns,
     )
 
     # Step 4: Export

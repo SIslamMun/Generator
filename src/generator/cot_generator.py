@@ -89,6 +89,9 @@ def generate_cot_pairs(
         pairs_per_chunk = n_pairs
         logger.info(f"Fixed pairs per chunk: {pairs_per_chunk}")
 
+    # Store config values before popping
+    skip_patterns = config.get('filtering', {}).get('skip_source_patterns', ['_log.md', 'login.md', 'retrieval_progress', 'signup'])
+    
     # Initialize LLM client
     provider = llm_config.pop("provider")
     client = get_client(provider, llm_config)
@@ -113,8 +116,8 @@ def generate_cot_pairs(
             source = row.get("source", "unknown")
             source_file = row.get("source_file", "unknown")
 
-            # Skip log files (paper retrieval metadata)
-            if "_log.md" in source_file:
+            # Skip filtered source files (logs, login pages, metadata)
+            if any(pattern in source_file for pattern in skip_patterns):
                 progress.update(task, advance=1)
                 continue
 
