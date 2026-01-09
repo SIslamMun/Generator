@@ -25,7 +25,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from .tool_schemas import Tool, Solution, ReasoningStep, ToolExample
-from .clients import get_client, BaseLLMClient
+from ..clients import get_client, BaseLLMClient
 
 console = Console()
 logger = logging.getLogger(__name__)

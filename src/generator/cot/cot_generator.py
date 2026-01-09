@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
-from .prompt_loader import load_prompts
+from ..prompt_loader import load_prompts
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ def generate_cot_pairs(
     Returns:
         Dict with summary statistics
     """
-    from .clients import get_client
+    from ..clients import get_client
 
     # Validate n_pairs and target_pairs
     if n_pairs is not None and target_pairs is not None:

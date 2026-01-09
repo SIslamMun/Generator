@@ -20,7 +20,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.table import Table
 
-from .clients import get_client, BaseLLMClient
+from ..clients import get_client, BaseLLMClient
 
 console = Console()
 logger = logging.getLogger(__name__)

@@ -16,7 +16,7 @@ from datetime import datetime
 import lancedb  # type: ignore[import-untyped]
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
-from .clients import get_client, BaseLLMClient
+from ..clients import get_client, BaseLLMClient
 
 console = Console()
 
@@ -83,6 +83,8 @@ def generate_qa_from_lancedb(
     save_freq = llm_config.get('rate_limit', {}).get('save_every_n_pairs', 50)
     backoff_base = llm_config.get('rate_limit', {}).get('backoff_base', 60)
     max_retries = llm_config.get('max_retries', 3)
+    
+    console.print(f"[dim]→ Rate limit delay: {delay}s, Save every: {save_freq} pairs[/dim]")
     
     provider = llm_config.pop("provider")
     llm = get_client(provider, llm_config)
@@ -307,6 +309,7 @@ def _save_intermediate(qa_pairs: List[Dict], output_path: Path):
     intermediate_path = output_path.parent / f"{output_path.stem}_intermediate.json"
     with open(intermediate_path, "w", encoding="utf-8") as f:
         json.dump(qa_pairs, f, indent=2, ensure_ascii=False)
+    console.print(f"[dim]💾 Saved {len(qa_pairs)} pairs to intermediate file[/dim]")
 
 
 def _save_results(qa_pairs: List[Dict], output_path: Path):

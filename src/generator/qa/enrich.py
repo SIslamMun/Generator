@@ -8,8 +8,8 @@ import json5
 from rich.console import Console
 from rich.progress import track
 
-from .clients import get_client
-from .prompt_loader import load_prompts
+from ..clients import get_client
+from ..prompt_loader import load_prompts
 
 console = Console()
 

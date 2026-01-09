@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Dict, List, Any
 from collections import Counter
 
-from .clients import get_client
-from .prompt_loader import load_prompts
+from ..clients import get_client
+from ..prompt_loader import load_prompts
 
 logger = logging.getLogger(__name__)
 

@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Dict, List
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
-from .prompt_loader import load_prompts
+from ..prompt_loader import load_prompts
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def enhance_with_cot(
     Returns:
         Dict with summary statistics
     """
-    from .clients import get_client
+    from ..clients import get_client
 
     # Load prompt template
     config_dir = Path(__file__).parent.parent.parent / "configs"
