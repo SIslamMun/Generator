@@ -83,7 +83,6 @@ uv run generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 - `--target-pairs INT` - Total target pairs (auto-calculates per chunk) ⭐
 - `--batch-size INT` - Chunks per batch (default: 50)
 - `--max-chunks INT` - Limit chunks (for testing)
-- `--topic TEXT` - Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation ⭐ NEW
 - `--provider TEXT` - Override provider from config
 - `--model TEXT` - Override model from config
 
@@ -92,14 +91,12 @@ uv run generator generate LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 # Recommended: Target-based generation
 uv run generator generate /path/to/lancedb -o qa.json --target-pairs 300
 
-# Generate from multiple tables (unified output) - text + code chunks ⭐ NEW
+# Generate from multiple tables (unified output) - text + code chunks
+# Auto-detects table type: code_chunks uses code-specific prompt ⭐
 uv run generator generate /path/to/lancedb --table text_chunks --table code_chunks -o qa_unified.json --target-pairs 1500
 
 # Test with limited data
 uv run generator generate /path/to/lancedb -o qa.json --max-chunks 10 --target-pairs 50
-
-# Generate with topic filtering (removes off-topic pairs)
-uv run generator generate /path/to/lancedb -o qa.json --target-pairs 300 --topic "HDF5"
 
 # Override provider
 uv run generator generate /path/to/lancedb -o qa.json --provider gemini --model gemini-2.0-flash-exp
@@ -145,7 +142,6 @@ uv run generator generate-cot LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 - `--target-pairs INT` - Total target pairs (auto-calculates per chunk) ⭐
 - `--batch-size INT` - Chunks per batch (default: 50)
 - `--max-chunks INT` - Limit chunks (for testing)
-- `--topic TEXT` - Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation ⭐ NEW
 - `--provider TEXT` - Override provider
 - `--model TEXT` - Override model
 
@@ -153,9 +149,6 @@ uv run generator generate-cot LANCEDB_PATH -o OUTPUT.json [OPTIONS]
 ```bash
 uv run generator generate-cot /path/to/lancedb -o cot.json --target-pairs 100
 uv run generator generate-cot /path/to/lancedb -o cot.json --max-chunks 10
-
-# Generate with topic filtering
-uv run generator generate-cot /path/to/lancedb -o cot.json --target-pairs 100 --topic "HDF5"
 ```
 
 **Output:** `[{"question": "...", "reasoning": "Step 1: ...\nStep 2: ...", "answer": "...", "chunk_id": "...", "source": "..."}]`

@@ -440,15 +440,22 @@ qa_generation: |
    - Prevents data loss on errors
    - Enables inspection during generation
 
-4. **Topic Filtering** (Added Jan 6, 2026)
+4. **Code-Specific Prompts** (Added Jan 9, 2026)
    ```python
-   # Optional post-generation filtering
-   if topic:
-       qa_pairs = filter_off_topic(qa_pairs, topic)
+   # Auto-detect table type and use appropriate prompt
+   if "code" in table_name.lower():
+       prompt = prompts.get("code_qa_generation") or prompts.get("qa_generation")
+   else:
+       prompt = prompts.get("qa_generation")
    ```
-   - Removes pairs not relevant to specified topic
-   - Uses LLM to judge relevance
-   - Maintains focus on target domain
+   - `code_chunks` table → uses `code_qa_generation.yaml` prompt
+   - Optimized for function behavior, implementation details, design patterns
+   - Falls back to text prompt if code prompt not found
+
+5. **Topic Filtering** (Moved to Curate - Jan 9, 2026)
+   - Topic filtering moved from `generate` to `curate` command
+   - Prevents slow LLM calls during generation
+   - Run `curate --topic "TOPIC"` for semantic topic filtering
 
 ### 4.2 Chain-of-Thought (CoT) Generation and Enhancement
 

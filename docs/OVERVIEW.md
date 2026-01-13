@@ -169,8 +169,9 @@ Training File (ChatML/Alpaca/ShareGPT)
 **Key Design Decisions:**
 1. **Target-based generation** - User specifies total pairs (e.g., 300), system calculates per-chunk
 2. **Batch processing with checkpoints** - Prevents data loss, enables resume
-3. **Topic filtering** - Optional post-generation filtering for focus
-4. **Multiple formats** - Export to ChatML, Alpaca, ShareGPT, JSONL
+3. **Code-specific prompts** - Auto-detects `code_chunks` table and uses optimized prompt
+4. **Topic filtering** - Available in `curate` command for semantic relevance filtering
+5. **Multiple formats** - Export to ChatML, Alpaca, ShareGPT, JSONL
 
 ### Tool-Use Pipeline (Agentic)
 
