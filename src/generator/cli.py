@@ -147,10 +147,9 @@ def list_providers():
 @click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
 @click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
-@click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, topic, provider, model):
+def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
     """Generate QA pairs from LanceDB chunks."""
     console.print("\n[bold]🚀 Generating QA pairs from LanceDB[/bold]\n")
 
@@ -178,14 +177,19 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
     # Handle multiple tables
     tables = table if table else ("text_chunks",)
     all_qa_pairs = []
+    output_path_obj = Path(output)
     
     for table_name in tables:
         console.print(f"\n[bold cyan]📊 Processing table: {table_name}[/bold cyan]")
         
+        # Use table-specific output path for intermediate files
+        # This prevents cross-table contamination when resuming
+        table_output = output_path_obj.parent / f"{output_path_obj.stem}_{table_name}.json"
+        
         # Generate QA pairs from this table
         qa_pairs = generate_qa_from_lancedb(
             db_path=lancedb_path,
-            output_path=output,
+            output_path=str(table_output),  # Table-specific output
             prompts=prompts,
             llm_config=llm_config.copy(),  # Copy to avoid mutation
             table_name=table_name,
@@ -197,52 +201,17 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
         
         all_qa_pairs.extend(qa_pairs)
     
-    console.print(f"\n[bold green]✓ Total pairs from all tables: {len(all_qa_pairs)}[/bold green]\n")
-
-    # Apply topic filtering if requested
-    if topic:
-        console.print(f"\n[bold cyan]🔍 Filtering pairs by topic: {topic}[/bold cyan]\n")
-        from .curate import _rate_batch
-        
-        # Get rating prompt for topic filtering
-        rating_prompt = prompts.get("qa_rating")
-        if not rating_prompt:
-            console.print("[yellow]⚠️  Warning: qa_rating prompt not found, skipping topic filter[/yellow]\n")
-        else:
-            # Initialize LLM for filtering (extract provider without modifying llm_config)
-            provider = llm_config.get('provider', 'gemini')
-            filter_llm = get_client(provider, llm_config)
-            
-            # Rate pairs with topic filter
-            original_count = len(all_qa_pairs)
-            filtered_pairs = []
-            batch_size_filter = 10
-            
-            for i in range(0, len(all_qa_pairs), batch_size_filter):
-                batch = all_qa_pairs[i:i + batch_size_filter]
-                rated_batch = _rate_batch(
-                    pairs=batch,
-                    llm=filter_llm,
-                    prompt_template=rating_prompt,
-                    temperature=0.1,
-                    topic_filter=topic
-                )
-                
-                # Keep only topic-relevant pairs
-                for pair in rated_batch:
-                    if pair.get('topic_relevant', True):
-                        filtered_pairs.append(pair)
-            
-            all_qa_pairs = filtered_pairs
-            removed = original_count - len(all_qa_pairs)
-            console.print(f"[green]✓ Filtered: kept {len(all_qa_pairs)}/{original_count} pairs (removed {removed} off-topic)[/green]\n")
-            
-            # Save filtered pairs
-            import json
-            with open(output, 'w', encoding='utf-8') as f:
-                json.dump(all_qa_pairs, f, indent=2, ensure_ascii=False)
-
+    # Save combined results from all tables
+    import json
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(all_qa_pairs, f, indent=2, ensure_ascii=False)
+    
+    console.print(f"\n[bold green]✓ Total pairs from all tables: {len(all_qa_pairs)}[/bold green]")
+    console.print(f"[bold green]✓ Saved to: {output}[/bold green]")
     console.print(f"[bold green]✨ Success! Generated {len(all_qa_pairs)} QA pairs[/bold green]\n")
+    console.print(f"[dim]💡 Tip: Use 'generator curate {output} --topic \"TOPIC\"' for topic filtering[/dim]\n")
 
 
 @main.command()

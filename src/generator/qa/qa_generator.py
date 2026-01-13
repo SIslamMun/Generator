@@ -90,10 +90,18 @@ def generate_qa_from_lancedb(
     llm = get_client(provider, llm_config)
     console.print(f"[green]✓ LLM ready: {llm.model}[/green]\n")
 
-    # Get prompt template
-    qa_prompt_template = prompts.get("qa_generation")
+    # Get prompt template - auto-detect based on table type
+    if "code" in table_name.lower():
+        qa_prompt_template = prompts.get("code_qa_generation") or prompts.get("qa_generation")
+        prompt_type = "code" if "code_qa_generation" in prompts else "text (fallback)"
+    else:
+        qa_prompt_template = prompts.get("qa_generation")
+        prompt_type = "text"
+    
     if not qa_prompt_template:
         raise ValueError("qa_generation prompt not found in prompts config")
+    
+    console.print(f"[dim]→ Using {prompt_type} prompt template[/dim]")
 
     all_qa_pairs = []
     output_file = Path(output_path)
