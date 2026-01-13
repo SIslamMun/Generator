@@ -1,0 +1,65 @@
+# ============================================================================
+# CODE QA GENERATION PROMPT
+# Optimized for generating QA pairs from source code chunks
+# ============================================================================
+
+prompt: |
+  Create question-answer pairs from this source code for LLM training.
+
+  Rules:
+  1. Questions must be about the code's functionality, design, and implementation
+  2. Answers must be directly supported by the code
+  3. Create {n_pairs} diverse question-answer pairs
+  4. IMPORTANT: Work with whatever code is provided, even if incomplete
+
+  **CRITICAL REQUIREMENTS:**
+  - ALWAYS include specific names (function names, class names, variable names) in questions
+  - NEVER ask generic questions like "What is the purpose of this class?" - instead ask "What does the `ClassName` class do?"
+  - Answers MUST be at least 2-3 sentences with specific details from the code
+  - Include code snippets or parameter details in answers when relevant
+
+  **GOOD question examples:**
+  - "What parameters does the `configure_pipeline()` function accept and what do they control?"
+  - "How does the `DataLoader` class handle batch processing based on the `batch_size` parameter?"
+  - "What happens when `retry_count` exceeds `max_retries` in the `fetch_data()` method?"
+
+  **BAD question examples (AVOID):**
+  - "What is the purpose of this class?" (too generic - no class name)
+  - "What does this code do?" (too vague)
+  - "What type of package is this?" (trivial)
+
+  **FOCUS ON** these question types:
+  - **Function/Method behavior**: "What does `function_name()` return when given X input?"
+  - **Parameter effects**: "How does the `param_name` parameter affect the behavior of `method()`?"
+  - **Error handling**: "What exception does `function()` raise when X condition occurs?"
+  - **Control flow**: "What is the execution flow when `condition` is True in `process()`?"
+  - **Integration**: "How does `ClassA` interact with `ClassB` through the `method()` call?"
+
+  **DO NOT** create questions about:
+  - Import statements alone (unless explaining why specific imports are needed)
+  - License headers or copyright notices
+  - Author names or version numbers
+  - Trivial variable assignments
+  - Questions answerable with single words
+
+  **ANSWER REQUIREMENTS:**
+  - Minimum 2-3 sentences
+  - Reference specific code elements (functions, variables, parameters)
+  - Explain the "why" not just the "what"
+  - Include relevant parameter names and their effects
+
+  Return ONLY valid JSON array format (no markdown, no explanation, no comments):
+
+  [
+    {{
+      "question": "What does the `process_batch()` method do when the `validate` parameter is set to True?",
+      "answer": "When `validate` is True, the `process_batch()` method first calls `_validate_input()` to check data integrity before processing. If validation fails, it raises a `ValidationError` with details about the invalid fields. The method uses the `batch_size` configuration to determine how many items to process in each iteration."
+    }},
+    {{
+      "question": "How does the `DataManager` class handle connection failures in the `connect()` method?",
+      "answer": "The `connect()` method implements exponential backoff retry logic using the `max_retries` and `backoff_factor` parameters. On each failed connection attempt, it waits `backoff_factor * (2 ** attempt)` seconds before retrying. After exhausting all retries, it raises a `ConnectionError` with the last error message and logs the failure using the configured logger."
+    }}
+  ]
+
+  Source Code:
+  {text}

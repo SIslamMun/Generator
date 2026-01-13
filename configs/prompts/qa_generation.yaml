@@ -13,32 +13,59 @@ prompt: |
   3. Create {n_pairs} diverse question-answer pairs
   4. IMPORTANT: Work with whatever text is provided, even if limited
   5. Extract facts from titles, headers, or any available content
-  6. **DO NOT** create questions about:
-     - Paper authors, affiliations, or institutions
-     - Lab locations or addresses
-     - Grant numbers or funding sources
-     - Publication titles or references
-     - Meta-information about the document itself
-     - Simple factual questions like "What programming language?", "What license?", "What version?"
-     - Questions answerable with single words or numbers
-  7. **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
-  8. **PREFER** questions that require:
-     - Explaining HOW something works
-     - Explaining WHY a design choice was made
-     - Describing relationships between components
-     - Comparing/contrasting different approaches
-     - Explaining use cases or applications
-     - Understanding technical trade-offs
-  9. Return ONLY valid JSON array format (no markdown, no explanation, no comments):
+
+  **CRITICAL REQUIREMENTS:**
+  - ALWAYS include specific names (tool names, system names, concepts) in questions
+  - NEVER ask vague questions like "What is the purpose of this?" - be specific
+  - Answers MUST be at least 2-3 sentences with concrete details
+  - Vary question starters - don't use "How does the..." for every question
+
+  **GOOD question examples:**
+  - "What configuration parameters does Jarvis-CD require for deploying Hermes?"
+  - "How does the data staging process differ between local and NFS storage in ARLDM?"
+  - "What happens when the daily quota is exceeded in the Gemini API client?"
+
+  **BAD question examples (AVOID):**
+  - "What is the purpose of this tool?" (too generic)
+  - "How does the system work?" (too vague)
+  - "What is X?" without context (too short)
+
+  **DO NOT** create questions about:
+  - Paper authors, affiliations, or institutions
+  - Lab locations or addresses
+  - Grant numbers or funding sources
+  - Publication titles or references
+  - Meta-information about the document itself
+  - **STRICTLY FORBIDDEN:** Questions about programming language, license type, version numbers
+  - Questions answerable with single words or numbers
+  - Repository metadata (stars, forks, topics list)
+  - File extensions or directory names alone
+
+  **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
+
+  **PREFER** questions that require:
+  - Explaining HOW something works with specific component names
+  - Explaining WHY a design choice was made
+  - Describing relationships between named components
+  - Comparing/contrasting different approaches
+  - Explaining use cases or applications with examples
+  - Understanding technical trade-offs
+
+  **ANSWER REQUIREMENTS:**
+  - Minimum 2-3 sentences
+  - Include specific names, values, or examples from the text
+  - Explain relationships and dependencies when relevant
+
+  Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
   [
     {{
-      "question": "Question 1?",
-      "answer": "Answer 1."
+      "question": "How does Jarvis-CD handle the deployment of applications with complex dependencies across multiple nodes?",
+      "answer": "Jarvis-CD uses a pipeline-based approach where applications (called 'jarvis pkgs') are connected to form deployment pipelines. Each package specifies its dependencies and configuration requirements. The resource graph, created once per Jarvis lifetime, provides hostfile details for multi-node deployment, allowing applications like Hermes and ARLDM to be deployed with their specific environment variables and configuration files."
     }},
     {{
-      "question": "Question 2?",
-      "answer": "Answer 2."
+      "question": "What steps are required to configure ARLDM to use Hermes for I/O buffering?",
+      "answer": "To configure ARLDM with Hermes, first set the `with_hermes` parameter to True in the configuration menu. This triggers the system to initialize Hermes-specific environment variables including HERMES_ADAPTER_MODE, HERMES_CLIENT_CONF, HERMES_CONF, and LD_PRELOAD. The Hermes component must be appended to the Jarvis pipeline using `jarvis pipeline append hermes_run` before the ARLDM component."
     }}
   ]
 
