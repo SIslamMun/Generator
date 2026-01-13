@@ -186,7 +186,7 @@ cot:
 # ============================================================================
 rate_limit:
   delay_between_requests: 4   # Seconds between API calls (15 RPM = 4s delay for safety)
-  save_every_n_pairs: 100     # Save intermediate results every N pairs
+  save_every_n_pairs: 5       # Save intermediate results every N pairs
   max_retries: 5              # Retry attempts for rate limit errors
   backoff_base: 65            # Base seconds for exponential backoff (65, 130, 260...)
 
