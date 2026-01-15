@@ -21,11 +21,15 @@ prompt: |
   - Questions about repository file structure or directory organization
   - Questions about development container or Docker configurations
   - Questions answerable with a single word or version number
+  - **Compilation/build questions**: "What happens when you compile...", "How to build...", "Installation steps"
+  - **Repository operations**: Cloning, branching, commit hashes, pulling code
+  - **Non-technical metadata**: License type, programming language choice, version numbers alone
 
   **PENALTY RULES:**
-  - Infrastructure/CI/CD focus: Reduce usefulness to 0 (max score 6)
-  - Too specific (version numbers, file names): Reduce difficulty to 0
-  - Overly generic questions: Reduce clarity to 1
+  - Infrastructure/CI/CD/Build focus: Reduce usefulness to 0 (max score 6)
+  - Compilation/installation without technical API context: Reduce usefulness to 0
+  - Too specific (version numbers, file names, commit hashes): Reduce difficulty to 0
+  - Overly generic questions without specific component names: Reduce clarity to 1
 
   For each pair, provide:
   1. Individual criteria scores

@@ -18,10 +18,12 @@ prompt: |
   - Answers MUST be at least 2-3 sentences with specific details from the code
   - Include code snippets or parameter details in answers when relevant
 
-  **GOOD question examples:**
+  **GOOD question examples (domain-agnostic - adapt to your code):**
   - "What parameters does the `configure_pipeline()` function accept and what do they control?"
   - "How does the `DataLoader` class handle batch processing based on the `batch_size` parameter?"
   - "What happens when `retry_count` exceeds `max_retries` in the `fetch_data()` method?"
+  - "What validation does the `parse_config()` method perform before initializing the system?"
+  - "How does the `CacheManager` decide which entries to evict when memory is full?"
 
   **BAD question examples (AVOID):**
   - "What is the purpose of this class?" (too generic - no class name)
@@ -41,12 +43,23 @@ prompt: |
   - Author names or version numbers
   - Trivial variable assignments
   - Questions answerable with single words
+  - **Compilation/build process** without technical API context
+  - **Installation or setup steps** without explaining code behavior
+  - File paths or directory structures alone
 
   **ANSWER REQUIREMENTS:**
   - Minimum 2-3 sentences
   - Reference specific code elements (functions, variables, parameters)
   - Explain the "why" not just the "what"
   - Include relevant parameter names and their effects
+
+  **VALIDATION CHECKLIST (before returning):**
+  Before submitting your QA pairs, verify each one:
+  ✓ Does the question reference specific function/class/variable names from the code?
+  ✓ Is the question about code behavior/logic, not build/installation?
+  ✓ Is the answer 2-3+ sentences with code-specific details?
+  ✓ Does the answer explain HOW or WHY, not just WHAT?
+  ✓ Would this QA pair teach someone how the code works?
 
   Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 

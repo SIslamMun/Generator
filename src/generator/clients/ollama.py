@@ -24,7 +24,7 @@ class OllamaClient(BaseLLMClient):
         super().__init__(config)
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = config.get("model", "qwen2.5:72b-instruct")
-        self.client = httpx.Client(timeout=120.0)
+        self.client = httpx.Client(timeout=300.0)  # 5 minutes for CPU inference
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def generate(

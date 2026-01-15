@@ -156,6 +156,18 @@ def generate_qa_from_lancedb(
                     progress.advance(task)
                     continue
 
+                # Skip repository metadata chunks (README, GitHub repo pages, etc.)
+                metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
+                                   'license', 'contributing', 'changelog', 'authors']
+                content_preview = content[:300].lower()
+                if any(pattern in source_file.lower() or pattern in content_preview
+                       for pattern in metadata_patterns):
+                    # Additional check: if it mentions "repository", "clone", "branch", "commit"
+                    repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
+                    if any(kw in content_preview for kw in repo_keywords):
+                        progress.advance(task)
+                        continue
+
                 # Skip very short chunks (headers, citations, etc.)
                 if not content or len(content.strip()) < min_length:
                     progress.advance(task)
@@ -312,6 +324,9 @@ def _generate_pairs_for_chunk(
     # Filter infrastructure-heavy pairs
     pairs = _filter_infrastructure_pairs(pairs)
 
+    # Filter build/compilation/installation questions
+    pairs = _filter_build_questions(pairs)
+
     return pairs  # type: ignore[no-any-return]
 
 
@@ -350,6 +365,57 @@ def _filter_infrastructure_pairs(pairs: List[Dict]) -> List[Dict]:
 
         # Skip if too infrastructure-heavy (more than 1 mention)
         if infra_mentions <= 1:
+            filtered.append(pair)
+
+    return filtered
+
+
+def _filter_build_questions(pairs: List[Dict]) -> List[Dict]:
+    """
+    Filter out build/compilation/installation focused pairs.
+
+    Removes pairs about compiling source code, installation steps,
+    repository cloning, or version management without technical context.
+
+    Args:
+        pairs: List of QA pairs to filter
+
+    Returns:
+        Filtered list with build/installation pairs removed
+    """
+    build_keywords = [
+        "compile", "compilation", "build the", "building the",
+        "install the", "installation of", "installing the",
+        "clone the repository", "pull the branch", "checkout the",
+        "commit hash", "version number", "release tag",
+        "from the repository", "from the source code",
+        "what happens when you compile", "what happens when you build",
+        "how do you install", "how to install", "steps to install",
+        "download the source", "extract the archive",
+        "gcc", "clang", "toolchain", "compiler flag"
+    ]
+
+    filtered = []
+    for pair in pairs:
+        question_lower = pair.get("question", "").lower()
+        answer_lower = pair.get("answer", "").lower()
+
+        # Check if question is build/installation focused
+        is_build_question = any(
+            kw in question_lower for kw in build_keywords
+        )
+
+        # Additional check: if answer mentions build without technical API/library context
+        has_build_without_context = False
+        if any(kw in answer_lower for kw in ["compile", "compilation", "build"]):
+            # Check if it's technical (has function calls, API references, etc.)
+            technical_indicators = ["function", "api", "method", "class", "()", "parameter"]
+            has_technical_context = any(ind in answer_lower for ind in technical_indicators)
+            if not has_technical_context:
+                has_build_without_context = True
+
+        # Skip if it's a build/installation question without technical merit
+        if not (is_build_question or has_build_without_context):
             filtered.append(pair)
 
     return filtered

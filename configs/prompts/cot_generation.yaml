@@ -20,13 +20,15 @@ prompt: |
   - Meta-information about the document itself
   - Simple factual questions like "What programming language?", "What license?", "What version?"
   - Questions answerable with single words or numbers without reasoning
+  - **Build/Infrastructure questions**: Compilation, installation, CI/CD, repository cloning
+  - **Repository metadata**: Commit hashes, branch names, directory structures
 
-  **FOCUS ON:**
+  **FOCUS ON (domain-agnostic - applies to any technical content):**
   - Technical concepts and methodologies
   - System architectures and designs
   - Problem-solving approaches
   - Performance analysis and optimization
-  - Domain-specific knowledge and applications
+  - Domain-specific knowledge and applications (APIs, algorithms, data structures, etc.)
 
   **PREFER questions that require:**
   - Multi-step reasoning about HOW systems work

@@ -29,11 +29,13 @@ prompt: |
   - "What causes..." / "What triggers..."
   - "Which approach is better for..." / "Which method..."
 
-  **GOOD question examples:**
-  - "What configuration parameters does the H5Pset_libver_bounds() function accept?"
-  - "How does the data layout affect read performance in HDF5 datasets?"
-  - "Why would you use chunked storage instead of contiguous storage?"
-  - "What happens when a dataset exceeds available memory during compression?"
+  **GOOD question examples (domain-agnostic - adapt to your content):**
+  - API/Functions: "What parameters does the `configure_cache()` function accept and how do they affect performance?"
+  - System Design: "How does the data layout choice affect read performance when accessing large datasets?"
+  - Trade-offs: "Why would you use chunked storage instead of contiguous storage for time-series data?"
+  - Error Handling: "What happens when memory allocation fails during compression operations?"
+  - Performance: "How does increasing the buffer size parameter impact throughput in high-latency networks?"
+  - Integration: "What steps are required to configure component X to work with component Y?"
 
   **BAD question examples (AVOID):**
   - "What is the purpose of this tool?" (too generic)
@@ -61,6 +63,9 @@ prompt: |
   - Specific version numbers in isolation (e.g., "What version is X?")
   - Operating systems that tests run on
   - Directory structure or file organization alone
+  - **Compilation/build questions** (e.g., "What happens when you compile X?")
+  - **Installation steps** without technical context (e.g., "How do you install X?")
+  - **Repository cloning or branching** (e.g., "What branch should you pull?")
 
   **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
 
@@ -80,16 +85,24 @@ prompt: |
   - Include specific names, values, or examples from the text
   - Explain relationships and dependencies when relevant
 
+  **VALIDATION CHECKLIST (before returning):**
+  Before submitting your QA pairs, verify each one:
+  ✓ Does the question include specific names/components from the text?
+  ✓ Is the question about technical concepts, not infrastructure/build/installation?
+  ✓ Is the answer 2-3+ sentences with specific details?
+  ✓ Is the answer directly supported by the provided text?
+  ✓ Would this QA pair teach domain-specific technical knowledge?
+
   Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
   [
     {{
-      "question": "How does Jarvis-CD handle the deployment of applications with complex dependencies across multiple nodes?",
-      "answer": "Jarvis-CD uses a pipeline-based approach where applications (called 'jarvis pkgs') are connected to form deployment pipelines. Each package specifies its dependencies and configuration requirements. The resource graph, created once per Jarvis lifetime, provides hostfile details for multi-node deployment, allowing applications like Hermes and ARLDM to be deployed with their specific environment variables and configuration files."
+      "question": "How does the caching layer handle concurrent read requests when multiple threads access the same data block?",
+      "answer": "The caching layer uses a read-write lock mechanism to coordinate concurrent access. When multiple threads request the same data block, the first thread acquires a write lock to populate the cache, while subsequent threads wait on a read lock. Once the cache entry is populated, all waiting threads can proceed with shared read access, improving throughput for frequently accessed data without requiring redundant disk reads."
     }},
     {{
-      "question": "What steps are required to configure ARLDM to use Hermes for I/O buffering?",
-      "answer": "To configure ARLDM with Hermes, first set the `with_hermes` parameter to True in the configuration menu. This triggers the system to initialize Hermes-specific environment variables including HERMES_ADAPTER_MODE, HERMES_CLIENT_CONF, HERMES_CONF, and LD_PRELOAD. The Hermes component must be appended to the Jarvis pipeline using `jarvis pipeline append hermes_run` before the ARLDM component."
+      "question": "What happens when the buffer pool reaches capacity during a large sequential write operation?",
+      "answer": "When the buffer pool reaches capacity, the system triggers an asynchronous flush operation to write the oldest dirty pages to disk. The write operation will block until sufficient space is freed in the buffer pool. The flush policy prioritizes pages that have been in memory longest (LRU eviction) while ensuring data consistency by maintaining write-ahead logging for crash recovery."
     }}
   ]
 
