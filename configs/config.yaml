@@ -88,8 +88,8 @@ llm:
 # GENERATION SETTINGS
 # ============================================================================
 generation:
-  n_pairs_per_chunk: 5        # Number of QA pairs to generate per chunk
-                              # Recommended: 5 (good balance of quality/quantity)
+  n_pairs_per_chunk: 3        # Number of QA pairs to generate per chunk
+                              # Recommended: 3 (better quality, less noise)
                               # Higher values: More pairs but potentially lower quality
   
   batch_size: 50              # Number of chunks to process in one batch
@@ -108,6 +108,13 @@ filtering:
     - "login.md"             # Login/authentication pages
     - "retrieval_progress"   # Retrieval progress tracking
     - "signup"               # Signup pages
+    - "workflow"             # GitHub workflows
+    - ".github/"             # GitHub configs
+    - "ci.yml"               # CI configuration
+    - "cd.yml"               # CD configuration
+    - ".devcontainer"        # Dev container configs
+    - "ISSUE_TEMPLATE"       # Issue templates
+    - "daily-"               # Daily build workflows
   
   # Question patterns to filter out during curation
   skip_question_patterns:
@@ -121,7 +128,7 @@ filtering:
     - "department.*work"
     - "university.*located"
     - "laboratory.*located"
-    
+
     # UI/website-specific
     - "cookie"
     - "password.*reset"
@@ -131,12 +138,34 @@ filtering:
     - "jira.*service"
     - "helpdesk.*support.*hours"
     - "business.*week"
-    
+
     # Document metadata (not technical content)
     - "DOI.*completed.*item"
     - "retrieval.*status"
     - "paper.*being.*retrieved"
     - "successfully.*downloaded"
+
+    # Infrastructure/CI/CD (NEW)
+    - "workflow.*executed"
+    - "workflow.*schedule"
+    - "GitHub Actions"
+    - "CI/CD"
+    - "pipeline.*job"
+    - "runs on.*operating system"
+    - "runs on.*ubuntu"
+    - "runs on.*windows"
+    - "runs on.*macos"
+    - "devcontainer.*extension"
+    - "test.*script.*run"
+    - "build.*system.*configure"
+    - "cmake.*argument"
+    - "cmake.*command"
+    - "makefile"
+    - "file.*named.*\\.yml"
+    - "directory.*contains.*file"
+    - "workflow.*trigger"
+    - "job.*depend"
+    - "build.*step"
   
   # Minimum content length for chunks (characters)
   min_chunk_length: 300          # Increased from 200 to filter short/problematic chunks
@@ -151,8 +180,9 @@ filtering:
 curate:
   provider: claude            # LLM judge provider (claude recommended for quality assessment)
                               # Options: ollama, claude, gemini, vllm, openai, anthropic
-  
+
   threshold: 7.0              # Minimum rating to keep (1-10 scale)
+  topic_filter: "HDF5"        # Filter out pairs not related to this topic
                               # Recommended ranges:
                               #   - 6.0-6.5: More pairs, moderate quality (60-80% retention)
                               #   - 7.0: Balanced quality (40-60% retention) ⭐ RECOMMENDED
@@ -185,7 +215,7 @@ cot:
 # RATE LIMITING (Prevent API Quota Issues)
 # ============================================================================
 rate_limit:
-  delay_between_requests: 4   # Seconds between API calls (15 RPM = 4s delay for safety)
+  delay_between_requests: 0.5 # Seconds between API calls (0.5 for local Ollama)
   save_every_n_pairs: 5       # Save intermediate results every N pairs
   max_retries: 5              # Retry attempts for rate limit errors
   backoff_base: 65            # Base seconds for exponential backoff (65, 130, 260...)

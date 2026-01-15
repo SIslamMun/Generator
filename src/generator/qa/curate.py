@@ -367,6 +367,32 @@ def _rate_batch(
             pair["usefulness"] = 1
             pair["difficulty"] = 0
             pair["reasoning"] = "Default rating (insufficient results)"
+
+        # Apply infrastructure penalty AFTER getting ratings
+        question_lower = pair.get("question", "").lower()
+        answer_lower = pair.get("answer", "").lower()
+
+        infrastructure_keywords = [
+            "workflow", "github actions", "ci/cd", "pipeline",
+            "cmake", "build system", "test script", "runs on",
+            "devcontainer", "ubuntu-latest", "windows-latest",
+            "workflow trigger", "job depend", "build step"
+        ]
+
+        # Check for infrastructure focus
+        infra_count = sum(
+            1 for kw in infrastructure_keywords
+            if kw in question_lower or kw in answer_lower
+        )
+
+        if infra_count >= 2:
+            # Heavy infrastructure penalty
+            pair["rating"] = max(0, pair["rating"] - 3)
+            pair["reasoning"] += " [Penalty: Infrastructure-focused]"
+        elif infra_count == 1:
+            # Light infrastructure penalty
+            pair["rating"] = max(0, pair["rating"] - 1)
+
         result.append(pair)
 
     return result

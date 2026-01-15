@@ -18,17 +18,28 @@ prompt: |
   - ALWAYS include specific names (tool names, system names, concepts) in questions
   - NEVER ask vague questions like "What is the purpose of this?" - be specific
   - Answers MUST be at least 2-3 sentences with concrete details
-  - Vary question starters - don't use "How does the..." for every question
+  - MANDATORY: Vary question starters - use diverse patterns (see below)
+
+  **QUESTION STARTER DIVERSITY (rotate through these patterns):**
+  - "How does..." / "How can..." / "How do..."
+  - "What happens when..." / "What occurs when..."
+  - "Why does..." / "Why is..."
+  - "When should..." / "When would..."
+  - "What's the difference between..." / "What distinguishes..."
+  - "What causes..." / "What triggers..."
+  - "Which approach is better for..." / "Which method..."
 
   **GOOD question examples:**
-  - "What configuration parameters does Jarvis-CD require for deploying Hermes?"
-  - "How does the data staging process differ between local and NFS storage in ARLDM?"
-  - "What happens when the daily quota is exceeded in the Gemini API client?"
+  - "What configuration parameters does the H5Pset_libver_bounds() function accept?"
+  - "How does the data layout affect read performance in HDF5 datasets?"
+  - "Why would you use chunked storage instead of contiguous storage?"
+  - "What happens when a dataset exceeds available memory during compression?"
 
   **BAD question examples (AVOID):**
   - "What is the purpose of this tool?" (too generic)
   - "How does the system work?" (too vague)
   - "What is X?" without context (too short)
+  - "What workflows are executed in the repository?" (infrastructure focus)
 
   **DO NOT** create questions about:
   - Paper authors, affiliations, or institutions
@@ -36,10 +47,20 @@ prompt: |
   - Grant numbers or funding sources
   - Publication titles or references
   - Meta-information about the document itself
-  - **STRICTLY FORBIDDEN:** Questions about programming language, license type, version numbers
+  - **STRICTLY FORBIDDEN:** Questions about programming language, license type
   - Questions answerable with single words or numbers
   - Repository metadata (stars, forks, topics list)
   - File extensions or directory names alone
+
+  **INFRASTRUCTURE & CI/CD (STRICTLY FORBIDDEN):**
+  - GitHub Actions workflows or pipeline configurations
+  - CI/CD job definitions, steps, or scheduling
+  - Build system configurations (CMake scripts, Makefiles)
+  - Test framework setups or test runner configurations
+  - Development container or Docker configurations
+  - Specific version numbers in isolation (e.g., "What version is X?")
+  - Operating systems that tests run on
+  - Directory structure or file organization alone
 
   **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
 
@@ -47,9 +68,12 @@ prompt: |
   - Explaining HOW something works with specific component names
   - Explaining WHY a design choice was made
   - Describing relationships between named components
-  - Comparing/contrasting different approaches
-  - Explaining use cases or applications with examples
-  - Understanding technical trade-offs
+  - Comparing/contrasting different approaches with names (e.g., "X vs Y")
+  - Explaining use cases or applications with concrete examples
+  - Understanding technical trade-offs between options
+  - Troubleshooting: "Why does X fail when..." or "What causes error Y?"
+  - Best practices: "What's the recommended way to..." or "When should I use..."
+  - Error scenarios: "What happens when X condition occurs?"
 
   **ANSWER REQUIREMENTS:**
   - Minimum 2-3 sentences

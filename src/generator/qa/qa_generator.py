@@ -309,7 +309,50 @@ def _generate_pairs_for_chunk(
         pair["generated_at"] = datetime.now().isoformat()
         pair["model"] = llm.model
 
+    # Filter infrastructure-heavy pairs
+    pairs = _filter_infrastructure_pairs(pairs)
+
     return pairs  # type: ignore[no-any-return]
+
+
+def _filter_infrastructure_pairs(pairs: List[Dict]) -> List[Dict]:
+    """
+    Filter out infrastructure/CI/CD focused pairs.
+
+    Removes pairs that heavily focus on GitHub workflows, build systems,
+    CI/CD configurations, or repository structure.
+
+    Args:
+        pairs: List of QA pairs to filter
+
+    Returns:
+        Filtered list with infrastructure pairs removed
+    """
+    infrastructure_keywords = [
+        "github actions", "workflow", "ci/cd", "pipeline job",
+        "devcontainer", "cmake", "build system", "test script",
+        "operating system", "runs on", "docker", "container",
+        "ubuntu-latest", "windows-latest", "macos-latest",
+        ".yml file", "yaml file", "workflow trigger", "job depend",
+        "build step", "test framework", "makefile", "ctest"
+    ]
+
+    filtered = []
+    for pair in pairs:
+        question_lower = pair.get("question", "").lower()
+        answer_lower = pair.get("answer", "").lower()
+
+        # Count infrastructure keyword mentions
+        infra_mentions = sum(
+            1 for kw in infrastructure_keywords
+            if kw in question_lower or kw in answer_lower
+        )
+
+        # Skip if too infrastructure-heavy (more than 1 mention)
+        if infra_mentions <= 1:
+            filtered.append(pair)
+
+    return filtered
 
 
 def _save_intermediate(qa_pairs: List[Dict], output_path: Path):

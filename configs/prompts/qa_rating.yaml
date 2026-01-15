@@ -10,10 +10,22 @@ prompt: |
   Criteria:
   - Clarity (0-3): Question clear? Answer understandable?
   - Accuracy (0-3): Answer correct and supported by evidence?
-  - Usefulness (0-2): Valuable for training?
+  - Usefulness (0-2): Valuable for training end-users (not DevOps)?
   - Difficulty (0-2): Appropriate complexity?
 
   Rate STRICTLY - most pairs should score 5-7. Only exceptional pairs score 8+.
+
+  **AUTOMATIC LOW SCORES (max score: 3) for:**
+  - Questions about GitHub workflows, CI/CD pipelines, or build automation
+  - Questions about specific test configurations or runner setups
+  - Questions about repository file structure or directory organization
+  - Questions about development container or Docker configurations
+  - Questions answerable with a single word or version number
+
+  **PENALTY RULES:**
+  - Infrastructure/CI/CD focus: Reduce usefulness to 0 (max score 6)
+  - Too specific (version numbers, file names): Reduce difficulty to 0
+  - Overly generic questions: Reduce clarity to 1
 
   For each pair, provide:
   1. Individual criteria scores
