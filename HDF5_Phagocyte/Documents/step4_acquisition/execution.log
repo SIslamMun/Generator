@@ -1,0 +1,131 @@
+Found 7 papers to retrieve:
+  - 7 with title/DOI (metadata search)
+  - 0 direct PDF URLs
+Output directory: ../pipeline_output/phase2_parser/step4_acquisition/papers
+Max concurrent: 3
+
+[1/7] Processing: 10.1109/TPDS.2021.3090322...
+
+[2/7] Processing: 10.1007/s11390-020-9822-9...
+
+[3/7] Processing: 10.1109/IPDPSW59300.2023.00107...
+
+Retrieving: 10.1109/tpds.2021.3090322
+  Title: "Transparent Asynchronous Parallel I/O Using Background Threads" (2022)
+
+  [1/11] unpaywall: 
+Retrieving: 10.1007/s11390-020-9822-9
+  Title: "ExaHDF5: Delivering Efficient Parallel I/O on Exascale Computing Systems" (2020)
+
+  [1/11] unpaywall: 
+Retrieving: 10.1109/ipdpsw59300.2023.00107
+  Title: "Efficient Asynchronous I/O with Request Merging" (2023)
+
+  [1/11] unpaywall: ✗ no OA version found
+  [2/11] arxiv: ✗ no OA version found
+  [2/11] arxiv: ✗ PDF download failed
+  [2/11] arxiv: ✗ not found on arXiv
+  [3/11] pmc: ✗ not found on arXiv
+  [3/11] pmc: ✗ no PMC ID for this DOI
+  [4/11] biorxiv: ✗ not a bioRxiv DOI
+  [5/11] semantic_scholar: ✗ not found on arXiv
+  [3/11] pmc: ✗ no PMC ID for this DOI
+  [4/11] biorxiv: ✗ no PMC ID for this DOI
+  [4/11] biorxiv: ✗ PDF download failed
+  [6/11] acl_anthology: ✗ not a bioRxiv DOI
+  [5/11] semantic_scholar: ✗ not a bioRxiv DOI
+  [5/11] semantic_scholar: ✗ not an ACL DOI
+  [7/11] openalex: ✓ downloaded -> ../pipeline_output/phase2_parser/step4_acquisition/papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca.pdf
+
+✓ Success via semantic_scholar
+  File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Byna_2020_ExaHDF5_Delivering_Efficient_Parallel_IO_on_Exasca.pdf
+
+[4/7] Processing: 10.1109/PDSW49588.2019.00006...
+
+Retrieving: 10.1109/pdsw49588.2019.00006
+  Title: "Enabling Transparent Asynchronous I/O using Background Threads" (2019)
+
+  [1/11] unpaywall: ✗ no OA URL
+  [8/11] frontiers: ✗ not a Frontiers DOI
+  [9/11] institutional: ✗ no OA version found
+  [2/11] arxiv: ✗ not found on arXiv
+  [3/11] pmc: ✗ no PMC ID for this DOI
+  [4/11] biorxiv: ✗ not a bioRxiv DOI
+  [5/11] semantic_scholar: ✓ downloaded -> ../pipeline_output/phase2_parser/step4_acquisition/papers/Chowdhury_2023_Efficient_Asynchronous_IO_with_Request_Merging.pdf
+
+✓ Success via semantic_scholar
+  File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Chowdhury_2023_Efficient_Asynchronous_IO_with_Request_Merging.pdf
+
+[5/7] Processing: Transparent Asynchronous Parallel I/O Using Background Threa...
+✗ institutional download failed
+  [10/11] scihub: 
+Retrieving: 10.1109/tpds.2021.3090322
+  Title: "Transparent Asynchronous Parallel I/O Using Background Threads" (2022)
+
+  [1/11] unpaywall: ✗ no OA version found
+  [2/11] arxiv: ✗ PDF download failed
+  [6/11] acl_anthology: ✗ not an ACL DOI
+  [7/11] openalex: ✗ not found on arXiv
+  [3/11] pmc: ✗ no OA URL
+  [8/11] frontiers: ✗ not a Frontiers DOI
+  [9/11] institutional: ✗ no PMC ID for this DOI
+  [4/11] biorxiv: ✗ not a bioRxiv DOI
+  [5/11] semantic_scholar: ✗ PDF download failed
+  [6/11] acl_anthology: ✗ not an ACL DOI
+  [7/11] openalex: ✗ no OA URL
+  [8/11] frontiers: ✗ not a Frontiers DOI
+  [9/11] institutional: ✗ institutional download failed
+  [10/11] scihub: 
+⚠️  WARNING: Paper retrieved via Sci-Hub (legal gray area)
+   Use may violate copyright laws in your jurisdiction.
+
+✓ downloaded -> ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2022_Transparent_Asynchronous_Parallel_IO_Using_Backgro.pdf
+
+✓ Success via scihub
+  File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2022_Transparent_Asynchronous_Parallel_IO_Using_Backgro.pdf
+
+[6/7] Processing: Tuning HDF5 subfiling performance on parallel file systems...
+✗ institutional download failed
+  [10/11] scihub: 
+Retrieving: N/A
+  Title: "Tuning HDF5 subfiling performance on parallel file systems" (2017)
+
+  [1/11] unpaywall: ✗ no DOI provided
+  [2/11] arxiv: ✗ not found on arXiv
+  [3/11] pmc: ✗ no DOI provided
+  [4/11] biorxiv: ✗ no DOI provided
+  [5/11] semantic_scholar: ✗ no open access PDF
+  [6/11] acl_anthology: ✗ no DOI provided
+  [7/11] openalex: ✗ PDF download failed
+  [8/11] frontiers: ✗ no DOI provided
+  [9/11] institutional: ✗ no DOI provided
+  [10/11] scihub: ✓ downloaded -> ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2019_Enabling_Transparent_Asynchronous_IO_using_Backgro.pdf
+
+✓ Success via scihub
+  File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2019_Enabling_Transparent_Asynchronous_IO_using_Backgro.pdf
+
+[7/7] Processing: Efficient Asynchronous I/O with Request Merging...
+
+Retrieving: 10.1109/ipdpsw59300.2023.00107
+  Title: "Efficient Asynchronous I/O with Request Merging" (2023)
+
+
+✓ Success via cached
+  File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Chowdhury_2023_Efficient_Asynchronous_IO_with_Request_Merging.pdf
+✗ not available or bot protection
+  [11/11] libgen: ✓ downloaded -> ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2022_Transparent_Asynchronous_Parallel_IO_Using_Backgro.pdf
+
+✓ Success via scihub
+  File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2022_Transparent_Asynchronous_Parallel_IO_Using_Backgro.pdf
+✗ not available or connection failed
+
+✗ Failed - PDF not found in any source
+  Log: ../pipeline_output/phase2_parser/step4_acquisition/papers/failed/Tuning HDF5 subfiling performance on parallel file systems.log
+
+Results:
+  ✓ Downloaded: 5
+  ⊘ Skipped: 1
+  ✗ Failed: 1
+
+Failed papers:
+  - Tuning HDF5 subfiling performance on parallel file systems

@@ -1,0 +1,557 @@
+{
+  "references": [
+    {
+      "type": "paper",
+      "value": "Transparent Asynchronous Parallel I/O Using Background Threads",
+      "title": "Transparent Asynchronous Parallel I/O Using Background Threads",
+      "authors": "Tang et al.",
+      "year": "2022",
+      "url": "https://jcst.ict.ac.cn/EN/10.1007/s11390-020-9822-9",
+      "context": "IEEE Transactions on Parallel and Distributed Systems, 2022. DOI: 10.1109/TPDS.2021.3090322",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "doi",
+      "value": "10.1109/TPDS.2021.3090322",
+      "title": "Transparent Asynchronous Parallel I/O Using Background Threads",
+      "authors": "Tang et al.",
+      "year": "2022",
+      "url": "",
+      "context": "IEEE Transactions on Parallel and Distributed Systems, 2022",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://cug.org/proceedings/cug2017_proceedings/includes/files/pap106s2-file1.pdf",
+      "title": "Tuning HDF5 subfiling performance on parallel file systems",
+      "authors": "Byna et al.",
+      "year": "2017",
+      "url": "https://cug.org/proceedings/cug2017_proceedings/includes/files/pap106s2-file1.pdf",
+      "context": "CUG, 2017 conference paper on subfiling performance",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "paper",
+      "value": "Efficient Asynchronous I/O with Request Merging",
+      "title": "Efficient Asynchronous I/O with Request Merging",
+      "authors": "Chowdhury et al.",
+      "year": "2023",
+      "url": "https://www.osti.gov/biblio/2228867",
+      "context": "IPDPSW, 2023. DOI: 10.1109/IPDPSW59300.2023.00107",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "doi",
+      "value": "10.1109/IPDPSW59300.2023.00107",
+      "title": "Efficient Asynchronous I/O with Request Merging",
+      "authors": "Chowdhury et al.",
+      "year": "2023",
+      "url": "",
+      "context": "IPDPSW, 2023 conference paper",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "paper",
+      "value": "Enabling Transparent Asynchronous I/O using Background Threads",
+      "title": "Enabling Transparent Asynchronous I/O using Background Threads",
+      "authors": "Tang et al.",
+      "year": "2019",
+      "url": "https://hdf5-vol-async.readthedocs.io/",
+      "context": "PDSW, 2019. DOI: 10.1109/PDSW49588.2019.00006",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "doi",
+      "value": "10.1109/PDSW49588.2019.00006",
+      "title": "Enabling Transparent Asynchronous I/O using Background Threads",
+      "authors": "Tang et al.",
+      "year": "2019",
+      "url": "",
+      "context": "PDSW, 2019 conference paper",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://docs.h5py.org/en/latest/swmr.html",
+      "title": "Single Writer Multiple Reader (SWMR)",
+      "authors": "",
+      "year": "",
+      "url": "https://docs.h5py.org/en/latest/swmr.html",
+      "context": "h5py Documentation on SWMR",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_SWMR.html",
+      "title": "Introduction to SWMR",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_SWMR.html",
+      "context": "The HDF Group Support documentation on SWMR",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://docs.h5py.org/en/latest/vds.html",
+      "title": "Virtual Datasets (VDS)",
+      "authors": "",
+      "year": "",
+      "url": "https://docs.h5py.org/en/latest/vds.html",
+      "context": "h5py Documentation on Virtual Datasets",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2023/08/ATPESC-2023-Track-7-Talk-9-Breitenfeld-HDF5.pdf",
+      "title": "HDF5 Advanced Topics",
+      "authors": "",
+      "year": "2023",
+      "url": "https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2023/08/ATPESC-2023-Track-7-Talk-9-Breitenfeld-HDF5.pdf",
+      "context": "Argonne National Laboratory Training material on HDF5 advanced topics",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/03_DataModel.html",
+      "title": "HDF5 Data Model",
+      "authors": "",
+      "year": "",
+      "url": "https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/03_DataModel.html",
+      "context": "LBL Documentation on HDF5 Data Model",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5",
+      "title": "About Hierarchical Data Formats - HDF5",
+      "authors": "",
+      "year": "",
+      "url": "https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5",
+      "context": "NEON Science tutorial on HDF5",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://tardis-sn.github.io/tardis/io/hdf/index.html",
+      "title": "HDF5 Reference",
+      "authors": "",
+      "year": "",
+      "url": "https://tardis-sn.github.io/tardis/io/hdf/index.html",
+      "context": "TARDIS Documentation on HDF5",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5_d_m__u_g.html",
+      "title": "HDF5 Abstract Data Model",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5_d_m__u_g.html",
+      "context": "The HDF Group Support documentation on Abstract Data Model",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/UG_frame03DataModel.html",
+      "title": "The Abstract Storage Model",
+      "authors": "",
+      "year": "",
+      "url": "https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/UG_frame03DataModel.html",
+      "context": "LBL Documentation on Abstract Storage Model",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://hps.vi4io.org/_media/research/theses/roman_jerger_modeling_and_performance_prediction_of_hdf5_data_on_objectstorage.pdf",
+      "title": "Modeling and Performance Prediction of HDF5 Data",
+      "authors": "Jerger",
+      "year": "",
+      "url": "https://hps.vi4io.org/_media/research/theses/roman_jerger_modeling_and_performance_prediction_of_hdf5_data_on_objectstorage.pdf",
+      "context": "Thesis on modeling and performance prediction of HDF5",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5__u_g.html",
+      "title": "The HDF5 Library and Programming Model",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5__u_g.html",
+      "context": "The HDF Group Support documentation on HDF5 Library and Programming Model",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://www.researchgate.net/figure/Overview-of-HDF5-base-model-objects-and-exemplary-hierarchic-data-structure_fig2_329062811",
+      "title": "Overview of HDF5 base model objects",
+      "authors": "",
+      "year": "",
+      "url": "https://www.researchgate.net/figure/Overview-of-HDF5-base-model-objects-and-exemplary-hierarchic-data-structure_fig2_329062811",
+      "context": "ResearchGate figure showing HDF5 base model objects",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/_par_compr.html",
+      "title": "Parallel Compression",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/_par_compr.html",
+      "context": "The HDF Group Support documentation on Parallel Compression",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://www.alcf.anl.gov/sites/default/files/2022-07/HDF5-Foundation-parallel.pdf",
+      "title": "HDF5 Foundation Parallel",
+      "authors": "",
+      "year": "2022",
+      "url": "https://www.alcf.anl.gov/sites/default/files/2022-07/HDF5-Foundation-parallel.pdf",
+      "context": "ALCF Training material on HDF5 parallel",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://www.hdfgroup.org/wp-content/uploads/2021/10/HUG_compression_21a.pdf",
+      "title": "HDF5 Compression",
+      "authors": "",
+      "year": "2021",
+      "url": "https://www.hdfgroup.org/wp-content/uploads/2021/10/HUG_compression_21a.pdf",
+      "context": "The HDF Group material on HDF5 compression",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://davis.lbl.gov/Manuals/HDF5-1.8.7/Advanced/Chunking/index.html",
+      "title": "Chunking in HDF5",
+      "authors": "",
+      "year": "",
+      "url": "https://davis.lbl.gov/Manuals/HDF5-1.8.7/Advanced/Chunking/index.html",
+      "context": "LBL Documentation on HDF5 chunking",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://biorack.github.io/BASTet/HDF5_format_performance.html",
+      "title": "HDF5 Format Performance",
+      "authors": "",
+      "year": "",
+      "url": "https://biorack.github.io/BASTet/HDF5_format_performance.html",
+      "context": "BASTet Documentation on HDF5 format performance",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VFD_subfiling_200424.pdf",
+      "title": "RFC: VFD Sub-filing",
+      "authors": "",
+      "year": "2020",
+      "url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VFD_subfiling_200424.pdf",
+      "context": "The HDF Group RFC on VFD subfiling",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://www.hdfgroup.org/2023/02/01/subfiling-virtual-file-driver-user-guide-is-now-available/",
+      "title": "Subfiling Virtual File Driver User Guide",
+      "authors": "",
+      "year": "2023",
+      "url": "https://www.hdfgroup.org/2023/02/01/subfiling-virtual-file-driver-user-guide-is-now-available/",
+      "context": "The HDF Group announcement on Subfiling VFD user guide",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://www.hdfgroup.org/wp-content/uploads/2022/09/HDF5-Subfiling-VFD.pdf",
+      "title": "HDF5 Subfiling VFD",
+      "authors": "",
+      "year": "2022",
+      "url": "https://www.hdfgroup.org/wp-content/uploads/2022/09/HDF5-Subfiling-VFD.pdf",
+      "context": "The HDF Group material on HDF5 Subfiling VFD",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5_e_s__u_g.html",
+      "title": "HDF5 Event Set Interface",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5_e_s__u_g.html",
+      "context": "The HDF Group Support documentation on Event Set Interface",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://hdf5-vol-async.readthedocs.io/en/latest/example.html",
+      "title": "Using Async I/O VOL",
+      "authors": "",
+      "year": "",
+      "url": "https://hdf5-vol-async.readthedocs.io/en/latest/example.html",
+      "context": "HDF5 Async VOL Documentation on using async I/O",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5_v_l__u_g.html",
+      "title": "Virtual Object Layer (VOL)",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/_h5_v_l__u_g.html",
+      "context": "The HDF Group Support documentation on VOL",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VOL.pdf",
+      "title": "RFC: Virtual Object Layer",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VOL.pdf",
+      "context": "The HDF Group RFC on Virtual Object Layer",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://www.hdfgroup.org/wp-content/uploads/2022/02/VOL_tutorial_feb_2022.pdf",
+      "title": "VOL Tutorial",
+      "authors": "",
+      "year": "2022",
+      "url": "https://www.hdfgroup.org/wp-content/uploads/2022/02/VOL_tutorial_feb_2022.pdf",
+      "context": "The HDF Group VOL tutorial",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_VDS.html",
+      "title": "Introduction to the Virtual Dataset",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_VDS.html",
+      "context": "The HDF Group Support documentation on Virtual Dataset",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/HDF5-VDS-requirements-use-cases-2014-12-10.pdf",
+      "title": "RFC: HDF5 Virtual Dataset",
+      "authors": "",
+      "year": "2014",
+      "url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/HDF5-VDS-requirements-use-cases-2014-12-10.pdf",
+      "context": "The HDF Group RFC on HDF5 Virtual Dataset requirements and use cases",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/_intro_h_d_f5.html",
+      "title": "HDF5 Data Model",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/_intro_h_d_f5.html",
+      "context": "The HDF Group Support documentation on HDF5 Data Model",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://support.hdfgroup.org/documentation/hdf5/latest/improve_compressed_perf.html",
+      "title": "Improving I/O Performance with Compressed Datasets",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/documentation/hdf5/latest/improve_compressed_perf.html",
+      "context": "The HDF Group Support documentation on improving compressed dataset performance",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://ilnumerics.net/multithreading-hdf5.html",
+      "title": "HDF5 Multithreading Notes",
+      "authors": "",
+      "year": "",
+      "url": "https://ilnumerics.net/multithreading-hdf5.html",
+      "context": "ILNumerics documentation on HDF5 multithreading",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_multi_thread.pdf",
+      "title": "RFC: HDF5 Thread Safety",
+      "authors": "",
+      "year": "",
+      "url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_multi_thread.pdf",
+      "context": "The HDF Group RFC on HDF5 thread safety",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "pdf",
+      "value": "https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2022/11/ATPESC-2022-Track-3-Talk-9-Breitenfeld-HDF5.pdf",
+      "title": "HDF5 Best Practices",
+      "authors": "",
+      "year": "2022",
+      "url": "https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2022/11/ATPESC-2022-Track-3-Talk-9-Breitenfeld-HDF5.pdf",
+      "context": "Argonne National Laboratory ATPESC training material on HDF5 best practices",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://openpmd-api.readthedocs.io/en/0.16.1/details/backendconfig.html",
+      "title": "HDF5 Backend Configuration",
+      "authors": "",
+      "year": "",
+      "url": "https://openpmd-api.readthedocs.io/en/0.16.1/details/backendconfig.html",
+      "context": "openPMD Documentation on HDF5 backend configuration",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://hdf5-vol-async.readthedocs.io/",
+      "title": "HDF5 Async VOL Documentation",
+      "authors": "",
+      "year": "",
+      "url": "https://hdf5-vol-async.readthedocs.io/",
+      "context": "HDF5 Async VOL Documentation main page",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    },
+    {
+      "type": "website",
+      "value": "https://www.osti.gov/biblio/2228867",
+      "title": "Efficient Asynchronous I/O with Request Merging",
+      "authors": "Chowdhury et al.",
+      "year": "2023",
+      "url": "https://www.osti.gov/biblio/2228867",
+      "context": "OSTI bibliography entry for async I/O paper",
+      "metadata": {
+        "source": "agent",
+        "agent_type": "anthropic"
+      }
+    }
+  ],
+  "raw_response": "```json\n[\n  {\n    \"type\": \"paper\",\n    \"value\": \"Transparent Asynchronous Parallel I/O Using Background Threads\",\n    \"title\": \"Transparent Asynchronous Parallel I/O Using Background Threads\",\n    \"authors\": \"Tang et al.\",\n    \"year\": \"2022\",\n    \"url\": \"https://jcst.ict.ac.cn/EN/10.1007/s11390-020-9822-9\",\n    \"context\": \"IEEE Transactions on Parallel and Distributed Systems, 2022. DOI: 10.1109/TPDS.2021.3090322\"\n  },\n  {\n    \"type\": \"doi\",\n    \"value\": \"10.1109/TPDS.2021.3090322\",\n    \"title\": \"Transparent Asynchronous Parallel I/O Using Background Threads\",\n    \"authors\": \"Tang et al.\",\n    \"year\": \"2022\",\n    \"url\": \"\",\n    \"context\": \"IEEE Transactions on Parallel and Distributed Systems, 2022\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://cug.org/proceedings/cug2017_proceedings/includes/files/pap106s2-file1.pdf\",\n    \"title\": \"Tuning HDF5 subfiling performance on parallel file systems\",\n    \"authors\": \"Byna et al.\",\n    \"year\": \"2017\",\n    \"url\": \"https://cug.org/proceedings/cug2017_proceedings/includes/files/pap106s2-file1.pdf\",\n    \"context\": \"CUG, 2017 conference paper on subfiling performance\"\n  },\n  {\n    \"type\": \"paper\",\n    \"value\": \"Efficient Asynchronous I/O with Request Merging\",\n    \"title\": \"Efficient Asynchronous I/O with Request Merging\",\n    \"authors\": \"Chowdhury et al.\",\n    \"year\": \"2023\",\n    \"url\": \"https://www.osti.gov/biblio/2228867\",\n    \"context\": \"IPDPSW, 2023. DOI: 10.1109/IPDPSW59300.2023.00107\"\n  },\n  {\n    \"type\": \"doi\",\n    \"value\": \"10.1109/IPDPSW59300.2023.00107\",\n    \"title\": \"Efficient Asynchronous I/O with Request Merging\",\n    \"authors\": \"Chowdhury et al.\",\n    \"year\": \"2023\",\n    \"url\": \"\",\n    \"context\": \"IPDPSW, 2023 conference paper\"\n  },\n  {\n    \"type\": \"paper\",\n    \"value\": \"Enabling Transparent Asynchronous I/O using Background Threads\",\n    \"title\": \"Enabling Transparent Asynchronous I/O using Background Threads\",\n    \"authors\": \"Tang et al.\",\n    \"year\": \"2019\",\n    \"url\": \"https://hdf5-vol-async.readthedocs.io/\",\n    \"context\": \"PDSW, 2019. DOI: 10.1109/PDSW49588.2019.00006\"\n  },\n  {\n    \"type\": \"doi\",\n    \"value\": \"10.1109/PDSW49588.2019.00006\",\n    \"title\": \"Enabling Transparent Asynchronous I/O using Background Threads\",\n    \"authors\": \"Tang et al.\",\n    \"year\": \"2019\",\n    \"url\": \"\",\n    \"context\": \"PDSW, 2019 conference paper\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://docs.h5py.org/en/latest/swmr.html\",\n    \"title\": \"Single Writer Multiple Reader (SWMR)\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://docs.h5py.org/en/latest/swmr.html\",\n    \"context\": \"h5py Documentation on SWMR\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_SWMR.html\",\n    \"title\": \"Introduction to SWMR\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_SWMR.html\",\n    \"context\": \"The HDF Group Support documentation on SWMR\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://docs.h5py.org/en/latest/vds.html\",\n    \"title\": \"Virtual Datasets (VDS)\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://docs.h5py.org/en/latest/vds.html\",\n    \"context\": \"h5py Documentation on Virtual Datasets\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2023/08/ATPESC-2023-Track-7-Talk-9-Breitenfeld-HDF5.pdf\",\n    \"title\": \"HDF5 Advanced Topics\",\n    \"authors\": \"\",\n    \"year\": \"2023\",\n    \"url\": \"https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2023/08/ATPESC-2023-Track-7-Talk-9-Breitenfeld-HDF5.pdf\",\n    \"context\": \"Argonne National Laboratory Training material on HDF5 advanced topics\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/03_DataModel.html\",\n    \"title\": \"HDF5 Data Model\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/03_DataModel.html\",\n    \"context\": \"LBL Documentation on HDF5 Data Model\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5\",\n    \"title\": \"About Hierarchical Data Formats - HDF5\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://www.neonscience.org/resources/learning-hub/tutorials/about-hdf5\",\n    \"context\": \"NEON Science tutorial on HDF5\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://tardis-sn.github.io/tardis/io/hdf/index.html\",\n    \"title\": \"HDF5 Reference\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://tardis-sn.github.io/tardis/io/hdf/index.html\",\n    \"context\": \"TARDIS Documentation on HDF5\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5_d_m__u_g.html\",\n    \"title\": \"HDF5 Abstract Data Model\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5_d_m__u_g.html\",\n    \"context\": \"The HDF Group Support documentation on Abstract Data Model\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/UG_frame03DataModel.html\",\n    \"title\": \"The Abstract Storage Model\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://davis.lbl.gov/Manuals/HDF5-1.8.7/UG/UG_frame03DataModel.html\",\n    \"context\": \"LBL Documentation on Abstract Storage Model\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://hps.vi4io.org/_media/research/theses/roman_jerger_modeling_and_performance_prediction_of_hdf5_data_on_objectstorage.pdf\",\n    \"title\": \"Modeling and Performance Prediction of HDF5 Data\",\n    \"authors\": \"Jerger\",\n    \"year\": \"\",\n    \"url\": \"https://hps.vi4io.org/_media/research/theses/roman_jerger_modeling_and_performance_prediction_of_hdf5_data_on_objectstorage.pdf\",\n    \"context\": \"Thesis on modeling and performance prediction of HDF5\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5__u_g.html\",\n    \"title\": \"The HDF5 Library and Programming Model\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5__u_g.html\",\n    \"context\": \"The HDF Group Support documentation on HDF5 Library and Programming Model\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://www.researchgate.net/figure/Overview-of-HDF5-base-model-objects-and-exemplary-hierarchic-data-structure_fig2_329062811\",\n    \"title\": \"Overview of HDF5 base model objects\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://www.researchgate.net/figure/Overview-of-HDF5-base-model-objects-and-exemplary-hierarchic-data-structure_fig2_329062811\",\n    \"context\": \"ResearchGate figure showing HDF5 base model objects\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_par_compr.html\",\n    \"title\": \"Parallel Compression\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_par_compr.html\",\n    \"context\": \"The HDF Group Support documentation on Parallel Compression\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://www.alcf.anl.gov/sites/default/files/2022-07/HDF5-Foundation-parallel.pdf\",\n    \"title\": \"HDF5 Foundation Parallel\",\n    \"authors\": \"\",\n    \"year\": \"2022\",\n    \"url\": \"https://www.alcf.anl.gov/sites/default/files/2022-07/HDF5-Foundation-parallel.pdf\",\n    \"context\": \"ALCF Training material on HDF5 parallel\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://www.hdfgroup.org/wp-content/uploads/2021/10/HUG_compression_21a.pdf\",\n    \"title\": \"HDF5 Compression\",\n    \"authors\": \"\",\n    \"year\": \"2021\",\n    \"url\": \"https://www.hdfgroup.org/wp-content/uploads/2021/10/HUG_compression_21a.pdf\",\n    \"context\": \"The HDF Group material on HDF5 compression\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://davis.lbl.gov/Manuals/HDF5-1.8.7/Advanced/Chunking/index.html\",\n    \"title\": \"Chunking in HDF5\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://davis.lbl.gov/Manuals/HDF5-1.8.7/Advanced/Chunking/index.html\",\n    \"context\": \"LBL Documentation on HDF5 chunking\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://biorack.github.io/BASTet/HDF5_format_performance.html\",\n    \"title\": \"HDF5 Format Performance\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://biorack.github.io/BASTet/HDF5_format_performance.html\",\n    \"context\": \"BASTet Documentation on HDF5 format performance\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VFD_subfiling_200424.pdf\",\n    \"title\": \"RFC: VFD Sub-filing\",\n    \"authors\": \"\",\n    \"year\": \"2020\",\n    \"url\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VFD_subfiling_200424.pdf\",\n    \"context\": \"The HDF Group RFC on VFD subfiling\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://www.hdfgroup.org/2023/02/01/subfiling-virtual-file-driver-user-guide-is-now-available/\",\n    \"title\": \"Subfiling Virtual File Driver User Guide\",\n    \"authors\": \"\",\n    \"year\": \"2023\",\n    \"url\": \"https://www.hdfgroup.org/2023/02/01/subfiling-virtual-file-driver-user-guide-is-now-available/\",\n    \"context\": \"The HDF Group announcement on Subfiling VFD user guide\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://www.hdfgroup.org/wp-content/uploads/2022/09/HDF5-Subfiling-VFD.pdf\",\n    \"title\": \"HDF5 Subfiling VFD\",\n    \"authors\": \"\",\n    \"year\": \"2022\",\n    \"url\": \"https://www.hdfgroup.org/wp-content/uploads/2022/09/HDF5-Subfiling-VFD.pdf\",\n    \"context\": \"The HDF Group material on HDF5 Subfiling VFD\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5_e_s__u_g.html\",\n    \"title\": \"HDF5 Event Set Interface\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5_e_s__u_g.html\",\n    \"context\": \"The HDF Group Support documentation on Event Set Interface\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://hdf5-vol-async.readthedocs.io/en/latest/example.html\",\n    \"title\": \"Using Async I/O VOL\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://hdf5-vol-async.readthedocs.io/en/latest/example.html\",\n    \"context\": \"HDF5 Async VOL Documentation on using async I/O\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5_v_l__u_g.html\",\n    \"title\": \"Virtual Object Layer (VOL)\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_h5_v_l__u_g.html\",\n    \"context\": \"The HDF Group Support documentation on VOL\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VOL.pdf\",\n    \"title\": \"RFC: Virtual Object Layer\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VOL.pdf\",\n    \"context\": \"The HDF Group RFC on Virtual Object Layer\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://www.hdfgroup.org/wp-content/uploads/2022/02/VOL_tutorial_feb_2022.pdf\",\n    \"title\": \"VOL Tutorial\",\n    \"authors\": \"\",\n    \"year\": \"2022\",\n    \"url\": \"https://www.hdfgroup.org/wp-content/uploads/2022/02/VOL_tutorial_feb_2022.pdf\",\n    \"context\": \"The HDF Group VOL tutorial\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_VDS.html\",\n    \"title\": \"Introduction to the Virtual Dataset\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5-docs/advanced_topics/intro_VDS.html\",\n    \"context\": \"The HDF Group Support documentation on Virtual Dataset\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/HDF5-VDS-requirements-use-cases-2014-12-10.pdf\",\n    \"title\": \"RFC: HDF5 Virtual Dataset\",\n    \"authors\": \"\",\n    \"year\": \"2014\",\n    \"url\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/HDF5-VDS-requirements-use-cases-2014-12-10.pdf\",\n    \"context\": \"The HDF Group RFC on HDF5 Virtual Dataset requirements and use cases\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_intro_h_d_f5.html\",\n    \"title\": \"HDF5 Data Model\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/_intro_h_d_f5.html\",\n    \"context\": \"The HDF Group Support documentation on HDF5 Data Model\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://support.hdfgroup.org/documentation/hdf5/latest/improve_compressed_perf.html\",\n    \"title\": \"Improving I/O Performance with Compressed Datasets\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/documentation/hdf5/latest/improve_compressed_perf.html\",\n    \"context\": \"The HDF Group Support documentation on improving compressed dataset performance\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://ilnumerics.net/multithreading-hdf5.html\",\n    \"title\": \"HDF5 Multithreading Notes\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://ilnumerics.net/multithreading-hdf5.html\",\n    \"context\": \"ILNumerics documentation on HDF5 multithreading\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_multi_thread.pdf\",\n    \"title\": \"RFC: HDF5 Thread Safety\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_multi_thread.pdf\",\n    \"context\": \"The HDF Group RFC on HDF5 thread safety\"\n  },\n  {\n    \"type\": \"pdf\",\n    \"value\": \"https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2022/11/ATPESC-2022-Track-3-Talk-9-Breitenfeld-HDF5.pdf\",\n    \"title\": \"HDF5 Best Practices\",\n    \"authors\": \"\",\n    \"year\": \"2022\",\n    \"url\": \"https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2022/11/ATPESC-2022-Track-3-Talk-9-Breitenfeld-HDF5.pdf\",\n    \"context\": \"Argonne National Laboratory ATPESC training material on HDF5 best practices\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://openpmd-api.readthedocs.io/en/0.16.1/details/backendconfig.html\",\n    \"title\": \"HDF5 Backend Configuration\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://openpmd-api.readthedocs.io/en/0.16.1/details/backendconfig.html\",\n    \"context\": \"openPMD Documentation on HDF5 backend configuration\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://hdf5-vol-async.readthedocs.io/\",\n    \"title\": \"HDF5 Async VOL Documentation\",\n    \"authors\": \"\",\n    \"year\": \"\",\n    \"url\": \"https://hdf5-vol-async.readthedocs.io/\",\n    \"context\": \"HDF5 Async VOL Documentation main page\"\n  },\n  {\n    \"type\": \"website\",\n    \"value\": \"https://www.osti.gov/biblio/2228867\",\n    \"title\": \"Efficient Asynchronous I/O with Request Merging\",\n    \"authors\": \"Chowdhury et al.\",\n    \"year\": \"2023\",\n    \"url\": \"https://www.osti.gov/biblio/2228867\",\n    \"context\": \"OSTI bibliography entry for async I/O paper\"\n  }\n]\n```",
+  "model": "claude-code",
+  "agent_type": "claude-agent-sdk",
+  "tokens_used": {},
+  "metadata": {
+    "backend": "claude-agent-sdk"
+  }
+}

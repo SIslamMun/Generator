@@ -1,0 +1,50 @@
+Help us improve by taking our short survey: <https://www.hdfgroup.org/website-survey/>
+![Logo](https://support.hdfgroup.org/documentation/hdf5/latest/HDFG-logo.png) |  HDF5 Last Updated on 2026-01-10 The HDF5 Field Guide  
+---|---  
+  * [Main Page](https://support.hdfgroup.org/documentation/hdf5/latest/index.html)
+  * [Getting started](https://support.hdfgroup.org/documentation/hdf5/latest/_getting_started.html)
+  * [User Guide](https://support.hdfgroup.org/documentation/hdf5/latest/_u_g.html)
+  * [Reference Manual](https://support.hdfgroup.org/documentation/hdf5/latest/_r_m.html)
+  * [Cookbook](https://support.hdfgroup.org/documentation/hdf5/latest/_cookbook.html)
+  * [Technical Notes](https://support.hdfgroup.org/documentation/hdf5/latest/_t_n.html)
+  * [RFCs](https://support.hdfgroup.org/documentation/hdf5/latest/_r_f_c.html)
+  * [Specifications](https://support.hdfgroup.org/documentation/hdf5/latest/_s_p_e_c.html)
+  * [Glossary](https://support.hdfgroup.org/documentation/hdf5/latest/_g_l_s.html)
+  * [Full-Text Search](https://support.hdfgroup.org/documentation/hdf5/latest/_f_t_s.html)
+  * [About](https://support.hdfgroup.org/documentation/hdf5/latest/_about.html)
+  * [![](https://support.hdfgroup.org/documentation/hdf5/latest/search/close.svg)](javascript:searchBox.CloseResultsWindow\(\))
+
+
+[•All](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))
+Loading...
+Searching...
+No Matches
+Additional Resources
+Navigate back: [Main](https://support.hdfgroup.org/documentation/hdf5/latest/index.html) / [HDF5 User Guide](https://support.hdfgroup.org/documentation/hdf5/latest/_u_g.html)
+* * *
+#  Additional Resources
+These documents provide additional information for the use and tuning of specific HDF5 features. 
+Table of Additional resources Document |  Comments  
+---|---  
+[HDF5 Examples](https://support.hdfgroup.org/documentation/hdf5/latest/_h_d_f5_examples.html) |  Code examples by API.   
+[Chunking in HDF5](https://support.hdfgroup.org/documentation/hdf5/latest/hdf5_chunking.html) |  Structuring the use of chunking and tuning it for performance.  
+[HDF5 High Level Optimizations](https://support.hdfgroup.org/documentation/hdf5/latest/_h5_d_o__u_g.html) |  Describes another way that chunks can be written to datasets.  
+[Copying Committed Datatypes with H5Ocopy](https://support.hdfgroup.org/documentation/hdf5/latest/copying_committed.html) |  Describes how to copy to another file a dataset that uses a committed datatype or an object with an attribute that uses a committed datatype so that the committed datatype in the destination file can be used by multiple objects.  
+[Metadata Caching in HDF5](https://support.hdfgroup.org/documentation/hdf5/latest/_t_n_m_d_c.html) |  Managing the HDF5 metadata cache and tuning it for performance.  
+[HDF5 Dynamically Loaded Filters](https://support.hdfgroup.org/releases/hdf5/documentation/rfc/HDF5DynamicallyLoadedFilters.pdf) |  Describes how an HDF5 application can apply a filter that is not registered with the HDF5 Library.  
+[HDF5 File Image](https://support.hdfgroup.org/documentation/hdf5/latest/_h5_f_i_m__u_g.html) |  Describes how to work with HDF5 files in memory. Disk I/O is not required when file images are opened, created, read from, or written to.  
+[Modified Region Writes](https://support.hdfgroup.org/documentation/hdf5/latest/mod_region_writes.html) |  Describes how to set write operations for in-memory files so that only modified regions are written to storage. Available when the Core (Memory) VFD is used.  
+[Using Identifiers](https://support.hdfgroup.org/documentation/hdf5/latest/_using_identifiers.html) |  Describes how identifiers behave and how they should be treated.  
+[Using UTF-8 Encoding in HDF5 Applications](https://support.hdfgroup.org/documentation/hdf5/latest/_u_n_i_c_o_d_e.html) |  Describes the use of UTF-8 Unicode character encodings in HDF5 applications.  
+[Freeing Memory Allocated by the HDF5 Library](https://support.hdfgroup.org/documentation/hdf5/latest/freeing_memory.html) |  Describes how inconsistent memory management can cause heap corruption or resource leaks and possible solutions.  
+[Glossary](https://support.hdfgroup.org/documentation/hdf5/latest/_g_l_s.html) |  A glossary of terms. 
+
+Don't like what you see? - You can help to improve this User Guide
+    Complete the survey linked near the top of this page!  
+We treat documentation like code: Fork the [HDF5 repo](https://github.com/HDFGroup/hdf5), make changes, and create a [pull request](https://github.com/HDFGroup/hdf5/pulls) !  
+  
+* * *
+Navigate back: [Main](https://support.hdfgroup.org/documentation/hdf5/latest/index.html) / [HDF5 User Guide](https://support.hdfgroup.org/documentation/hdf5/latest/_u_g.html)
+  * Generated by [![doxygen](https://support.hdfgroup.org/documentation/hdf5/latest/doxygen.svg)](https://www.doxygen.org/index.html) 1.13.2 
+
+

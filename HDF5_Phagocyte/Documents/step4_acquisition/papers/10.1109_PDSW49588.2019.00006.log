@@ -1,0 +1,52 @@
+==================================================
+Paper Retrieval Log
+==================================================
+DOI: 10.1109/PDSW49588.2019.00006
+Title: N/A
+Started: 2026-01-01 15:07:25
+
+
+[UNPAYWALL] Starting...
+  Checking OA status for 10.1109/pdsw49588.2019.00006
+  Result: not found - no OA version found
+
+[ARXIV] Starting...
+  Searching arXiv by title: Enabling Transparent Asynchronous I/O using Backgr...
+  Result: not found - not found on arXiv
+
+[PMC] Starting...
+  Looking up PMC ID for 10.1109/pdsw49588.2019.00006
+  Result: not found - no PMC ID for this DOI
+
+[BIORXIV] Starting...
+  Result: not found - not a bioRxiv DOI
+
+[SEMANTIC_SCHOLAR] Starting...
+  Looking up paper by DOI: 10.1109/pdsw49588.2019.00006
+  Searching by title: Enabling Transparent Asynchronous I/O using Backgr...
+  PDF URL: https://doi.org/10.1109/tpds.2021.3090322
+  Result: not found - PDF download failed
+
+[ACL_ANTHOLOGY] Starting...
+  Result: not found - not an ACL DOI
+
+[OPENALEX] Starting...
+  Looking up work by DOI: 10.1109/pdsw49588.2019.00006
+  Result: not found - no OA URL
+
+[FRONTIERS] Starting...
+  Result: not found - not a Frontiers DOI
+
+[INSTITUTIONAL] Starting...
+  Accessing via EZProxy: 10.1109/pdsw49588.2019.00006
+  Result: not found - institutional download failed
+
+[SCIHUB] Starting...
+  Trying Sci-Hub mirrors...
+  Trying by title: Enabling Transparent Asynchronous I/O us...
+  Trying by DOI: 10.1109/pdsw49588.2019.00006
+  Result: SUCCESS - downloaded
+
+==================================================
+Completed: SUCCESS via scihub
+File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2019_Enabling_Transparent_Asynchronous_IO_using_Backgro.pdf

@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Transparent Asynchronous Parallel I/O Using Background Threads",
+    "doi": "10.1109/TPDS.2021.3090322",
+    "pdf_url": null,
+    "arxiv_id": null
+  },
+  {
+    "title": "Tuning HDF5 subfiling performance on parallel file systems",
+    "doi": null,
+    "pdf_url": "https://cug.org/proceedings/cug2017_proceedings/includes/files/pap106s2-file1.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "Efficient Asynchronous I/O with Request Merging",
+    "doi": "10.1109/IPDPSW59300.2023.00107",
+    "pdf_url": null,
+    "arxiv_id": null
+  },
+  {
+    "title": "HDF5 Advanced Topics",
+    "doi": null,
+    "pdf_url": "https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2023/08/ATPESC-2023-Track-7-Talk-9-Breitenfeld-HDF5.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "Modeling and Performance Prediction of HDF5 Data",
+    "doi": null,
+    "pdf_url": "https://hps.vi4io.org/_media/research/theses/roman_jerger_modeling_and_performance_prediction_of_hdf5_data_on_objectstorage.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "HDF5 Foundation Parallel",
+    "doi": null,
+    "pdf_url": "https://www.alcf.anl.gov/sites/default/files/2022-07/HDF5-Foundation-parallel.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "HDF5 Compression",
+    "doi": null,
+    "pdf_url": "https://www.hdfgroup.org/wp-content/uploads/2021/10/HUG_compression_21a.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "RFC: VFD Sub-filing",
+    "doi": null,
+    "pdf_url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VFD_subfiling_200424.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "HDF5 Subfiling VFD",
+    "doi": null,
+    "pdf_url": "https://www.hdfgroup.org/wp-content/uploads/2022/09/HDF5-Subfiling-VFD.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "RFC: Virtual Object Layer",
+    "doi": null,
+    "pdf_url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_VOL.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "VOL Tutorial",
+    "doi": null,
+    "pdf_url": "https://www.hdfgroup.org/wp-content/uploads/2022/02/VOL_tutorial_feb_2022.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "RFC: HDF5 Virtual Dataset",
+    "doi": null,
+    "pdf_url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/HDF5-VDS-requirements-use-cases-2014-12-10.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "RFC: HDF5 Thread Safety",
+    "doi": null,
+    "pdf_url": "https://support.hdfgroup.org/releases/hdf5/documentation/rfc/RFC_multi_thread.pdf",
+    "arxiv_id": null
+  },
+  {
+    "title": "HDF5 Best Practices",
+    "doi": null,
+    "pdf_url": "https://extremecomputingtraining.anl.gov/wp-content/uploads/sites/96/2022/11/ATPESC-2022-Track-3-Talk-9-Breitenfeld-HDF5.pdf",
+    "arxiv_id": null
+  }
+]
