@@ -1,0 +1,51 @@
+==================================================
+Paper Retrieval Log
+==================================================
+DOI: 10.1109/TPDS.2021.3090322
+Title: N/A
+Started: 2026-01-01 15:07:13
+
+
+[UNPAYWALL] Starting...
+  Checking OA status for 10.1109/tpds.2021.3090322
+  Result: not found - no OA version found
+
+[ARXIV] Starting...
+  Searching arXiv by title: Transparent Asynchronous Parallel I/O Using Backgr...
+  Result: not found - not found on arXiv
+
+[PMC] Starting...
+  Looking up PMC ID for 10.1109/tpds.2021.3090322
+  Result: not found - no PMC ID for this DOI
+
+[BIORXIV] Starting...
+  Result: not found - not a bioRxiv DOI
+
+[SEMANTIC_SCHOLAR] Starting...
+  Looking up paper by DOI: 10.1109/tpds.2021.3090322
+  PDF URL: https://doi.org/10.1109/tpds.2021.3090322
+  Result: not found - PDF download failed
+
+[ACL_ANTHOLOGY] Starting...
+  Result: not found - not an ACL DOI
+
+[OPENALEX] Starting...
+  Looking up work by DOI: 10.1109/tpds.2021.3090322
+  Result: not found - no OA URL
+
+[FRONTIERS] Starting...
+  Result: not found - not a Frontiers DOI
+
+[INSTITUTIONAL] Starting...
+  Accessing via EZProxy: 10.1109/tpds.2021.3090322
+  Result: not found - institutional download failed
+
+[SCIHUB] Starting...
+  Trying Sci-Hub mirrors...
+  Trying by title: Transparent Asynchronous Parallel I/O Us...
+  Trying by DOI: 10.1109/tpds.2021.3090322
+  Result: SUCCESS - downloaded
+
+==================================================
+Completed: SUCCESS via scihub
+File: ../pipeline_output/phase2_parser/step4_acquisition/papers/Tang_2022_Transparent_Asynchronous_Parallel_IO_Using_Backgro.pdf

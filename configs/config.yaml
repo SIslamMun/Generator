@@ -95,8 +95,8 @@ generation:
   batch_size: 50              # Number of chunks to process in one batch
                               # Larger batches = faster but more memory usage
   
-  max_retries: 3              # Number of retry attempts on LLM errors
-  retry_delay: 1.0            # Seconds to wait between retries
+  max_retries: 5              # Number of retry attempts on LLM errors
+  retry_delay: 5.0            # Seconds to wait between retries (increased for slow models)
 
 # ============================================================================
 # FILTERING SETTINGS (Pre-filtering before curation)

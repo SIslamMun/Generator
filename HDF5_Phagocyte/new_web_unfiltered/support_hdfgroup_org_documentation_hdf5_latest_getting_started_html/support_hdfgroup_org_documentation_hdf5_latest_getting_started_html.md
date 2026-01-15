@@ -1,0 +1,65 @@
+Help us improve by taking our short survey: <https://www.hdfgroup.org/website-survey/>
+![Logo](https://support.hdfgroup.org/documentation/hdf5/latest/HDFG-logo.png) |  HDF5 Last Updated on 2026-01-10 The HDF5 Field Guide  
+---|---  
+  * [Main Page](https://support.hdfgroup.org/documentation/hdf5/latest/index.html)
+  * [Getting started](https://support.hdfgroup.org/documentation/hdf5/latest/_getting_started.html)
+  * [User Guide](https://support.hdfgroup.org/documentation/hdf5/latest/_u_g.html)
+  * [Reference Manual](https://support.hdfgroup.org/documentation/hdf5/latest/_r_m.html)
+  * [Cookbook](https://support.hdfgroup.org/documentation/hdf5/latest/_cookbook.html)
+  * [Technical Notes](https://support.hdfgroup.org/documentation/hdf5/latest/_t_n.html)
+  * [RFCs](https://support.hdfgroup.org/documentation/hdf5/latest/_r_f_c.html)
+  * [Specifications](https://support.hdfgroup.org/documentation/hdf5/latest/_s_p_e_c.html)
+  * [Glossary](https://support.hdfgroup.org/documentation/hdf5/latest/_g_l_s.html)
+  * [Full-Text Search](https://support.hdfgroup.org/documentation/hdf5/latest/_f_t_s.html)
+  * [About](https://support.hdfgroup.org/documentation/hdf5/latest/_about.html)
+  * [![](https://support.hdfgroup.org/documentation/hdf5/latest/search/close.svg)](javascript:searchBox.CloseResultsWindow\(\))
+
+
+### Table of contents
+  * [ Learning HDF5](https://support.hdfgroup.org/documentation/hdf5/latest/_getting_started.html#title0 "H1")
+  * [ The HDF Group Resources](https://support.hdfgroup.org/documentation/hdf5/latest/_getting_started.html#title1 "H2")
+  * [ The HDF Group Tutorials & Examples](https://support.hdfgroup.org/documentation/hdf5/latest/_getting_started.html#title2 "H2")
+
+
+[•All](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))[](javascript:void\(0\))
+Loading...
+Searching...
+No Matches
+Getting Started with HDF5
+Navigate back: [Main](https://support.hdfgroup.org/documentation/hdf5/latest/index.html)
+* * *
+#  Learning HDF5
+There are several resources for learning about HDF5. The HDF Group provides an on-line HDF5 tutorial, documentation, examples, and videos. There are also tutorials provided by other organizations that are very useful for learning about HDF5.
+##  The HDF Group Resources
+For a quick introduction to HDF5 see the following: 
+[Introduction to HDF5](https://support.hdfgroup.org/documentation/hdf5/latest/_intro_h_d_f5.html) | A very brief introduction to HDF5 and the HDF5 programming model and APIs   
+---|---  
+[Learning HDF5 with HDFView](https://support.hdfgroup.org/documentation/hdf5/latest/_learn_h_d_f_view.html) | A tutorial for learning how to use HDFView. NO programming involved!   
+[Learning the Basics](https://support.hdfgroup.org/documentation/hdf5/latest/_learn_basics.html) | Step by step instructions for learning HDF5 that include programming examples   
+##  The HDF Group Tutorials & Examples
+These tutorials and examples are available for learning about the HDF5 High Level APIs, tools, Parallel HDF5, and the VDS and SWMR features: 
+[Using the High Level API](https://support.hdfgroup.org/documentation/hdf5/latest/md_doxygen_2examples_2menus_2high__level__menu.html) | The high-level HDF5 library includes several sets of convenience and standard-use APIs to facilitate common HDF5 operations.   
+---|---  
+[A Brief Introduction to Parallel HDF5](https://support.hdfgroup.org/documentation/hdf5/latest/_intro_par_h_d_f5.html) | A brief introduction to Parallel HDF5. If you are new to HDF5 please see the [Learning the Basics](https://support.hdfgroup.org/documentation/hdf5/latest/_learn_basics.html) topic first.   
+[Tools for Viewing and Editing HDF5 Files](https://support.hdfgroup.org/documentation/hdf5/latest/_view_tools.html) | 
+  * [Learning HDF5 with HDFView](https://support.hdfgroup.org/documentation/hdf5/latest/_learn_h_d_f_view.html)
+  * [Command-line Tools](https://support.hdfgroup.org/documentation/hdf5/latest/_view_tools_command.html)
+  * [Use Case: Examining a JPSS NPP File With HDF5 Tools](https://support.hdfgroup.org/documentation/hdf5/latest/_view_tools_j_p_s_s.html)
+
+  
+New Features since HDF5-1.10  | 
+  * [Introduction to the Virtual Dataset - VDS](https://support.hdfgroup.org/documentation/hdf5/latest/_v_d_s_t_n.html)
+  * [Introduction to Single-Writer/Multiple-Reader (SWMR)](https://support.hdfgroup.org/documentation/hdf5/latest/_s_w_m_r_t_n.html)
+
+  
+Example Programs  |  [HDF5 Examples](https://support.hdfgroup.org/documentation/hdf5/latest/_h_d_f5_examples.html)  
+Videos  | 
+  * [Introduction to HDF5](https://www.youtube.com/watch?v=BAjsCldRMMc)
+  * [Parallel HDF5](https://www.youtube.com/watch?v=qrI27pI0P1E)
+
+  
+* * *
+Navigate back: [Main](https://support.hdfgroup.org/documentation/hdf5/latest/index.html)
+  * Generated by [![doxygen](https://support.hdfgroup.org/documentation/hdf5/latest/doxygen.svg)](https://www.doxygen.org/index.html) 1.13.2 
+
+
