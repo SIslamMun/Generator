@@ -9,7 +9,7 @@ prompt: |
   Rules:
   1. Questions must be about the code's functionality, design, and implementation
   2. Answers must be directly supported by the code
-  3. Create {n_pairs} diverse question-answer pairs
+  3. Create {n_pairs_min}-{n_pairs_max} diverse question-answer pairs (generate as many as warranted by code complexity, up to the max)
   4. IMPORTANT: Work with whatever code is provided, even if incomplete
 
   **CRITICAL REQUIREMENTS:**

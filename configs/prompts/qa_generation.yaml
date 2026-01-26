@@ -2,7 +2,7 @@
 # Paper: Self-Alignment with Instruction Backtranslation (Meta AI, 2024)
 
 prompt: |
-  Create {n_pairs} QA pairs from this text. Format: JSON array only.
+  Create {n_pairs_min}-{n_pairs_max} high-quality QA pairs from this text (generate as many as warranted by content richness, up to the max). Format: JSON array only.
 
   FOCUS: Technical concepts, how systems work, design choices, trade-offs, error handling.
   AVOID: Authors, URLs, build instructions, metadata, vague questions.

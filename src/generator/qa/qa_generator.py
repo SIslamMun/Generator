@@ -77,9 +77,10 @@ def generate_qa_from_lancedb(
         console.print(f"[cyan]→ Target: {target_pairs} pairs → {n_pairs_per_chunk} per chunk[/cyan]")
     elif not n_pairs_per_chunk:
         n_pairs_per_chunk = 3  # Default
-        console.print(f"[cyan]→ Using default: {n_pairs_per_chunk} pairs per chunk[/cyan]")
+        console.print(f"[cyan]→ Using default: {n_pairs_per_chunk} pairs per chunk (with wiggle room)[/cyan]")
     else:
-        console.print(f"[cyan]→ Fixed: {n_pairs_per_chunk} pairs per chunk[/cyan]")
+        n_pairs_max = min(n_pairs_per_chunk * 2, 10)
+        console.print(f"[cyan]→ Wiggle room: {n_pairs_per_chunk}-{n_pairs_max} pairs per chunk (adaptive)[/cyan]")
 
     console.print()
 
@@ -207,8 +208,10 @@ def _generate_pairs_for_chunk(
     backoff_base: int = 60,
 ) -> List[Dict]:
     """Generate QA pairs for a single chunk with retry logic."""
-    # Fill in prompt template
-    prompt = prompt_template.format(text=content, n_pairs=n_pairs)
+    # Fill in prompt template with wiggle room (n_pairs to 2*n_pairs)
+    n_pairs_min = n_pairs
+    n_pairs_max = min(n_pairs * 2, 10)  # Cap at 10 max
+    prompt = prompt_template.format(text=content, n_pairs_min=n_pairs_min, n_pairs_max=n_pairs_max)
 
     # Generate response with exponential backoff retry
     last_error: Exception = ValueError("Max retries exhausted")
