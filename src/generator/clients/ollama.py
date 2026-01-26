@@ -2,14 +2,13 @@
 
 import httpx
 from typing import Optional, Dict, Any
-from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .base import BaseLLMClient
 
 
 class OllamaClient(BaseLLMClient):
     """Ollama local LLM client."""
-
+    
     def __init__(self, config: Dict[str, Any]):
         """
         Initialize Ollama client.
@@ -24,9 +23,9 @@ class OllamaClient(BaseLLMClient):
         super().__init__(config)
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = config.get("model", "qwen2.5:72b-instruct")
-        self.client = httpx.Client(timeout=300.0)  # 5 minutes for CPU inference
+        # 180s timeout for safety
+        self.timeout = httpx.Timeout(180.0)
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
     def generate(
         self, prompt: str, temperature: Optional[float] = None, max_tokens: Optional[int] = None
     ) -> str:
@@ -48,18 +47,12 @@ class OllamaClient(BaseLLMClient):
             "prompt": prompt,
             "temperature": temperature or self.temperature,
             "stream": False,
-            "options": {
-                "num_predict": max_tokens or self.max_tokens,
-            },
         }
 
-        response = self.client.post(url, json=payload)
-        response.raise_for_status()
-        result = response.json()
+        # Create new client per request (thread-safe for parallel processing)
+        with httpx.Client(timeout=self.timeout) as client:
+            response = client.post(url, json=payload)
+            response.raise_for_status()
+            result = response.json()
 
         return result["response"]  # type: ignore[no-any-return]
-
-    def __del__(self):
-        """Cleanup HTTP client."""
-        if hasattr(self, "client"):
-            self.client.close()

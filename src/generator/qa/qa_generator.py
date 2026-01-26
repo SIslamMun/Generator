@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import lancedb  # type: ignore[import-untyped]
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
@@ -31,6 +32,8 @@ def generate_qa_from_lancedb(
     target_pairs: Optional[int] = None,
     batch_size: int = 50,
     max_chunks: Optional[int] = None,
+    chunk_ids: Optional[List[str]] = None,
+    workers: int = 1,
 ) -> List[Dict]:
     """
     Generate QA pairs from LanceDB chunks.
@@ -45,6 +48,8 @@ def generate_qa_from_lancedb(
         target_pairs: Total pairs target (calculates per-chunk if specified)
         batch_size: Number of chunks to process in one batch
         max_chunks: Optional limit on chunks to process (for testing)
+        chunk_ids: Optional list of specific chunk IDs to process
+        workers: Number of parallel workers (1=sequential, 4=recommended for Ollama)
 
     Returns:
         List of generated QA pairs with metadata
@@ -55,9 +60,14 @@ def generate_qa_from_lancedb(
     db = lancedb.connect(db_path)
     table = db.open_table(table_name)
 
-    total_chunks = table.count_rows()
-    if max_chunks:
-        total_chunks = min(total_chunks, max_chunks)
+    # Filter by chunk IDs if provided
+    if chunk_ids:
+        total_chunks = len(chunk_ids)
+        console.print(f"[cyan]→ Filtering to {total_chunks} specific chunks[/cyan]")
+    elif max_chunks:
+        total_chunks = min(table.count_rows(), max_chunks)
+    else:
+        total_chunks = table.count_rows()
 
     console.print(f"[green]✓ Found {total_chunks} chunks in '{table_name}'[/green]")
 
@@ -74,6 +84,9 @@ def generate_qa_from_lancedb(
     console.print()
 
     # Initialize LLM client
+    # Start timing
+    start_time = time.time()
+    
     console.print(f"[bold cyan]🤖 Initializing LLM: {llm_config['provider']}[/bold cyan]")
     
     # Store config values before popping
@@ -122,94 +135,63 @@ def generate_qa_from_lancedb(
         except Exception as e:
             console.print(f"[yellow]⚠ Could not load intermediate file: {e}[/yellow]")
 
-    # Process chunks in batches
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        console=console,
-    ) as progress:
-        task = progress.add_task("[cyan]Generating QA pairs...", total=total_chunks)
-        processed = 0
-
-        # Read chunks in batches
-        offset = 0
-        while offset < total_chunks:
-            # Get batch of chunks
-            limit = min(batch_size, total_chunks - offset)
-            df = table.to_pandas()[offset : offset + limit]
-
-            for idx, row in df.iterrows():
-                chunk_id = row.get("id", f"chunk_{offset + idx}")
-                content = row.get("content", "")
-                source_file = row.get("source_file", "unknown")
-
-                # Skip already processed chunks (resume support)
-                if chunk_id in processed_chunk_ids:
-                    progress.advance(task)
-                    processed += 1
-                    continue
-
-                # Skip filtered source files (logs, login pages, metadata)
-                if any(pattern in source_file for pattern in skip_patterns):
-                    progress.advance(task)
-                    continue
-
-                # Skip repository metadata chunks (README, GitHub repo pages, etc.)
-                metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
-                                   'license', 'contributing', 'changelog', 'authors']
-                content_preview = content[:300].lower()
-                if any(pattern in source_file.lower() or pattern in content_preview
-                       for pattern in metadata_patterns):
-                    # Additional check: if it mentions "repository", "clone", "branch", "commit"
-                    repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
-                    if any(kw in content_preview for kw in repo_keywords):
-                        progress.advance(task)
-                        continue
-
-                # Skip very short chunks (headers, citations, etc.)
-                if not content or len(content.strip()) < min_length:
-                    progress.advance(task)
-                    continue
-
-                # Generate QA pairs for this chunk with retry logic
-                try:
-                    pairs = _generate_pairs_for_chunk(
-                        content=content,
-                        chunk_id=chunk_id,
-                        source_file=source_file,
-                        llm=llm,
-                        prompt_template=qa_prompt_template,
-                        n_pairs=n_pairs_per_chunk,
-                        max_retries=max_retries,
-                        backoff_base=backoff_base,
-                    )
-
-                    all_qa_pairs.extend(pairs)
-
-                    # Rate limiting: configurable delay between requests
-                    time.sleep(delay)
-
-                    # Save intermediate results periodically
-                    if len(all_qa_pairs) % save_freq == 0:
-                        _save_intermediate(all_qa_pairs, output_file)
-
-                except Exception as e:
-                    console.print(f"[yellow]⚠ Error on chunk {chunk_id}: {e}[/yellow]")
-
-                processed += 1
-                remaining = total_chunks - processed
-                progress.update(task, description=f"[cyan]Generating QA pairs... ({len(all_qa_pairs)} generated, {remaining} chunks left)")
-                progress.advance(task)
-
-            offset += limit
+    # Process chunks - choose sequential or parallel based on workers parameter
+    if workers == 1:
+        # Sequential processing (original behavior)
+        all_qa_pairs = _process_chunks_sequential(
+            table=table,
+            total_chunks=total_chunks,
+            chunk_ids=chunk_ids,
+            batch_size=batch_size,
+            processed_chunk_ids=processed_chunk_ids,
+            skip_patterns=skip_patterns,
+            min_length=min_length,
+            llm=llm,
+            qa_prompt_template=qa_prompt_template,
+            n_pairs_per_chunk=n_pairs_per_chunk,
+            max_retries=max_retries,
+            backoff_base=backoff_base,
+            delay=delay,
+            save_freq=save_freq,
+            output_file=output_file,
+            all_qa_pairs=all_qa_pairs,
+        )
+    else:
+        # Parallel processing
+        console.print(f"[yellow]⚡ Using parallel processing with {workers} workers[/yellow]")
+        all_qa_pairs = _process_chunks_parallel(
+            table=table,
+            total_chunks=total_chunks,
+            chunk_ids=chunk_ids,
+            processed_chunk_ids=processed_chunk_ids,
+            skip_patterns=skip_patterns,
+            min_length=min_length,
+            llm=llm,
+            qa_prompt_template=qa_prompt_template,
+            n_pairs_per_chunk=n_pairs_per_chunk,
+            max_retries=max_retries,
+            backoff_base=backoff_base,
+            save_freq=save_freq,
+            output_file=output_file,
+            all_qa_pairs=all_qa_pairs,
+            workers=workers,
+        )
 
     # Final save
     _save_results(all_qa_pairs, output_file)
 
+    # Calculate total time
+    end_time = time.time()
+    total_seconds = int(end_time - start_time)
+    hours = total_seconds // 3600
+    minutes = (total_seconds % 3600) // 60
+    seconds = total_seconds % 60
+    
+    time_str = f"{hours}h {minutes}m {seconds}s" if hours > 0 else f"{minutes}m {seconds}s"
+
     console.print(f"\n[bold green]✓ Generated {len(all_qa_pairs)} QA pairs[/bold green]")
-    console.print(f"[bold green]✓ Saved to: {output_file}[/bold green]\n")
+    console.print(f"[bold green]✓ Saved to: {output_file}[/bold green]")
+    console.print(f"[bold cyan]⏱️  Total time: {time_str}[/bold cyan]\n")
 
     return all_qa_pairs
 
@@ -277,22 +259,18 @@ def _generate_pairs_for_chunk(
             json_str = response.split("```json")[1].split("```")[0].strip()
             if not json_str:
                 raise ValueError(f"Empty JSON in markdown code block for chunk {chunk_id}")
-            # Escape backticks in extracted JSON to prevent parsing errors
-            json_str = json_str.replace('`', '\\`')
             try:
                 pairs = json5.loads(json_str)
             except Exception as e2:
-                raise ValueError(f"Failed to parse JSON from markdown: {e2}\nJSON: {json_str[:200]}")
+                raise ValueError(f"Failed to parse JSON from markdown: {e2}\nJSON: {json_str[:300]}")
         elif "```" in response:
             json_str = response.split("```")[1].split("```")[0].strip()
             if not json_str:
                 raise ValueError(f"Empty JSON in code block for chunk {chunk_id}")
-            # Escape backticks in extracted JSON
-            json_str = json_str.replace('`', '\\`')
             try:
                 pairs = json5.loads(json_str)
             except Exception as e2:
-                raise ValueError(f"Failed to parse JSON from code block: {e2}\nJSON: {json_str[:200]}")
+                raise ValueError(f"Failed to parse JSON from code block: {e2}\nJSON: {json_str[:300]}")
         else:
             # Try to extract JSON array from response with extra text
             # Find first [ and last ]
@@ -300,8 +278,6 @@ def _generate_pairs_for_chunk(
             end_idx = response.rfind(']')
             if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                 json_str = response[start_idx:end_idx+1]
-                # Escape backticks in extracted JSON
-                json_str = json_str.replace('`', '\\`')
                 try:
                     pairs = json5.loads(json_str)
                 except Exception as e2:
@@ -312,20 +288,34 @@ def _generate_pairs_for_chunk(
                     except Exception as e3:
                         raise ValueError(f"Failed to parse JSON response: {e}\nExtraction failed: {e2}\nStandard JSON failed: {e3}\nExtracted JSON: {json_str[:300]}")
             else:
-                raise ValueError(f"Failed to parse JSON response: {e}\nNo JSON array found in response: {response[:200]}")
+                raise ValueError(f"Failed to parse JSON response: {e}\nNo JSON array found in response: {response[:300]}")
+
+    # Ensure pairs is a list (sometimes LLM returns a single dict)
+    if isinstance(pairs, dict):
+        pairs = [pairs]
+    elif not isinstance(pairs, list):
+        raise ValueError(f"Invalid response format: expected list or dict, got {type(pairs).__name__}")
+    
+    # Flatten if nested list (some LLMs return [[{...}]] instead of [{...}])
+    if pairs and isinstance(pairs[0], list):
+        pairs = pairs[0]
+    
+    # Validate we got some pairs
+    if not pairs or len(pairs) == 0:
+        raise ValueError(f"No QA pairs generated for chunk {chunk_id}")
 
     # Add metadata to each pair
     for pair in pairs:
+        if not isinstance(pair, dict):
+            raise ValueError(f"Invalid pair format: expected dict, got {type(pair).__name__}. Pairs: {pairs[:2]}")
         pair["chunk_id"] = chunk_id
         pair["source_file"] = source_file
         pair["generated_at"] = datetime.now().isoformat()
         pair["model"] = llm.model
 
-    # Filter infrastructure-heavy pairs
-    pairs = _filter_infrastructure_pairs(pairs)
-
-    # Filter build/compilation/installation questions
-    pairs = _filter_build_questions(pairs)
+    # NOTE: Filtering disabled - let all generated pairs through
+    # pairs = _filter_infrastructure_pairs(pairs)
+    # pairs = _filter_build_questions(pairs)
 
     return pairs  # type: ignore[no-any-return]
 
@@ -452,3 +442,194 @@ def _save_results(qa_pairs: List[Dict], output_path: Path):
     summary_path = output_path.parent / f"{output_path.stem}_summary.json"
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
+
+
+def _process_chunks_sequential(
+    table, total_chunks, chunk_ids, batch_size, processed_chunk_ids,
+    skip_patterns, min_length, llm, qa_prompt_template, n_pairs_per_chunk,
+    max_retries, backoff_base, delay, save_freq, output_file, all_qa_pairs
+):
+    """Sequential processing (original behavior)."""
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("[cyan]Generating QA pairs...", total=total_chunks)
+        processed = 0
+        offset = 0
+        
+        while offset < total_chunks:
+            limit = min(batch_size, total_chunks - offset)
+            
+            if chunk_ids:
+                df = table.to_pandas()
+                df = df[df["id"].isin(chunk_ids[offset : offset + limit])]
+            else:
+                df = table.to_pandas()[offset : offset + limit]
+
+            for idx, row in df.iterrows():
+                chunk_id = row.get("id", f"chunk_{offset + idx}")
+                content = row.get("content", "")
+                source_file = row.get("source_file", "unknown")
+
+                if chunk_id in processed_chunk_ids:
+                    progress.advance(task)
+                    processed += 1
+                    continue
+
+                if any(pattern in source_file for pattern in skip_patterns):
+                    progress.advance(task)
+                    continue
+
+                metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
+                                   'license', 'contributing', 'changelog', 'authors']
+                content_preview = content[:300].lower()
+                if any(pattern in source_file.lower() or pattern in content_preview
+                       for pattern in metadata_patterns):
+                    repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
+                    if any(kw in content_preview for kw in repo_keywords):
+                        progress.advance(task)
+                        continue
+
+                if not content or len(content.strip()) < min_length:
+                    progress.advance(task)
+                    continue
+
+                try:
+                    pairs = _generate_pairs_for_chunk(
+                        content=content,
+                        chunk_id=chunk_id,
+                        source_file=source_file,
+                        llm=llm,
+                        prompt_template=qa_prompt_template,
+                        n_pairs=n_pairs_per_chunk,
+                        max_retries=max_retries,
+                        backoff_base=backoff_base,
+                    )
+                    all_qa_pairs.extend(pairs)
+                    time.sleep(delay)
+                    if len(all_qa_pairs) % save_freq == 0:
+                        _save_intermediate(all_qa_pairs, output_file)
+                except Exception as e:
+                    console.print(f"[red]✗ FAILED: {chunk_id} - {str(e)[:100]}[/red]")
+
+                processed += 1
+                remaining = total_chunks - processed
+                progress.update(task, description=f"[cyan]Generating QA pairs... ({len(all_qa_pairs)} generated, {remaining} chunks left)")
+                progress.advance(task)
+
+            offset += limit
+    
+    return all_qa_pairs
+
+
+def _process_chunks_parallel(
+    table, total_chunks, chunk_ids, processed_chunk_ids,
+    skip_patterns, min_length, llm, qa_prompt_template, n_pairs_per_chunk,
+    max_retries, backoff_base, save_freq, output_file, all_qa_pairs, workers
+):
+    """Parallel processing with ThreadPoolExecutor."""
+    # Load all chunks at once for parallel processing
+    if chunk_ids:
+        df = table.to_pandas()
+        df = df[df["id"].isin(chunk_ids)]
+    else:
+        df = table.to_pandas()
+    
+    # Filter chunks
+    chunks_to_process = []
+    for idx, row in df.iterrows():
+        chunk_id = row.get("id", f"chunk_{idx}")
+        content = row.get("content", "")
+        source_file = row.get("source_file", "unknown")
+        
+        # Apply same filters as sequential
+        if chunk_id in processed_chunk_ids:
+            continue
+        if any(pattern in source_file for pattern in skip_patterns):
+            continue
+        
+        metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
+                           'license', 'contributing', 'changelog', 'authors']
+        content_preview = content[:300].lower()
+        if any(pattern in source_file.lower() or pattern in content_preview
+               for pattern in metadata_patterns):
+            repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
+            if any(kw in content_preview for kw in repo_keywords):
+                continue
+        
+        if not content or len(content.strip()) < min_length:
+            continue
+        
+        chunks_to_process.append({
+            'content': content,
+            'chunk_id': chunk_id,
+            'source_file': source_file
+        })
+    
+    console.print(f"[cyan]Processing {len(chunks_to_process)} chunks with {workers} workers...[/cyan]")
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("[cyan]Generating QA pairs...", total=len(chunks_to_process))
+        
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = {}
+            for chunk in chunks_to_process:
+                future = executor.submit(
+                    _generate_pairs_for_chunk,
+                    content=chunk['content'],
+                    chunk_id=chunk['chunk_id'],
+                    source_file=chunk['source_file'],
+                    llm=llm,
+                    prompt_template=qa_prompt_template,
+                    n_pairs=n_pairs_per_chunk,
+                    max_retries=max_retries,
+                    backoff_base=backoff_base,
+                )
+                futures[future] = chunk['chunk_id']
+            
+            completed_chunks = 0
+            batch_count = 0
+            
+            for future in as_completed(futures):
+                chunk_id = futures[future]
+                try:
+                    pairs = future.result()
+                    all_qa_pairs.extend(pairs)
+                    completed_chunks += 1
+                    batch_count += 1
+                    
+                    # Save periodically - check if we crossed a save boundary
+                    current_count = len(all_qa_pairs)
+                    previous_count = current_count - len(pairs)
+                    if (current_count // save_freq) > (previous_count // save_freq):
+                        _save_intermediate(all_qa_pairs, output_file)
+                except Exception as e:
+                    error_msg = str(e)[:200] if len(str(e)) > 200 else str(e)
+                    console.print(f"[red]✗ FAILED: {chunk_id} - {type(e).__name__}: {error_msg}[/red]")
+                    completed_chunks += 1
+                    batch_count += 1
+                
+                # Update progress in batches of workers count (show parallel completion)
+                if batch_count >= workers:
+                    remaining_chunks = len(chunks_to_process) - completed_chunks
+                    progress.update(task, description=f"[cyan]Generating QA pairs... ({len(all_qa_pairs)} pairs | {completed_chunks}/{len(chunks_to_process)} chunks | {remaining_chunks} left)")
+                    progress.advance(task, advance=batch_count)
+                    batch_count = 0
+            
+            # Final batch update for remaining chunks
+            if batch_count > 0:
+                remaining_chunks = len(chunks_to_process) - completed_chunks
+                progress.update(task, description=f"[cyan]Generating QA pairs... ({len(all_qa_pairs)} pairs | {completed_chunks}/{len(chunks_to_process)} chunks | {remaining_chunks} left)")
+                progress.advance(task, advance=batch_count)
+    
+    return all_qa_pairs

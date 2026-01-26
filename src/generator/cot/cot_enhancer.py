@@ -13,7 +13,7 @@ import re
 import logging
 from pathlib import Path
 from typing import Dict, List
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TaskProgressColumn, TimeRemainingColumn
 
 from ..prompt_loader import load_prompts
 
@@ -43,8 +43,8 @@ def enhance_with_cot(
     """
     from ..clients import get_client
 
-    # Load prompt template
-    config_dir = Path(__file__).parent.parent.parent / "configs"
+    # Load prompt template - use correct path relative to project root
+    config_dir = Path(__file__).parent.parent.parent.parent / "configs"
     prompts = load_prompts(config_dir)
     cot_enhance_prompt = prompts.get("cot_enhancement")
     if not cot_enhance_prompt:
@@ -75,10 +75,13 @@ def enhance_with_cot(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        TaskProgressColumn(),
+        TextColumn("[cyan]{task.completed}/{task.total}[/cyan]"),
+        TextColumn("[yellow]({task.percentage:>3.0f}%)[/yellow]"),
+        TimeRemainingColumn(),
     ) as progress:
         task = progress.add_task(
-            "[cyan]Enhancing with CoT reasoning...",
+            "[cyan]Enhancing with CoT...",
             total=total_pairs,
         )
 
@@ -96,7 +99,6 @@ def enhance_with_cot(
                 progress.update(
                     task,
                     advance=len(batch),
-                    description=f"[cyan]Enhanced {len(enhanced_pairs)}/{total_pairs} pairs...",
                 )
 
             except Exception as e:

@@ -1,110 +1,17 @@
-# ============================================================================
-# QA GENERATION PROMPT (Instruction Backtranslation)
+# QA Generation Prompt - Compact version to avoid truncation
 # Paper: Self-Alignment with Instruction Backtranslation (Meta AI, 2024)
-# Treats document chunks as "answers" and generates questions
-# ============================================================================
 
 prompt: |
-  Create question-answer pairs from this text for LLM training.
+  Create {n_pairs} QA pairs from this text. Format: JSON array only.
 
-  Rules:
-  1. Questions must be about important facts in the text
-  2. Answers must be directly supported by the text
-  3. Create {n_pairs} diverse question-answer pairs
-  4. IMPORTANT: Work with whatever text is provided, even if limited
-  5. Extract facts from titles, headers, or any available content
+  FOCUS: Technical concepts, how systems work, design choices, trade-offs, error handling.
+  AVOID: Authors, URLs, build instructions, metadata, vague questions.
+  
+  Each answer: 2-3 sentences with concrete details from text.
+  Vary starters: How/What/Why/When/Which.
 
-  **CRITICAL REQUIREMENTS:**
-  - ALWAYS include specific names (tool names, system names, concepts) in questions
-  - NEVER ask vague questions like "What is the purpose of this?" - be specific
-  - Answers MUST be at least 2-3 sentences with concrete details
-  - MANDATORY: Vary question starters - use diverse patterns (see below)
-
-  **QUESTION STARTER DIVERSITY (rotate through these patterns):**
-  - "How does..." / "How can..." / "How do..."
-  - "What happens when..." / "What occurs when..."
-  - "Why does..." / "Why is..."
-  - "When should..." / "When would..."
-  - "What's the difference between..." / "What distinguishes..."
-  - "What causes..." / "What triggers..."
-  - "Which approach is better for..." / "Which method..."
-
-  **GOOD question examples (domain-agnostic - adapt to your content):**
-  - API/Functions: "What parameters does the `configure_cache()` function accept and how do they affect performance?"
-  - System Design: "How does the data layout choice affect read performance when accessing large datasets?"
-  - Trade-offs: "Why would you use chunked storage instead of contiguous storage for time-series data?"
-  - Error Handling: "What happens when memory allocation fails during compression operations?"
-  - Performance: "How does increasing the buffer size parameter impact throughput in high-latency networks?"
-  - Integration: "What steps are required to configure component X to work with component Y?"
-
-  **BAD question examples (AVOID):**
-  - "What is the purpose of this tool?" (too generic)
-  - "How does the system work?" (too vague)
-  - "What is X?" without context (too short)
-  - "What workflows are executed in the repository?" (infrastructure focus)
-
-  **DO NOT** create questions about:
-  - Paper authors, affiliations, or institutions
-  - Lab locations or addresses
-  - Grant numbers or funding sources
-  - Publication titles or references
-  - Meta-information about the document itself
-  - **STRICTLY FORBIDDEN:** Questions about programming language, license type
-  - Questions answerable with single words or numbers
-  - Repository metadata (stars, forks, topics list)
-  - File extensions or directory names alone
-
-  **INFRASTRUCTURE & CI/CD (STRICTLY FORBIDDEN):**
-  - GitHub Actions workflows or pipeline configurations
-  - CI/CD job definitions, steps, or scheduling
-  - Build system configurations (CMake scripts, Makefiles)
-  - Test framework setups or test runner configurations
-  - Development container or Docker configurations
-  - Specific version numbers in isolation (e.g., "What version is X?")
-  - Operating systems that tests run on
-  - Directory structure or file organization alone
-  - **Compilation/build questions** (e.g., "What happens when you compile X?")
-  - **Installation steps** without technical context (e.g., "How do you install X?")
-  - **Repository cloning or branching** (e.g., "What branch should you pull?")
-
-  **FOCUS ON** technical concepts, methods, architectures, features, and domain-specific knowledge
-
-  **PREFER** questions that require:
-  - Explaining HOW something works with specific component names
-  - Explaining WHY a design choice was made
-  - Describing relationships between named components
-  - Comparing/contrasting different approaches with names (e.g., "X vs Y")
-  - Explaining use cases or applications with concrete examples
-  - Understanding technical trade-offs between options
-  - Troubleshooting: "Why does X fail when..." or "What causes error Y?"
-  - Best practices: "What's the recommended way to..." or "When should I use..."
-  - Error scenarios: "What happens when X condition occurs?"
-
-  **ANSWER REQUIREMENTS:**
-  - Minimum 2-3 sentences
-  - Include specific names, values, or examples from the text
-  - Explain relationships and dependencies when relevant
-
-  **VALIDATION CHECKLIST (before returning):**
-  Before submitting your QA pairs, verify each one:
-  ✓ Does the question include specific names/components from the text?
-  ✓ Is the question about technical concepts, not infrastructure/build/installation?
-  ✓ Is the answer 2-3+ sentences with specific details?
-  ✓ Is the answer directly supported by the provided text?
-  ✓ Would this QA pair teach domain-specific technical knowledge?
-
-  Return ONLY valid JSON array format (no markdown, no explanation, no comments):
-
-  [
-    {{
-      "question": "How does the caching layer handle concurrent read requests when multiple threads access the same data block?",
-      "answer": "The caching layer uses a read-write lock mechanism to coordinate concurrent access. When multiple threads request the same data block, the first thread acquires a write lock to populate the cache, while subsequent threads wait on a read lock. Once the cache entry is populated, all waiting threads can proceed with shared read access, improving throughput for frequently accessed data without requiring redundant disk reads."
-    }},
-    {{
-      "question": "What happens when the buffer pool reaches capacity during a large sequential write operation?",
-      "answer": "When the buffer pool reaches capacity, the system triggers an asynchronous flush operation to write the oldest dirty pages to disk. The write operation will block until sufficient space is freed in the buffer pool. The flush policy prioritizes pages that have been in memory longest (LRU eviction) while ensuring data consistency by maintaining write-ahead logging for crash recovery."
-    }}
-  ]
+  Return ONLY this JSON (no markdown):
+  [{{"question":"...","answer":"..."}}]
 
   Text:
   {text}

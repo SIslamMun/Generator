@@ -147,9 +147,11 @@ def list_providers():
 @click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
 @click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
+@click.option("--chunk-ids", help="Comma-separated list of specific chunk IDs to process")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, provider, model):
+@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4=recommended for Ollama with OLLAMA_NUM_PARALLEL=4)")
+def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, chunk_ids, provider, model, workers):
     """Generate QA pairs from LanceDB chunks."""
     console.print("\n[bold]🚀 Generating QA pairs from LanceDB[/bold]\n")
 
@@ -179,8 +181,17 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
     all_qa_pairs = []
     output_path_obj = Path(output)
     
+    # Parse chunk IDs if provided
+    chunk_id_list = None
+    if chunk_ids:
+        chunk_id_list = [cid.strip() for cid in chunk_ids.split(",")]
+        console.print(f"[cyan]Filtering to {len(chunk_id_list)} specific chunks[/cyan]")
+    
     for table_name in tables:
         console.print(f"\n[bold cyan]📊 Processing table: {table_name}[/bold cyan]")
+        
+        if workers > 1:
+            console.print(f"[yellow]⚡ Parallel mode: {workers} workers[/yellow]")
         
         # Use table-specific output path for intermediate files
         # This prevents cross-table contamination when resuming
@@ -197,6 +208,8 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
             target_pairs=target_pairs // len(tables) if target_pairs else None,  # Split target across tables
             batch_size=batch_size,
             max_chunks=max_chunks,
+            chunk_ids=chunk_id_list,
+            workers=workers,  # Pass workers parameter
         )
         
         all_qa_pairs.extend(qa_pairs)
@@ -240,9 +253,9 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
     # Load prompts from individual files
     prompts = load_prompts(Path(config_path).parent)
 
-    # Extract LLM config - use curate.provider if specified, otherwise fallback to main provider
+    # Extract LLM config - CLI flag takes precedence over config file
     curate_config = cfg.get("curate", {})
-    curate_provider = curate_config.get("provider") or provider  # curate.provider > --provider flag > main llm.provider
+    curate_provider = provider or curate_config.get("provider")  # --provider flag > curate.provider > main llm.provider
     llm_config = _extract_llm_config(cfg, curate_provider, model)
     
     # Merge curate temperature into llm_config

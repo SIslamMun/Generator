@@ -14,7 +14,7 @@ llm:
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ CURRENT ACTIVE PROVIDER - Change this line to switch providers     │
   # └─────────────────────────────────────────────────────────────────────┘
-  provider: gemini            # Options: ollama, claude, gemini, vllm, openai, anthropic
+  provider: ollama            # Options: ollama, claude, gemini, vllm, openai, anthropic
   
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ 1. OLLAMA - Local LLM (RECOMMENDED for unlimited free usage) ⭐     │
@@ -23,7 +23,7 @@ llm:
   # └─────────────────────────────────────────────────────────────────────┘
   ollama:
     base_url: http://localhost:11434
-    model: mistral:latest       # Available: mistral, llama3.3, qwen2.5, etc.
+    model: llama3.2             # Available: mistral, llama3.3, qwen2.5, etc.
   
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ 2. CLAUDE - Claude API (PAID, requires API key)                     │
@@ -88,7 +88,7 @@ llm:
 # GENERATION SETTINGS
 # ============================================================================
 generation:
-  n_pairs_per_chunk: 3        # Number of QA pairs to generate per chunk
+  n_pairs_per_chunk: 10       # Number of QA pairs to generate per chunk
                               # Recommended: 3 (better quality, less noise)
                               # Higher values: More pairs but potentially lower quality
   
@@ -215,8 +215,8 @@ cot:
 # RATE LIMITING (Prevent API Quota Issues)
 # ============================================================================
 rate_limit:
-  delay_between_requests: 0.5 # Seconds between API calls (0.5 for local Ollama)
-  save_every_n_pairs: 5       # Save intermediate results every N pairs
+  delay_between_requests: 0.0 # Seconds between API calls (0 for parallel mode with Ollama)
+  save_every_n_pairs: 50      # Save intermediate results every N pairs (increased for less I/O overhead)
   max_retries: 5              # Retry attempts for rate limit errors
   backoff_base: 65            # Base seconds for exponential backoff (65, 130, 260...)
 

@@ -66,15 +66,15 @@ class MultiScore:
     
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "complexity": self.complexity,
-            "quality": self.quality,
-            "diversity": self.diversity,
-            "combined": self.combined,
-            "clarity": self.clarity,
-            "accuracy": self.accuracy,
-            "usefulness": self.usefulness,
-            "reasoning_depth": self.reasoning_depth,
-            "knowledge_breadth": self.knowledge_breadth,
+            "complexity": float(self.complexity),
+            "quality": float(self.quality),
+            "diversity": float(self.diversity),
+            "combined": float(self.combined),
+            "clarity": float(self.clarity),
+            "accuracy": float(self.accuracy),
+            "usefulness": float(self.usefulness),
+            "reasoning_depth": int(self.reasoning_depth),
+            "knowledge_breadth": int(self.knowledge_breadth),
             "reasoning": self.reasoning,
         }
 
@@ -211,20 +211,33 @@ Return ONLY valid JSON."""
         
         prompt = self.prompts["complexity_rating"].format(question=question)
         
-        try:
-            response = self.llm.generate(prompt, temperature=0.1)
-            result = self._parse_json(response)
-            
-            if result:
-                return {
-                    "complexity": float(result.get("complexity", 5)),
-                    "reasoning_depth": int(result.get("reasoning_depth", 2)),
-                    "knowledge_breadth": int(result.get("knowledge_breadth", 2)),
-                    "cognitive_type": result.get("cognitive_type", "application"),
-                    "reasoning": result.get("reasoning", ""),
-                }
-        except Exception as e:
-            logger.warning(f"Complexity scoring failed: {e}")
+        # Retry with exponential backoff for 503 errors
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = self.llm.generate(prompt, temperature=0.1)
+                result = self._parse_json(response)
+                
+                if result:
+                    return {
+                        "complexity": float(result.get("complexity", 5)),
+                        "reasoning_depth": int(result.get("reasoning_depth", 2)),
+                        "knowledge_breadth": int(result.get("knowledge_breadth", 2)),
+                        "cognitive_type": result.get("cognitive_type", "application"),
+                        "reasoning": result.get("reasoning", ""),
+                    }
+            except Exception as e:
+                error_str = str(e)
+                if ("503" in error_str or "UNAVAILABLE" in error_str or 
+                    "429" in error_str or "RESOURCE_EXHAUSTED" in error_str):
+                    if attempt < max_retries - 1:
+                        # Longer wait for 429 quota errors
+                        wait_time = (2 ** attempt) * 10 if "429" in error_str else (2 ** attempt) * 5
+                        logger.warning(f"Rate limit/overload error, retrying in {wait_time}s... (attempt {attempt + 1}/{max_retries})")
+                        time.sleep(wait_time)
+                        continue
+                logger.warning(f"Complexity scoring failed: {e}")
         
         return self._heuristic_complexity(question)
     
@@ -282,25 +295,38 @@ Return ONLY valid JSON."""
             answer=answer,
         )
         
-        try:
-            response = self.llm.generate(prompt, temperature=0.1)
-            result = self._parse_json(response)
-            
-            if result:
-                clarity = float(result.get("clarity", 5))
-                accuracy = float(result.get("accuracy", 5))
-                usefulness = float(result.get("usefulness", 5))
+        # Retry with exponential backoff for 503 errors
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                response = self.llm.generate(prompt, temperature=0.1)
+                result = self._parse_json(response)
                 
-                return {
-                    "clarity": clarity,
-                    "accuracy": accuracy,
-                    "usefulness": usefulness,
-                    "quality": (clarity + accuracy + usefulness) / 3,
-                    "issues": result.get("issues", []),
-                    "reasoning": result.get("reasoning", ""),
-                }
-        except Exception as e:
-            logger.warning(f"Quality scoring failed: {e}")
+                if result:
+                    clarity = float(result.get("clarity", 5))
+                    accuracy = float(result.get("accuracy", 5))
+                    usefulness = float(result.get("usefulness", 5))
+                    
+                    return {
+                        "clarity": clarity,
+                        "accuracy": accuracy,
+                        "usefulness": usefulness,
+                        "quality": (clarity + accuracy + usefulness) / 3,
+                        "issues": result.get("issues", []),
+                        "reasoning": result.get("reasoning", ""),
+                    }
+            except Exception as e:
+                error_str = str(e)
+                if ("503" in error_str or "UNAVAILABLE" in error_str or 
+                    "429" in error_str or "RESOURCE_EXHAUSTED" in error_str):
+                    if attempt < max_retries - 1:
+                        # Longer wait for 429 quota errors
+                        wait_time = (2 ** attempt) * 10 if "429" in error_str else (2 ** attempt) * 5
+                        logger.warning(f"Rate limit/overload error, retrying in {wait_time}s... (attempt {attempt + 1}/{max_retries})")
+                        time.sleep(wait_time)
+                        continue
+                logger.warning(f"Quality scoring failed: {e}")
         
         return self._heuristic_quality(question, answer)
     
@@ -456,15 +482,20 @@ Return ONLY valid JSON."""
         results = []
         scored_pairs = []  # For incremental diversity
         
+        from rich.progress import TaskProgressColumn, TimeRemainingColumn
+        
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             BarColumn(),
-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            TaskProgressColumn(),
+            TextColumn("[cyan]{task.completed}/{task.total}[/cyan]"),
+            TextColumn("[yellow]({task.percentage:>3.0f}%)[/yellow]"),
+            TimeRemainingColumn(),
             console=console,
         ) as progress:
             task = progress.add_task(
-                "[cyan]Multi-dimensional scoring...",
+                "[cyan]Scoring pairs...",
                 total=len(pairs),
             )
             
