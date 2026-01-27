@@ -9,8 +9,11 @@ prompt: |
   
   Each answer: 2-3 sentences with concrete details from text.
   Vary starters: How/What/Why/When/Which.
+  
+  IMPORTANT: When referencing code with quotes/backticks, use markdown code formatting in your answer text.
+  Do NOT include raw code snippets with unescaped quotes inside JSON strings.
 
-  Return ONLY this JSON (no markdown):
+  Return ONLY this JSON (no markdown blocks):
   [{{"question":"...","answer":"..."}}]
 
   Text:

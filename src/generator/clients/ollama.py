@@ -23,8 +23,8 @@ class OllamaClient(BaseLLMClient):
         super().__init__(config)
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = config.get("model", "qwen2.5:72b-instruct")
-        # 180s timeout for safety
-        self.timeout = httpx.Timeout(180.0)
+        # No timeout - let complex chunks complete
+        self.timeout = httpx.Timeout(None)
 
     def generate(
         self, prompt: str, temperature: Optional[float] = None, max_tokens: Optional[int] = None

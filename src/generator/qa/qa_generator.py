@@ -9,6 +9,7 @@ Uses Instruction Backtranslation methodology:
 
 import json
 import json5
+import re
 import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -197,6 +198,30 @@ def generate_qa_from_lancedb(
     return all_qa_pairs
 
 
+def _sanitize_chunk_for_llm(content: str) -> str:
+    """
+    Sanitize chunk content before sending to LLM to prevent JSON parsing issues.
+    
+    Replaces problematic patterns that cause JSON errors when LLM includes them
+    in responses, particularly double-quoted strings in code.
+    """
+    # Replace common problematic patterns in code:
+    # 1. Dictionary access with double quotes: config["key"] -> config['key']
+    sanitized = re.sub(r'\["([^"]+)"\]', r"['\1']", content)
+    
+    # 2. F-strings with double quotes: f"{var}" -> f'{var}'
+    sanitized = re.sub(r'f"([^"]*)"', r"f'\1'", sanitized)
+    
+    # 3. Replace exception messages with double quotes: Exception("msg") -> Exception('msg')
+    sanitized = re.sub(r'Exception\("([^"]*)"\)', r"Exception('\1')", sanitized)
+    
+    # 4. Replace other common string literals in parentheses/function calls
+    # Only do this for simple cases to avoid breaking too much
+    sanitized = re.sub(r'\(\"([^"]{1,50})\"\)', r"('\1')", sanitized)
+    
+    return sanitized
+
+
 def _generate_pairs_for_chunk(
     content: str,
     chunk_id: str,
@@ -208,10 +233,13 @@ def _generate_pairs_for_chunk(
     backoff_base: int = 60,
 ) -> List[Dict]:
     """Generate QA pairs for a single chunk with retry logic."""
+    # Sanitize chunk content to prevent JSON parsing issues
+    sanitized_content = _sanitize_chunk_for_llm(content)
+    
     # Fill in prompt template with wiggle room (n_pairs to 2*n_pairs)
     n_pairs_min = n_pairs
     n_pairs_max = min(n_pairs * 2, 10)  # Cap at 10 max
-    prompt = prompt_template.format(text=content, n_pairs_min=n_pairs_min, n_pairs_max=n_pairs_max)
+    prompt = prompt_template.format(text=sanitized_content, n_pairs_min=n_pairs_min, n_pairs_max=n_pairs_max)
 
     # Generate response with exponential backoff retry
     last_error: Exception = ValueError("Max retries exhausted")
@@ -253,9 +281,87 @@ def _generate_pairs_for_chunk(
     if not response or not response.strip():
         raise ValueError(f"Empty response from LLM for chunk {chunk_id}")
     
+    # Helper function to clean/sanitize JSON strings
+    def sanitize_json(json_str: str) -> str:
+        """Clean up common JSON formatting issues."""
+        # Remove any BOM or invisible characters
+        json_str = json_str.strip().lstrip('\ufeff')
+        
+        # Fix common issues with trailing commas before closing brackets
+        json_str = json_str.replace(',]', ']').replace(',}', '}')
+        
+        # Fix double commas
+        json_str = re.sub(r',\s*,', ',', json_str)
+        
+        # Remove any text before the first [ if it exists
+        if '[' in json_str:
+            start = json_str.find('[')
+            json_str = json_str[start:]
+        
+        # Remove any text after the last ] if it exists
+        if ']' in json_str:
+            end = json_str.rfind(']') + 1
+            json_str = json_str[:end]
+        
+        return json_str
+    
+    def try_parse_with_escaping(json_str: str) -> list:
+        """Attempt to parse JSON with various escaping strategies."""
+        # Strategy 1: Try json5 directly (most lenient)
+        try:
+            return json5.loads(json_str)
+        except:
+            pass
+        
+        # Strategy 2: Replace bracket-quoted strings ["key"] -> ['key']
+        # This handles patterns like: self.config["CM1_PATH"] or just ["key"]
+        try:
+            # First try: only after word characters (safer)
+            fixed = re.sub(r'(?<=\w)\["([^"]+)"\]', r"['\1']", json_str)
+            return json5.loads(fixed)
+        except:
+            pass
+        
+        # Strategy 3: More aggressive bracket replacement (without word boundary)
+        try:
+            fixed = re.sub(r'\["([^"]+)"\]', r"['\1']", json_str)
+            return json5.loads(fixed)
+        except:
+            pass
+        
+        # Strategy 4: Replace double quotes inside f-strings patterns
+        # Matches patterns like f'{...config["key"]...}' or f"...config["key"]..."
+        try:
+            # Find f-string patterns and convert inner double quotes to single quotes
+            fixed = re.sub(r'(f["\'])([^"\']*?)\["([^"]+)"\]([^"\']*?)(\1)', 
+                          lambda m: f"{m.group(1)}{m.group(2)}['{m.group(3)}']" + m.group(4) + m.group(5),
+                          json_str)
+            return json5.loads(fixed)
+        except:
+            pass
+        
+        # Strategy 5: Try standard json parser
+        try:
+            return json.loads(json_str)
+        except:
+            pass
+        
+        # Strategy 6: Nuclear option - replace ALL double-quoted strings in brackets
+        # This might break valid JSON but is last resort
+        try:
+            # Replace any ["..."] pattern with ['...'], even if it breaks structure
+            fixed = json_str
+            # Use a more greedy pattern
+            fixed = re.sub(r'\[\\?"([^"]+)\\?"\]', r"['\1']", fixed)
+            return json5.loads(fixed)
+        except:
+            pass
+        
+        raise ValueError("All parsing strategies failed")
+    
     # Parse JSON response (lenient with json5)
     try:
-        pairs = json5.loads(response)
+        pairs = try_parse_with_escaping(sanitize_json(response))
     except Exception as e:
         # Try to extract JSON from markdown code blocks
         if "```json" in response:
@@ -263,7 +369,7 @@ def _generate_pairs_for_chunk(
             if not json_str:
                 raise ValueError(f"Empty JSON in markdown code block for chunk {chunk_id}")
             try:
-                pairs = json5.loads(json_str)
+                pairs = try_parse_with_escaping(sanitize_json(json_str))
             except Exception as e2:
                 raise ValueError(f"Failed to parse JSON from markdown: {e2}\nJSON: {json_str[:300]}")
         elif "```" in response:
@@ -271,7 +377,7 @@ def _generate_pairs_for_chunk(
             if not json_str:
                 raise ValueError(f"Empty JSON in code block for chunk {chunk_id}")
             try:
-                pairs = json5.loads(json_str)
+                pairs = try_parse_with_escaping(sanitize_json(json_str))
             except Exception as e2:
                 raise ValueError(f"Failed to parse JSON from code block: {e2}\nJSON: {json_str[:300]}")
         else:
@@ -281,15 +387,23 @@ def _generate_pairs_for_chunk(
             end_idx = response.rfind(']')
             if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                 json_str = response[start_idx:end_idx+1]
+                json_str = sanitize_json(json_str)
                 try:
-                    pairs = json5.loads(json_str)
+                    pairs = try_parse_with_escaping(json_str)
                 except Exception as e2:
-                    # Last attempt: try standard json parser which is stricter
-                    import json
+                    # Final fallback: save debug info
                     try:
-                        pairs = json.loads(json_str)
-                    except Exception as e3:
-                        raise ValueError(f"Failed to parse JSON response: {e}\nExtraction failed: {e2}\nStandard JSON failed: {e3}\nExtracted JSON: {json_str[:300]}")
+                        # Save the problematic JSON to help debug
+                        debug_file = Path(output_path).parent / f"debug_json_{chunk_id.replace(':', '_').replace('/', '_')}.txt"
+                        with open(debug_file, 'w') as f:
+                            f.write(f"Chunk ID: {chunk_id}\n")
+                            f.write(f"Error: {e2}\n\n")
+                            f.write(f"JSON String (first 1000 chars):\n{json_str[:1000]}\n\n")
+                            f.write(f"Full response:\n{response}\n")
+                        console.print(f"[dim]→ Debug info saved to {debug_file}[/dim]")
+                    except:
+                        pass
+                    raise ValueError(f"Failed to parse JSON response: {e}\nExtraction failed: {e2}\nExtracted JSON: {json_str[:300]}")
             else:
                 raise ValueError(f"Failed to parse JSON response: {e}\nNo JSON array found in response: {response[:300]}")
 
@@ -487,15 +601,16 @@ def _process_chunks_sequential(
                     progress.advance(task)
                     continue
 
-                metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
-                                   'license', 'contributing', 'changelog', 'authors']
-                content_preview = content[:300].lower()
-                if any(pattern in source_file.lower() or pattern in content_preview
-                       for pattern in metadata_patterns):
-                    repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
-                    if any(kw in content_preview for kw in repo_keywords):
-                        progress.advance(task)
-                        continue
+                # DISABLED: Metadata filtering - process ALL chunks including READMEs
+                # metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
+                #                    'license', 'contributing', 'changelog', 'authors']
+                # content_preview = content[:300].lower()
+                # if any(pattern in source_file.lower() or pattern in content_preview
+                #        for pattern in metadata_patterns):
+                #     repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
+                #     if any(kw in content_preview for kw in repo_keywords):
+                #         progress.advance(task)
+                #         continue
 
                 if not content or len(content.strip()) < min_length:
                     progress.advance(task)
@@ -540,7 +655,8 @@ def _process_chunks_parallel(
         df = table.to_pandas()
         df = df[df["id"].isin(chunk_ids)]
     else:
-        df = table.to_pandas()
+        # Limit to total_chunks (respects max_chunks parameter)
+        df = table.to_pandas().head(total_chunks)
     
     # Filter chunks
     chunks_to_process = []
@@ -555,14 +671,15 @@ def _process_chunks_parallel(
         if any(pattern in source_file for pattern in skip_patterns):
             continue
         
-        metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
-                           'license', 'contributing', 'changelog', 'authors']
-        content_preview = content[:300].lower()
-        if any(pattern in source_file.lower() or pattern in content_preview
-               for pattern in metadata_patterns):
-            repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
-            if any(kw in content_preview for kw in repo_keywords):
-                continue
+        # DISABLED: Metadata filtering - process ALL chunks including READMEs
+        # metadata_patterns = ['readme', 'github.com', 'gitlab.com', 'bitbucket.org',
+        #                    'license', 'contributing', 'changelog', 'authors']
+        # content_preview = content[:300].lower()
+        # if any(pattern in source_file.lower() or pattern in content_preview
+        #        for pattern in metadata_patterns):
+        #     repo_keywords = ['repository', 'clone', 'branch', 'commit', 'pull request', 'fork']
+        #     if any(kw in content_preview for kw in repo_keywords):
+        #         continue
         
         if not content or len(content.strip()) < min_length:
             continue
