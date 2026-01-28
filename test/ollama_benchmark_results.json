@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-01-27T17:54:05.006821",
+  "model": "gpt-oss:20b",
+  "parallelism_values": [
+    1,
+    2
+  ],
+  "queries_per_parallel": 5,
+  "results": [
+    {
+      "parallelism": 1,
+      "experiment": "sequential",
+      "query_count": 5,
+      "total_time_sec": 281.54,
+      "time_per_query_sec": 56.31,
+      "throughput_qps": 0.018
+    },
+    {
+      "parallelism": 1,
+      "experiment": "threadpool",
+      "query_count": 5,
+      "total_time_sec": 295.7,
+      "time_per_query_sec": 59.14,
+      "throughput_qps": 0.017
+    },
+    {
+      "parallelism": 2,
+      "experiment": "sequential",
+      "query_count": 10,
+      "total_time_sec": 955.06,
+      "time_per_query_sec": 95.51,
+      "throughput_qps": 0.01
+    },
+    {
+      "parallelism": 2,
+      "experiment": "threadpool",
+      "query_count": 10,
+      "total_time_sec": 890.0,
+      "time_per_query_sec": 89.0,
+      "throughput_qps": 0.011
+    }
+  ]
+}

@@ -20,10 +20,23 @@ llm:
   # │ 1. OLLAMA - Local LLM (RECOMMENDED for unlimited free usage) ⭐     │
   # │    Setup: ollama pull mistral:latest                                │
   # │    Docs: https://ollama.com                                         │
+  # │                                                                     │
+  # │    PERFORMANCE TUNING (based on RTX 4090 benchmarks):               │
+  # │    Set OLLAMA_NUM_PARALLEL and use matching --workers count:        │
+  # │                                                                     │
+  # │      export OLLAMA_NUM_PARALLEL=20                                  │
+  # │      generator generate ... --workers 20                            │
+  # │                                                                     │
+  # │    Benchmark results:                                               │
+  # │      PARALLEL=12: 0.059 q/s                                         │
+  # │      PARALLEL=20: 0.082 q/s (recommended)                           │
+  # │      PARALLEL=24: 0.087 q/s (best, higher VRAM)                     │
   # └─────────────────────────────────────────────────────────────────────┘
   ollama:
     base_url: http://localhost:11434
-    model: llama3.2             # Available: mistral, llama3.3, qwen2.5, etc.
+    model: gpt-oss:20b          # Available: mistral, llama3.3, qwen2.5, etc.
+    timeout: 600                # Request timeout in seconds (default: 600)
+    max_connections: 100        # Max concurrent HTTP connections
   
   # ┌─────────────────────────────────────────────────────────────────────┐
   # │ 2. CLAUDE - Claude API (PAID, requires API key)                     │
@@ -82,7 +95,7 @@ llm:
   # │ GENERATION PARAMETERS (applies to all providers)                    │
   # └─────────────────────────────────────────────────────────────────────┘
   temperature: 0.7
-  max_tokens: 4096
+  max_tokens: 8192              # Increased from 4096 to prevent JSON truncation
 
 # ============================================================================
 # GENERATION SETTINGS

@@ -150,7 +150,7 @@ def list_providers():
 @click.option("--chunk-ids", help="Comma-separated list of specific chunk IDs to process")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4=recommended for Ollama with OLLAMA_NUM_PARALLEL=4)")
+@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential). For Ollama: match to OLLAMA_NUM_PARALLEL (20-24 optimal)")
 def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, chunk_ids, provider, model, workers):
     """Generate QA pairs from LanceDB chunks."""
     console.print("\n[bold]🚀 Generating QA pairs from LanceDB[/bold]\n")
@@ -165,7 +165,7 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
 
     # Extract LLM config
     llm_config = _extract_llm_config(cfg, provider, model)
-    
+
     # Add filtering configuration to llm_config
     filtering_config = cfg.get("filtering", {})
     if filtering_config.get("enabled", True):
