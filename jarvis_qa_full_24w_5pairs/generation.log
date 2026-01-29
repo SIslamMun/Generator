@@ -1,0 +1,354 @@
+
+🚀 Generating QA pairs from LanceDB
+
+
+📊 Processing table: code_chunks
+⚡ Parallel mode: 24 workers
+
+📊 Connecting to LanceDB: /home/cc/Jarvis_QA_Generator/lancedb
+✓ Found 800 chunks in 'code_chunks'
+→ Wiggle room: 5-10 pairs per chunk (adaptive)
+
+🤖 Initializing LLM: ollama
+→ Rate limit delay: 0.0s, Save every: 50 pairs
+✓ LLM ready: gpt-oss:20b
+
+→ Using code prompt template
+⚡ Using parallel processing with 24 workers
+Processing 587 chunks with 24 workers...
+💾 Saved 52 pairs to intermediate file
+💾 Saved 102 pairs to intermediate file
+💾 Saved 150 pairs to intermediate file
+💾 Saved 205 pairs to intermediate file
+💾 Saved 257 pairs to intermediate file
+💾 Saved 305 pairs to intermediate file
+💾 Saved 351 pairs to intermediate file
+💾 Saved 404 pairs to intermediate file
+💾 Saved 453 pairs to intermediate file
+✗ FAILED: pkg.py:0:3713acee - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What attributes are set by the `_init()` method and
+💾 Saved 506 pairs to intermediate file
+💾 Saved 555 pairs to intermediate file
+💾 Saved 605 pairs to intermediate file
+💾 Saved 659 pairs to intermediate file
+💾 Saved 700 pairs to intermediate file
+💾 Saved 751 pairs to intermediate file
+💾 Saved 807 pairs to intermediate file
+💾 Saved 851 pairs to intermediate file
+💾 Saved 903 pairs to intermediate file
+💾 Saved 950 pairs to intermediate file
+💾 Saved 1000 pairs to intermediate file
+💾 Saved 1059 pairs to intermediate file
+💾 Saved 1106 pairs to intermediate file
+💾 Saved 1155 pairs to intermediate file
+💾 Saved 1200 pairs to intermediate file
+💾 Saved 1254 pairs to intermediate file
+💾 Saved 1306 pairs to intermediate file
+💾 Saved 1350 pairs to intermediate file
+💾 Saved 1407 pairs to intermediate file
+✗ FAILED: logging.py:0:820376a4 - ValueError: Failed to parse JSON response: All
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What happens when the `color` argument passed to `C
+💾 Saved 1450 pairs to intermediate file
+💾 Saved 1506 pairs to intermediate file
+💾 Saved 1557 pairs to intermediate file
+💾 Saved 1605 pairs to intermediate file
+💾 Saved 1655 pairs to intermediate file
+💾 Saved 1700 pairs to intermediate file
+💾 Saved 1753 pairs to intermediate file
+💾 Saved 1800 pairs to intermediate file
+💾 Saved 1853 pairs to intermediate file
+💾 Saved 1906 pairs to intermediate file
+💾 Saved 1951 pairs to intermediate file
+💾 Saved 2000 pairs to intermediate file
+💾 Saved 2051 pairs to intermediate file
+💾 Saved 2104 pairs to intermediate file
+💾 Saved 2150 pairs to intermediate file
+✗ FAILED: pkg.py:0:37ef2dac - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What modifications does the `_configure_nyx()` meth
+💾 Saved 2205 pairs to intermediate file
+💾 Saved 2253 pairs to intermediate file
+💾 Saved 2308 pairs to intermediate file
+💾 Saved 2354 pairs to intermediate file
+💾 Saved 2403 pairs to intermediate file
+✗ FAILED: module_manager.py:0:22da10cf - ValueError: No QA pairs generated for 
+chunk module_manager.py:0:22da10cf
+💾 Saved 2450 pairs to intermediate file
+💾 Saved 2506 pairs to intermediate file
+💾 Saved 2551 pairs to intermediate file
+💾 Saved 2600 pairs to intermediate file
+💾 Saved 2651 pairs to intermediate file
+💾 Saved 2702 pairs to intermediate file
+💾 Saved 2751 pairs to intermediate file
+💾 Saved 2801 pairs to intermediate file
+💾 Saved 2852 pairs to intermediate file
+💾 Saved 2901 pairs to intermediate file
+💾 Saved 2950 pairs to intermediate file
+💾 Saved 3006 pairs to intermediate file
+💾 Saved 3050 pairs to intermediate file
+💾 Saved 3101 pairs to intermediate file
+💾 Saved 3152 pairs to intermediate file
+💾 Saved 3201 pairs to intermediate file
+✗ FAILED: scp_exec.py:0:20a75e70 - ValueError: Failed to parse JSON response: 
+All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What happens inside the `PscpExec.__init__()` metho
+💾 Saved 3250 pairs to intermediate file
+✗ FAILED: argparse.py:0:e9a2e72c - ValueError: Failed to parse JSON response: 
+All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What does the `add_menu()` method store in the `sel
+💾 Saved 3301 pairs to intermediate file
+💾 Saved 3350 pairs to intermediate file
+✗ FAILED: logger.py:0:3b6d7ca3 - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What is the purpose of the `enable_colors` attribut
+💾 Saved 3404 pairs to intermediate file
+💾 Saved 3450 pairs to intermediate file
+💾 Saved 3509 pairs to intermediate file
+💾 Saved 3552 pairs to intermediate file
+💾 Saved 3600 pairs to intermediate file
+✗ FAILED: test_module_integration.py:0:73c28744 - ValueError: Failed to parse 
+JSON response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What does the `test_mod_prepend_multiple_values` me
+💾 Saved 3651 pairs to intermediate file
+💾 Saved 3702 pairs to intermediate file
+💾 Saved 3751 pairs to intermediate file
+💾 Saved 3804 pairs to intermediate file
+💾 Saved 3853 pairs to intermediate file
+💾 Saved 3902 pairs to intermediate file
+💾 Saved 3951 pairs to intermediate file
+💾 Saved 4006 pairs to intermediate file
+💾 Saved 4056 pairs to intermediate file
+💾 Saved 4104 pairs to intermediate file
+💾 Saved 4150 pairs to intermediate file
+💾 Saved 4200 pairs to intermediate file
+💾 Saved 4254 pairs to intermediate file
+💾 Saved 4301 pairs to intermediate file
+💾 Saved 4355 pairs to intermediate file
+💾 Saved 4400 pairs to intermediate file
+  Generating QA pairs... (4434 pairs | 587/587 chunks | 0 left) ━━━━━━━━━━━ 100%
+
+✓ Generated 4434 QA pairs
+✓ Saved to: jarvis_qa_full_24w_5pairs/jarvis_qa_code_chunks.json
+⏱️  Total time: 54m 46s
+
+
+📊 Processing table: text_chunks
+⚡ Parallel mode: 24 workers
+
+📊 Connecting to LanceDB: /home/cc/Jarvis_QA_Generator/lancedb
+✓ Found 1749 chunks in 'text_chunks'
+→ Wiggle room: 5-10 pairs per chunk (adaptive)
+
+🤖 Initializing LLM: ollama
+→ Rate limit delay: 0.0s, Save every: 50 pairs
+✓ LLM ready: gpt-oss:20b
+
+→ Using text prompt template
+⚡ Using parallel processing with 24 workers
+Processing 664 chunks with 24 workers...
+💾 Saved 53 pairs to intermediate file
+💾 Saved 100 pairs to intermediate file
+💾 Saved 152 pairs to intermediate file
+💾 Saved 204 pairs to intermediate file
+💾 Saved 253 pairs to intermediate file
+💾 Saved 307 pairs to intermediate file
+💾 Saved 351 pairs to intermediate file
+💾 Saved 402 pairs to intermediate file
+💾 Saved 454 pairs to intermediate file
+💾 Saved 502 pairs to intermediate file
+💾 Saved 550 pairs to intermediate file
+💾 Saved 604 pairs to intermediate file
+💾 Saved 656 pairs to intermediate file
+💾 Saved 707 pairs to intermediate file
+💾 Saved 750 pairs to intermediate file
+💾 Saved 807 pairs to intermediate file
+💾 Saved 856 pairs to intermediate file
+💾 Saved 901 pairs to intermediate file
+💾 Saved 954 pairs to intermediate file
+✗ FAILED: phase3-launch.md:0:4849b6ee - ValueError: Failed to parse JSON 
+response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What is the purpose of the Kill class and how does
+it work?"
+💾 Saved 1006 pairs to intermediate file
+💾 Saved 1056 pairs to intermediate file
+💾 Saved 1106 pairs to intermediate file
+💾 Saved 1157 pairs to intermediate file
+💾 Saved 1200 pairs to intermediate file
+✗ FAILED: INSTALL.md:0:05b0317a - ValueError: Failed to parse JSON response: All
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What is the purpose of adding `. 
+${PWD}/share/spack/setup-en
+💾 Saved 1254 pairs to intermediate file
+💾 Saved 1307 pairs to intermediate file
+💾 Saved 1351 pairs to intermediate file
+💾 Saved 1406 pairs to intermediate file
+💾 Saved 1455 pairs to intermediate file
+✗ FAILED: README.md:0:bc706242 - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"How does the workflow ensure that the Gray-Scott 
+simulation 
+💾 Saved 1505 pairs to intermediate file
+💾 Saved 1556 pairs to intermediate file
+💾 Saved 1604 pairs to intermediate file
+💾 Saved 1652 pairs to intermediate file
+💾 Saved 1704 pairs to intermediate file
+💾 Saved 1759 pairs to intermediate file
+💾 Saved 1801 pairs to intermediate file
+💾 Saved 1850 pairs to intermediate file
+💾 Saved 1906 pairs to intermediate file
+✗ FAILED: README.md:0:bf9102cd - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What happens when you set `diag_print` to 
+2?","answer":"Sett
+💾 Saved 1952 pairs to intermediate file
+💾 Saved 2000 pairs to intermediate file
+✗ FAILED: README.md:0:3bf3f700 - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"How does the manual build process for Spark using 
+Spack and 
+💾 Saved 2054 pairs to intermediate file
+💾 Saved 2102 pairs to intermediate file
+💾 Saved 2157 pairs to intermediate file
+💾 Saved 2204 pairs to intermediate file
+💾 Saved 2256 pairs to intermediate file
+💾 Saved 2305 pairs to intermediate file
+💾 Saved 2357 pairs to intermediate file
+💾 Saved 2401 pairs to intermediate file
+💾 Saved 2450 pairs to intermediate file
+💾 Saved 2507 pairs to intermediate file
+💾 Saved 2555 pairs to intermediate file
+💾 Saved 2605 pairs to intermediate file
+💾 Saved 2655 pairs to intermediate file
+✗ FAILED: package_dev_guide.md:0:8555546e - ValueError: Failed to parse JSON 
+response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What is the primary purpose of the `SimplePackage`
+base clas
+💾 Saved 2705 pairs to intermediate file
+✗ FAILED: package_dev_guide.md:0:91027e26 - ValueError: Failed to parse JSON 
+response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What is the primary responsibility of the start() 
+method in 
+💾 Saved 2753 pairs to intermediate file
+💾 Saved 2806 pairs to intermediate file
+💾 Saved 2853 pairs to intermediate file
+💾 Saved 2904 pairs to intermediate file
+✗ FAILED: package_dev_guide.md:0:bc926033 - ValueError: Failed to parse JSON 
+response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What does the `size.bytes` property return for the
+string '2
+💾 Saved 2951 pairs to intermediate file
+💾 Saved 3001 pairs to intermediate file
+💾 Saved 3052 pairs to intermediate file
+💾 Saved 3102 pairs to intermediate file
+💾 Saved 3154 pairs to intermediate file
+💾 Saved 3200 pairs to intermediate file
+💾 Saved 3253 pairs to intermediate file
+💾 Saved 3302 pairs to intermediate file
+💾 Saved 3354 pairs to intermediate file
+💾 Saved 3403 pairs to intermediate file
+💾 Saved 3452 pairs to intermediate file
+✗ FAILED: pipelines.md:0:e09f0239 - ValueError: Failed to parse JSON response: 
+All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"How many MPI processes are configured for the 
+parallel solve
+💾 Saved 3502 pairs to intermediate file
+💾 Saved 3555 pairs to intermediate file
+💾 Saved 3603 pairs to intermediate file
+💾 Saved 3652 pairs to intermediate file
+💾 Saved 3704 pairs to intermediate file
+💾 Saved 3754 pairs to intermediate file
+💾 Saved 3801 pairs to intermediate file
+💾 Saved 3855 pairs to intermediate file
+✗ FAILED: shell.md:0:9d78648e - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What is the purpose of LocalExecInfo when 
+initializing a Loc
+💾 Saved 3904 pairs to intermediate file
+✗ FAILED: shell.md:0:250aa83a - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What is the purpose of the Mkdir class in the 
+provided code?
+💾 Saved 3954 pairs to intermediate file
+💾 Saved 4001 pairs to intermediate file
+💾 Saved 4056 pairs to intermediate file
+💾 Saved 4102 pairs to intermediate file
+💾 Saved 4155 pairs to intermediate file
+💾 Saved 4201 pairs to intermediate file
+💾 Saved 4251 pairs to intermediate file
+💾 Saved 4304 pairs to intermediate file
+💾 Saved 4356 pairs to intermediate file
+💾 Saved 4407 pairs to intermediate file
+💾 Saved 4457 pairs to intermediate file
+💾 Saved 4503 pairs to intermediate file
+💾 Saved 4558 pairs to intermediate file
+💾 Saved 4603 pairs to intermediate file
+💾 Saved 4653 pairs to intermediate file
+✗ FAILED: grc_iit_edu_members_jaime-cernuda.md:0:68366edd - ValueError: No QA 
+pairs generated for chunk grc_iit_edu_members_jaime-cernuda.md:0:68366edd
+💾 Saved 4701 pairs to intermediate file
+✗ FAILED: grc_iit_edu_docs_jarvis_jarvis-cd_pipeline-tests.md:0:d8271fd9 - 
+ValueError: Failed to parse JSON response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What environment variables does Jarvis use to 
+store director
+💾 Saved 4752 pairs to intermediate file
+✗ FAILED: grc_iit_edu_docs_jarvis_jarvis-cd_pipeline-tests.md:0:f87780a9 - 
+ValueError: Failed to parse JSON response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"How does the configuration specify the number of 
+Spark nodes
+💾 Saved 4801 pairs to intermediate file
+✗ FAILED: grc_iit_edu_research_projects_iowarp.md:0:0d6529a3 - ValueError: No QA
+pairs generated for chunk grc_iit_edu_research_projects_iowarp.md:0:0d6529a3
+💾 Saved 4853 pairs to intermediate file
+💾 Saved 4901 pairs to intermediate file
+💾 Saved 4950 pairs to intermediate file
+💾 Saved 5002 pairs to intermediate file
+  Generating QA pairs... (5019 pairs | 664/664 chunks | 0 left) ━━━━━━━━━━━ 100%
+
+✓ Generated 5019 QA pairs
+✓ Saved to: jarvis_qa_full_24w_5pairs/jarvis_qa_text_chunks.json
+⏱️  Total time: 41m 13s
+
+
+✓ Total pairs from all tables: 9453
+✓ Saved to: jarvis_qa_full_24w_5pairs/jarvis_qa.json
+✨ Success! Generated 9453 QA pairs
+
+💡 Tip: Use 'generator curate jarvis_qa_full_24w_5pairs/jarvis_qa.json --topic 
+"TOPIC"' for topic filtering
+

@@ -13,6 +13,7 @@ import lancedb
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from ..prompt_loader import load_prompts
@@ -29,6 +30,7 @@ def generate_cot_pairs(
     target_pairs: Optional[int] = None,
     batch_size: int = 50,
     max_chunks: Optional[int] = None,
+    workers: int = 1,
 ) -> Dict:
     """
     Generate CoT (Chain-of-Thought) pairs from LanceDB chunks.
@@ -42,6 +44,7 @@ def generate_cot_pairs(
         target_pairs: Total target number of pairs (auto-calculates per-chunk)
         batch_size: Number of chunks to process per batch
         max_chunks: Maximum number of chunks to process (for testing)
+        workers: Number of parallel workers (1=sequential, 4+ recommended for Ollama)
     
     Returns:
         Dict with summary statistics
@@ -99,63 +102,104 @@ def generate_cot_pairs(
     # Generate CoT pairs
     all_cot_pairs = []
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-    ) as progress:
-        task = progress.add_task(
-            f"[cyan]Generating CoT pairs ({pairs_per_chunk}/chunk)...",
-            total=total_chunks,
-        )
+    # Prepare chunks for processing
+    chunks_to_process = []
+    for idx, row in chunks_df.iterrows():
+        chunk_text = row[text_col]
+        chunk_id = row.get("id", f"chunk_{idx}")
+        source = row.get("source", "unknown")
+        source_file = row.get("source_file", "unknown")
 
-        for idx, row in chunks_df.iterrows():
-            chunk_text = row[text_col]
-            chunk_id = row.get("id", f"chunk_{idx}")
-            source = row.get("source", "unknown")
-            source_file = row.get("source_file", "unknown")
+        # Skip filtered source files (logs, login pages, metadata)
+        if any(pattern in source_file for pattern in skip_patterns):
+            continue
 
-            # Skip filtered source files (logs, login pages, metadata)
-            if any(pattern in source_file for pattern in skip_patterns):
-                progress.update(task, advance=1)
-                continue
+        chunks_to_process.append({
+            'text': chunk_text,
+            'chunk_id': chunk_id,
+            'source': source,
+            'source_file': source_file
+        })
 
-            # Format prompt
-            prompt = cot_prompt.format(
-                text=chunk_text,
-                n_pairs=pairs_per_chunk,
+    logger.info(f"Processing {len(chunks_to_process)} chunks with {workers} workers")
+
+    if workers == 1:
+        # Sequential processing
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        ) as progress:
+            task = progress.add_task(
+                f"[cyan]Generating CoT pairs ({pairs_per_chunk}/chunk)...",
+                total=len(chunks_to_process),
             )
 
-            try:
-                # Generate CoT pairs
-                response = client.generate(prompt)
+            for chunk in chunks_to_process:
+                try:
+                    pairs = _generate_cot_for_chunk(
+                        chunk['text'], chunk['chunk_id'], chunk['source'],
+                        client, cot_prompt, pairs_per_chunk
+                    )
+                    all_cot_pairs.extend(pairs)
+                    progress.update(
+                        task,
+                        advance=1,
+                        description=f"[cyan]Generated {len(all_cot_pairs)} CoT pairs...",
+                    )
 
-                # Parse response (expect JSON array)
-                pairs = _parse_cot_response(response)
+                    if target_pairs and len(all_cot_pairs) >= target_pairs:
+                        logger.info(f"Reached target of {target_pairs} pairs, stopping...")
+                        break
 
-                # Add metadata
-                for pair in pairs:
-                    pair["chunk_id"] = chunk_id
-                    pair["source"] = source
+                except Exception as e:
+                    logger.warning(f"Failed for chunk {chunk['chunk_id']}: {e}")
+                    progress.update(task, advance=1)
+    else:
+        # Parallel processing
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+        ) as progress:
+            task = progress.add_task(
+                f"[cyan]Generating CoT pairs ({pairs_per_chunk}/chunk)...",
+                total=len(chunks_to_process),
+            )
 
-                all_cot_pairs.extend(pairs)
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                futures = {}
+                for chunk in chunks_to_process:
+                    future = executor.submit(
+                        _generate_cot_for_chunk,
+                        chunk['text'], chunk['chunk_id'], chunk['source'],
+                        client, cot_prompt, pairs_per_chunk
+                    )
+                    futures[future] = chunk['chunk_id']
 
-                progress.update(
-                    task,
-                    advance=1,
-                    description=f"[cyan]Generated {len(all_cot_pairs)} CoT pairs...",
-                )
+                completed = 0
+                for future in as_completed(futures):
+                    chunk_id = futures[future]
+                    try:
+                        pairs = future.result()
+                        all_cot_pairs.extend(pairs)
+                        completed += 1
+                        progress.update(
+                            task,
+                            advance=1,
+                            description=f"[cyan]Generated {len(all_cot_pairs)} CoT pairs... ({completed}/{len(chunks_to_process)})",
+                        )
 
-                # Check if we've reached target
-                if target_pairs and len(all_cot_pairs) >= target_pairs:
-                    logger.info(f"Reached target of {target_pairs} pairs, stopping...")
-                    break
+                        if target_pairs and len(all_cot_pairs) >= target_pairs:
+                            logger.info(f"Reached target of {target_pairs} pairs, stopping...")
+                            break
 
-            except Exception as e:
-                logger.warning(f"Failed to generate CoT pairs for chunk {chunk_id}: {e}")
-                progress.update(task, advance=1)
-                continue
+                    except Exception as e:
+                        logger.warning(f"Failed for chunk {chunk_id}: {e}")
+                        completed += 1
+                        progress.update(task, advance=1)
 
     # Save results
     output_path = Path(output_path)
@@ -172,6 +216,23 @@ def generate_cot_pairs(
         "pairs_per_chunk": pairs_per_chunk,
         "output_file": str(output_path),
     }
+
+
+def _generate_cot_for_chunk(text: str, chunk_id: str, source: str, client, cot_prompt, n_pairs: int) -> List[Dict]:
+    """Generate CoT pairs for a single chunk."""
+    # Use wiggle room like QA generator (adaptive pairs per chunk)
+    n_pairs_min = n_pairs
+    n_pairs_max = min(n_pairs * 2, 10)  # Cap at 10 max
+    prompt = cot_prompt.format(text=text, n_pairs_min=n_pairs_min, n_pairs_max=n_pairs_max)
+    response = client.generate(prompt)
+    pairs = _parse_cot_response(response)
+    
+    # Add metadata
+    for pair in pairs:
+        pair["chunk_id"] = chunk_id
+        pair["source"] = source
+    
+    return pairs
 
 
 def _parse_cot_response(response: str) -> List[Dict]:

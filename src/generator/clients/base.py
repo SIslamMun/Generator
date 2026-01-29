@@ -15,7 +15,7 @@ class BaseLLMClient(ABC):
             config: Configuration dictionary with provider-specific settings
         """
         self.temperature = config.get("temperature", 0.7)
-        self.max_tokens = config.get("max_tokens", 4096)
+        self.max_tokens = config.get("max_tokens", 24576)  # 24K for CoT batches
         self.model = config.get("model")
 
     @abstractmethod

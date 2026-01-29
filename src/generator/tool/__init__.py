@@ -5,6 +5,7 @@ from .tool_generator import ToolGenerator
 from .tool_curator import ToolCurator
 from .tool_parser import ToolParser
 from .tool_executor import ToolExecutor
+from .mcp_generator import MCPGenerator
 from .coverage_selector import CoverageSelector, select_by_coverage
 from .dependency_graph import (
     DependencyGraph,
@@ -28,6 +29,8 @@ __all__ = [
     "ToolExample",
     # Generator
     "ToolGenerator",
+    # MCP Generator
+    "MCPGenerator",
     # Curator
     "ToolCurator",
     # Parser

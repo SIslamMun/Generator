@@ -95,7 +95,7 @@ llm:
   # │ GENERATION PARAMETERS (applies to all providers)                    │
   # └─────────────────────────────────────────────────────────────────────┘
   temperature: 0.7
-  max_tokens: 8192              # Increased from 4096 to prevent JSON truncation
+  max_tokens: 24576             # 24K for CoT batch processing (prevents truncation)
 
 # ============================================================================
 # GENERATION SETTINGS
@@ -191,7 +191,7 @@ filtering:
 # Based on: AlpaGasus (2023) + LIMA (2023) papers
 # ============================================================================
 curate:
-  provider: claude            # LLM judge provider (claude recommended for quality assessment)
+  provider: ollama            # LLM judge provider (ollama for local, claude for best quality)
                               # Options: ollama, claude, gemini, vllm, openai, anthropic
 
   threshold: 7.0              # Minimum rating to keep (1-10 scale)

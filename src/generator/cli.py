@@ -236,7 +236,8 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
 @click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def curate(input_file, output, config, threshold, batch_size, topic, provider, model):
+@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended)")
+def curate(input_file, output, config, threshold, batch_size, topic, provider, model, workers):
     """
     Filter QA pairs or CoT examples by quality using LLM-as-Judge.
     
@@ -276,6 +277,7 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
         batch_size=batch_size,
         topic_filter=topic,
         skip_question_patterns=skip_patterns,
+        workers=workers,
     )
 
     console.print(
@@ -464,7 +466,8 @@ def multi_score(input_file, output, config, min_score, top_k, strategy,
 @click.option("--model", help="LLM model (override config)")
 @click.option("--batch-size", type=int, default=5, help="Pairs to process per batch")
 @click.option("--no-preserve-original", is_flag=True, help="Don't keep original answer")
-def enrich(input_file, output, config, provider, model, batch_size, no_preserve_original):
+@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended)")
+def enrich(input_file, output, config, provider, model, batch_size, no_preserve_original, workers):
     """
     Enrich QA pairs by rewriting answers for better clarity and structure.
     
@@ -502,6 +505,7 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
         batch_size=batch_size,
         preserve_original=not no_preserve_original,
         temperature=enrich_config.get("temperature", 0.3),
+        workers=workers,
     )
 
     # Save enriched pairs
@@ -522,7 +526,8 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
 @click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
-def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, topic, provider, model):
+@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended for Ollama)")
+def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, topic, provider, model, workers):
     """
     Generate CoT (Chain-of-Thought) pairs from LanceDB chunks.
     
@@ -557,6 +562,7 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
         target_pairs=target_pairs,
         batch_size=batch_size,
         max_chunks=max_chunks,
+        workers=workers,
     )
 
     # Apply topic filtering if requested
@@ -624,7 +630,8 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
 @click.option("--batch-size", type=int, default=5, help="Pairs to enhance per batch")
-def enhance_cot(input_file, output, config, provider, model, batch_size):
+@click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended for Ollama)")
+def enhance_cot(input_file, output, config, provider, model, batch_size, workers):
     """
     Add CoT reasoning to existing QA pairs.
     
@@ -650,9 +657,216 @@ def enhance_cot(input_file, output, config, provider, model, batch_size):
         output_path=output,
         llm_config=llm_config,
         batch_size=batch_size,
+        workers=workers,
     )
 
     console.print(f"[bold green]✨ Success! Enhanced {result['enhanced_pairs']} pairs with CoT reasoning[/bold green]\n")
+
+
+@main.command()
+@click.argument("input_qa_file", type=click.Path(exists=True))
+@click.argument("intermediate_file", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+@click.option("--batch-size", type=int, default=5, help="Pairs to enhance per batch")
+@click.option("--workers", type=int, default=1, help="Number of parallel workers")
+def resume_cot(input_qa_file, intermediate_file, output, config, provider, model, batch_size, workers):
+    """
+    Resume CoT enhancement from intermediate file.
+    
+    Takes the original QA file and intermediate CoT file, determines which pairs
+    haven't been processed yet, and continues enhancement from where it left off.
+    
+    Example:
+        generator resume-cot qa.json intermediate.json -o final.json
+    """
+    console.print("\n[bold]⏩ Resuming CoT enhancement from intermediate file[/bold]\n")
+
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+
+    # Load files
+    import json
+    with open(input_qa_file, 'r') as f:
+        original_qa = json.load(f)
+    
+    with open(intermediate_file, 'r') as f:
+        processed_cot = json.load(f)
+    
+    total_pairs = len(original_qa)
+    processed_count = len(processed_cot)
+    remaining = total_pairs - processed_count
+    
+    console.print(f"[cyan]Total pairs: {total_pairs}[/cyan]")
+    console.print(f"[cyan]Already processed: {processed_count} ({processed_count/total_pairs*100:.1f}%)[/cyan]")
+    console.print(f"[yellow]Remaining: {remaining}[/yellow]\n")
+    
+    if remaining == 0:
+        console.print(f"[green]✨ All pairs already processed! Copying to output.[/green]")
+        with open(output, 'w') as f:
+            json.dump(processed_cot, f, indent=2, ensure_ascii=False)
+        console.print(f"[green]✓ Saved to {output}[/green]\n")
+        return
+    
+    # Get remaining pairs to process
+    remaining_qa = original_qa[processed_count:]
+    
+    # Save to temp file
+    temp_file = Path(intermediate_file).parent / "temp_remaining_qa.json"
+    with open(temp_file, 'w') as f:
+        json.dump(remaining_qa, f, indent=2)
+    
+    console.print(f"[cyan]Enhancing remaining {remaining} pairs...[/cyan]\n")
+    
+    # Enhance remaining pairs - pass processed_cot so it's included in intermediate saves
+    from .cot.cot_enhancer import enhance_with_cot
+    
+    # Use temporary output path to avoid conflicts
+    temp_output = Path(intermediate_file).parent / "temp_remaining_cot.json"
+    
+    # Run enhancement on remaining pairs, using the original intermediate file for saves
+    result = enhance_with_cot(
+        input_path=str(temp_file),
+        output_path=str(temp_output),
+        llm_config=llm_config,
+        batch_size=batch_size,
+        workers=workers,
+        prepend_pairs=processed_cot,  # Include already-processed pairs in intermediate saves
+        intermediate_path=str(intermediate_file),  # Use original intermediate file path
+    )
+    
+    # After completion, merge with previously processed pairs
+    if temp_output.exists():
+        with open(temp_output, 'r') as f:
+            new_cot = json.load(f)
+        
+        # Combine: processed_cot (old) + new_cot (newly enhanced)
+        final_cot = processed_cot + new_cot
+        
+        # Save combined result to final output
+        with open(output, 'w') as f:
+            json.dump(final_cot, f, indent=2, ensure_ascii=False)
+        
+        console.print(f"\n[bold green]✨ Success! Total enhanced pairs: {len(final_cot)}[/bold green]")
+        console.print(f"[green]✓ Saved to {output}[/green]\n")
+        
+        # Clean up temp files
+        temp_output.unlink(missing_ok=True)
+        temp_intermediate = Path(intermediate_file).parent / f"{temp_output.stem}_intermediate.json"
+        temp_intermediate.unlink(missing_ok=True)
+    else:
+        console.print(f"\n[red]✗ Enhancement failed - output file not created[/red]\n")
+    
+    # Clean up input temp file
+    temp_file.unlink(missing_ok=True)
+
+
+@main.command()
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+@click.option("--batch-size", type=int, default=5, help="Pairs to enhance per batch")
+@click.option("--workers", type=int, default=1, help="Number of parallel workers")
+def fix_cot(input_file, output, config, provider, model, batch_size, workers):
+    """
+    Re-enhance failed CoT pairs (those with empty reasoning).
+    
+    Takes a CoT file (intermediate or final) and re-enhances only the pairs
+    that have empty or missing reasoning. Useful for fixing failed batches.
+    
+    Example:
+        generator fix-cot jarvis_qa_cot_24w/jarvis_qa_code_chunks_cot_intermediate.json -o fixed.json
+    """
+    console.print("\n[bold]🔧 Re-enhancing failed CoT pairs[/bold]\n")
+
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+
+    # Load input file
+    import json
+    with open(input_file, 'r') as f:
+        cot_pairs = json.load(f)
+    
+    console.print(f"[cyan]Loaded {len(cot_pairs)} pairs from {input_file}[/cyan]")
+    
+    # Find failed pairs (empty reasoning)
+    failed_pairs = []
+    failed_indices = []
+    for i, pair in enumerate(cot_pairs):
+        if not pair.get('reasoning') or pair.get('reasoning', '').strip() == '':
+            failed_pairs.append(pair)
+            failed_indices.append(i)
+    
+    console.print(f"[yellow]Found {len(failed_pairs)} pairs with empty reasoning ({len(failed_pairs)/len(cot_pairs)*100:.1f}%)[/yellow]")
+    
+    if not failed_pairs:
+        console.print(f"[green]✨ All pairs already have reasoning! No fixes needed.[/green]\n")
+        # Just copy the file
+        import shutil
+        shutil.copy(input_file, output)
+        console.print(f"[green]✓ Copied to {output}[/green]\n")
+        return
+    
+    # Convert failed pairs back to QA format for enhancement
+    qa_pairs = [{"question": p["question"], "answer": p["answer"]} for p in failed_pairs]
+    
+    # Save to temp file
+    temp_file = Path(input_file).parent / "temp_failed_qa.json"
+    with open(temp_file, 'w') as f:
+        json.dump(qa_pairs, f, indent=2)
+    
+    console.print(f"[cyan]Re-enhancing {len(qa_pairs)} failed pairs...[/cyan]\n")
+    
+    # Enhance with CoT
+    from .cot.cot_enhancer import enhance_with_cot
+    temp_output = Path(input_file).parent / "temp_enhanced_cot.json"
+    result = enhance_with_cot(
+        input_path=str(temp_file),
+        output_path=str(temp_output),
+        llm_config=llm_config,
+        batch_size=batch_size,
+        workers=workers,
+    )
+    
+    # Load enhanced pairs
+    with open(temp_output, 'r') as f:
+        enhanced_pairs = json.load(f)
+    
+    # Merge back into original file
+    for i, enhanced in zip(failed_indices, enhanced_pairs):
+        cot_pairs[i] = enhanced
+    
+    # Save final result
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, 'w') as f:
+        json.dump(cot_pairs, f, indent=2, ensure_ascii=False)
+    
+    # Clean up temp files
+    temp_file.unlink(missing_ok=True)
+    temp_output.unlink(missing_ok=True)
+    
+    # Check how many are still failed
+    final_failed = sum(1 for p in cot_pairs if not p.get('reasoning') or p.get('reasoning', '').strip() == '')
+    fixed = len(failed_pairs) - final_failed
+    
+    console.print(f"\n[bold green]✨ Success! Fixed {fixed}/{len(failed_pairs)} pairs[/bold green]")
+    console.print(f"[dim]Remaining failures: {final_failed}[/dim]")
+    console.print(f"[green]✓ Saved to {output}[/green]\n")
 
 
 @main.command()
@@ -1068,6 +1282,114 @@ def tool_generate(tools_path, output, config, mode, target_pairs, max_steps, pro
     save_examples(examples, output)
     
     console.print(f"\n[bold green]✨ Generated {len(examples)} examples → {output}[/bold green]\n")
+
+
+@main.command("tool-generate-from-topic")
+@click.argument("topic")
+@click.option("-o", "--output", required=True, help="Output file path (.yaml or .json)")
+@click.option("--docs", help="Path to documentation/QA data for context (.json/.jsonl)")
+@click.option("--n-tools", type=int, default=20, help="Number of tools to generate")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+def tool_generate_from_topic(topic, output, docs, n_tools, config, provider, model):
+    """
+    Generate MCP tool definitions from topic/domain using LLM.
+    
+    Creates plausible MCP tool definitions when no existing server is available,
+    using domain knowledge and documentation as input.
+    
+    \b
+    Examples:
+      # From topic only
+      uv run generator tool-generate-from-topic "HDF5 file operations" -o hdf5_tools.yaml
+      
+      # With documentation context
+      uv run generator tool-generate-from-topic "Jarvis HPC pipelines" \\
+        -o jarvis_tools.yaml \\
+        --docs jarvis_qa_full.json \\
+        --n-tools 30
+      
+      # Custom model
+      uv run generator tool-generate-from-topic "Kubernetes management" \\
+        -o k8s_tools.yaml \\
+        --provider ollama --model mistral:latest
+    """
+    import yaml
+    from pathlib import Path
+    from .tool.mcp_generator import MCPGenerator
+    
+    console.print(f"\n[bold]🔧 MCP Tool Generator from Topic[/bold]\n")
+    console.print(f"[cyan]Topic: {topic}[/cyan]")
+    console.print(f"[cyan]Target: {n_tools} tools[/cyan]\n")
+    
+    # Load config
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+    
+    # Load prompts
+    from .prompt_loader import load_prompts
+    prompts = load_prompts(Path(config_path).parent)
+    
+    # Extract LLM config
+    llm_config = _extract_llm_config(cfg, provider, model)
+    
+    console.print(f"[cyan]Provider: {llm_config.get('provider', 'ollama')}[/cyan]")
+    if docs:
+        console.print(f"[cyan]Documentation: {docs}[/cyan]")
+    console.print()
+    
+    # Generate MCP tools
+    generator = MCPGenerator(llm_config.copy(), prompts)
+    tools = generator.generate_mcp_from_topic(topic, n_tools, docs)
+    
+    if not tools:
+        console.print("[red]❌ No valid tools generated. Exiting.[/red]")
+        return
+    
+    # Prepare output
+    output_path = Path(output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    output_data = {
+        "name": f"{output_path.stem.replace('_', ' ').title()} MCP",
+        "description": f"Auto-generated MCP tools for {topic}",
+        "version": "1.0.0",
+        "tools": tools
+    }
+    
+    # Save
+    with open(output_path, 'w') as f:
+        if output_path.suffix in [".yaml", ".yml"]:
+            yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
+        else:
+            import json
+            json.dump(output_data, f, indent=2)
+    
+    console.print(f"\n[green]💾 Saved {len(tools)} tools to: {output_path}[/green]")
+    
+    # Print summary
+    console.print(f"\n[bold green]✨ Success![/bold green]")
+    console.print(f"\n📊 Generated Tools:")
+    
+    categories = {}
+    for tool in tools:
+        cat = tool.get('category', 'other')
+        categories[cat] = categories.get(cat, 0) + 1
+        param_count = len(tool.get('parameters', []))
+        console.print(f"  • [cyan]{tool['name']}[/cyan] ({param_count} params)")
+    
+    if categories:
+        console.print(f"\n📈 By Category:")
+        for cat, count in sorted(categories.items()):
+            console.print(f"  • {cat}: {count} tools")
+    
+    console.print(f"\n🚀 Next Step - Generate Training Examples:")
+    console.print(f"   [bold]uv run generator tool-generate \\[/bold]")
+    console.print(f"     [bold]{output} \\[/bold]")
+    console.print(f"     [bold]-o tool_examples.json \\[/bold]")
+    console.print(f"     [bold]--target-pairs 300 --hybrid[/bold]")
 
 
 @main.command("tool-generate-chain")

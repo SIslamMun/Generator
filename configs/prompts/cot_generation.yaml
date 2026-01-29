@@ -38,6 +38,8 @@ prompt: |
   - Reasoning about cause and effect
   - Problem-solving with multiple considerations
 
+  Generate {n_pairs_min}-{n_pairs_max} high-quality examples (adaptive based on text richness).
+
   Return JSON format only:
 
   [

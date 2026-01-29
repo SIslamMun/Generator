@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from ..clients import get_client, BaseLLMClient
@@ -161,6 +162,7 @@ def curate_qa_pairs(
     batch_size: int = 5,
     topic_filter: str = None,
     skip_question_patterns: List[str] = None,
+    workers: int = 1,
 ) -> Dict[str, Any]:
     """
     Filter QA pairs by quality using LLM-as-Judge.
@@ -220,51 +222,97 @@ def curate_qa_pairs(
     output_file = Path(output_path)
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
+    # Prepare batches
+    batches = []
+    for i in range(0, total_pairs, batch_size):
+        batches.append(conversations[i : i + batch_size])
+
     # Process in batches
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        console=console,
-    ) as progress:
-        task = progress.add_task("[cyan]Rating pairs...", total=total_pairs)
+    if workers == 1:
+        # Sequential processing
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Rating pairs...", total=total_pairs)
 
-        for i in range(0, total_pairs, batch_size):
-            batch = conversations[i : i + batch_size]
+            for batch in batches:
+                try:
+                    qa_batch = [_extract_qa_from_conversation(conv) for conv in batch]
+                    temperature = llm_config.get('temperature', 0.1) if isinstance(llm_config, dict) else 0.1
+                    rated_batch = _rate_batch(
+                        pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template, temperature=temperature, topic_filter=topic_filter
+                    )
 
-            try:
-                # Extract QA for rating
-                qa_batch = [_extract_qa_from_conversation(conv) for conv in batch]
+                    for j, conv in enumerate(batch):
+                        if j < len(rated_batch):
+                            rating = rated_batch[j].get("rating", 0)
+                            total_score += rating
 
-                # Rate this batch
+                            for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning", "topic_relevant"]:
+                                if key in rated_batch[j]:
+                                    conv[key] = rated_batch[j][key]
+
+                            rated_pairs.append(conv)
+
+                            topic_relevant = rated_batch[j].get("topic_relevant", True)
+                            if rating >= threshold and topic_relevant:
+                                filtered_pairs.append(conv)
+
+                except Exception as e:
+                    console.print(f"[yellow]⚠ Error rating batch: {e}[/yellow]")
+
+                progress.advance(task, advance=len(batch))
+    else:
+        # Parallel processing
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Rating pairs...", total=total_pairs)
+
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                futures = {}
                 temperature = llm_config.get('temperature', 0.1) if isinstance(llm_config, dict) else 0.1
-                rated_batch = _rate_batch(
-                    pairs=qa_batch, llm=llm, prompt_template=rating_prompt_template, temperature=temperature, topic_filter=topic_filter
-                )
+                
+                for i, batch in enumerate(batches):
+                    qa_batch = [_extract_qa_from_conversation(conv) for conv in batch]
+                    future = executor.submit(
+                        _rate_batch,
+                        qa_batch, llm, rating_prompt_template, temperature, topic_filter
+                    )
+                    futures[future] = (i, batch, qa_batch)
 
-                # Merge ratings back to conversation format
-                for j, conv in enumerate(batch):
-                    if j < len(rated_batch):
-                        rating = rated_batch[j].get("rating", 0)
-                        total_score += rating
+                for future in as_completed(futures):
+                    batch_idx, batch, qa_batch = futures[future]
+                    try:
+                        rated_batch = future.result()
+                        
+                        for j, conv in enumerate(batch):
+                            if j < len(rated_batch):
+                                rating = rated_batch[j].get("rating", 0)
+                                total_score += rating
 
-                        # Copy rating fields to conversation
-                        for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning", "topic_relevant"]:
-                            if key in rated_batch[j]:
-                                conv[key] = rated_batch[j][key]
+                                for key in ["rating", "clarity", "accuracy", "usefulness", "difficulty", "reasoning", "topic_relevant"]:
+                                    if key in rated_batch[j]:
+                                        conv[key] = rated_batch[j][key]
 
-                        rated_pairs.append(conv)
+                                rated_pairs.append(conv)
 
-                        # Filter by threshold AND topic relevance
-                        topic_relevant = rated_batch[j].get("topic_relevant", True)
-                        if rating >= threshold and topic_relevant:
-                            filtered_pairs.append(conv)
+                                topic_relevant = rated_batch[j].get("topic_relevant", True)
+                                if rating >= threshold and topic_relevant:
+                                    filtered_pairs.append(conv)
 
-            except Exception as e:
-                console.print(f"[yellow]⚠ Error rating batch {i}-{i+batch_size}: {e}[/yellow]")
-
-            progress.advance(task, advance=len(batch))
+                        progress.advance(task, advance=len(batch))
+                    except Exception as e:
+                        console.print(f"[yellow]⚠ Error rating batch {batch_idx}: {e}[/yellow]")
+                        progress.advance(task, advance=len(batch))
 
     # Calculate metrics
     avg_score = total_score / len(rated_pairs) if rated_pairs else 0

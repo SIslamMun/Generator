@@ -21,6 +21,7 @@ import json
 import json5
 import logging
 from typing import List, Dict, Any, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
@@ -61,6 +62,7 @@ class ToolGenerator:
         tools: List[Tool],
         n_per_tool: int = 10,
         include_multi_tool: bool = True,
+        workers: int = 1,
     ) -> List[Dict[str, Any]]:
         """
         Generate diverse user instructions for tools.
@@ -69,6 +71,7 @@ class ToolGenerator:
             tools: List of tool definitions
             n_per_tool: Instructions to generate per tool
             include_multi_tool: Whether to generate multi-tool instructions
+            workers: Number of parallel workers (1=sequential)
             
         Returns:
             List of instruction dicts with metadata
@@ -77,22 +80,56 @@ class ToolGenerator:
         
         prompt_template = self._get_prompt("tool_instruction_generation")
         
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-            console=console,
-        ) as progress:
-            task = progress.add_task(
-                "[cyan]Generating instructions...", 
-                total=len(tools)
-            )
-            
-            for tool in tools:
-                tool_instructions = self._generate_for_tool(tool, n_per_tool, prompt_template)
-                all_instructions.extend(tool_instructions)
-                progress.advance(task)
+        if workers == 1:
+            # Sequential processing
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                console=console,
+            ) as progress:
+                task = progress.add_task(
+                    "[cyan]Generating instructions...", 
+                    total=len(tools)
+                )
+                
+                for tool in tools:
+                    tool_instructions = self._generate_for_tool(tool, n_per_tool, prompt_template)
+                    all_instructions.extend(tool_instructions)
+                    progress.advance(task)
+        else:
+            # Parallel processing
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                console=console,
+            ) as progress:
+                task = progress.add_task(
+                    "[cyan]Generating instructions...", 
+                    total=len(tools)
+                )
+                
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    futures = {}
+                    for tool in tools:
+                        future = executor.submit(
+                            self._generate_for_tool,
+                            tool, n_per_tool, prompt_template
+                        )
+                        futures[future] = tool.name
+                    
+                    for future in as_completed(futures):
+                        tool_name = futures[future]
+                        try:
+                            tool_instructions = future.result()
+                            all_instructions.extend(tool_instructions)
+                            progress.advance(task)
+                        except Exception as e:
+                            logger.warning(f"Failed for tool {tool_name}: {e}")
+                            progress.advance(task)
         
         # Generate multi-tool instructions if enabled
         if include_multi_tool and len(tools) > 1:
@@ -110,12 +147,17 @@ class ToolGenerator:
         prompt_template: str,
     ) -> List[Dict[str, Any]]:
         """Generate instructions for a single tool."""
+        # Use wiggle room like QA/CoT generators (adaptive based on tool complexity)
+        n_min = n
+        n_max = min(n * 2, 20)  # Cap at 20 max for tools
+        
         prompt = prompt_template.format(
             tool_name=tool.name,
             tool_description=tool.description,
             parameters=json.dumps([p.to_dict() for p in tool.parameters], indent=2),
             examples=json.dumps(tool.examples, indent=2) if tool.examples else "[]",
-            n_instructions=n,
+            n_instructions_min=n_min,
+            n_instructions_max=n_max,
         )
         
         try:

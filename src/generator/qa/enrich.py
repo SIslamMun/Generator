@@ -3,10 +3,11 @@
 import json
 from pathlib import Path
 from typing import Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import json5
 from rich.console import Console
-from rich.progress import track
+from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
 from ..clients import get_client
 from ..prompt_loader import load_prompts
@@ -21,6 +22,7 @@ def enrich_qa_pairs(
     batch_size: int = 5,
     preserve_original: bool = True,
     temperature: float = 0.3,
+    workers: int = 1,
 ) -> List[Dict]:
     """
     Enrich QA pairs by rewriting answers for better clarity and structure.
@@ -59,16 +61,57 @@ def enrich_qa_pairs(
     enriched_pairs = []
     total_batches = (len(qa_pairs) + batch_size - 1) // batch_size
 
-    for i in track(
-        range(0, len(qa_pairs), batch_size),
-        description="Enriching QA pairs",
-        total=total_batches,
-    ):
-        batch = qa_pairs[i : i + batch_size]
-        enriched_batch = _enrich_batch(
-            batch, llm, enrichment_prompt, preserve_original, temperature
-        )
-        enriched_pairs.extend(enriched_batch)
+    if workers == 1:
+        # Sequential processing
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Enriching QA pairs", total=len(qa_pairs))
+            
+            for i in range(0, len(qa_pairs), batch_size):
+                batch = qa_pairs[i : i + batch_size]
+                enriched_batch = _enrich_batch(
+                    batch, llm, enrichment_prompt, preserve_original, temperature
+                )
+                enriched_pairs.extend(enriched_batch)
+                progress.advance(task, advance=len(batch))
+    else:
+        # Parallel processing
+        batches = []
+        for i in range(0, len(qa_pairs), batch_size):
+            batches.append(qa_pairs[i : i + batch_size])
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("Enriching QA pairs", total=len(qa_pairs))
+            
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                futures = {}
+                for i, batch in enumerate(batches):
+                    future = executor.submit(
+                        _enrich_batch,
+                        batch, llm, enrichment_prompt, preserve_original, temperature
+                    )
+                    futures[future] = (i, batch)
+                
+                for future in as_completed(futures):
+                    batch_idx, batch = futures[future]
+                    try:
+                        enriched_batch = future.result()
+                        enriched_pairs.extend(enriched_batch)
+                        progress.advance(task, advance=len(batch))
+                    except Exception as e:
+                        console.print(f"[yellow]⚠ Batch {batch_idx} failed: {e}[/yellow]")
+                        progress.advance(task, advance=len(batch))
 
     console.print(
         f"[green]✓ Enriched {len(enriched_pairs)} pairs successfully[/green]"

@@ -18,7 +18,7 @@ class OllamaClient(BaseLLMClient):
                 - base_url: Ollama server URL (default: http://localhost:11434)
                 - model: Model name (default: qwen2.5:72b-instruct)
                 - temperature: Sampling temperature (default: 0.7)
-                - max_tokens: Maximum tokens to generate (default: 4096)
+                - max_tokens: Maximum tokens to generate (default: 24576)
                 - timeout: Request timeout in seconds (default: 600)
                 - max_connections: Max concurrent HTTP connections (default: 100)
         """
@@ -66,7 +66,12 @@ class OllamaClient(BaseLLMClient):
         # Add num_predict to prevent JSON truncation
         # Ollama uses 'num_predict' instead of 'max_tokens'
         token_limit = max_tokens or self.max_tokens
-        payload["options"] = {"num_predict": token_limit}
+        # Set context window to 24K to balance performance and capacity
+        # Model supports 131K context, 24K allows ~8K input + 16K output
+        payload["options"] = {
+            "num_predict": token_limit,
+            "num_ctx": 24576,  # 24K context window (input + output)
+        }
 
         # Reuse persistent client with connection pooling
         response = self._client.post(url, json=payload)

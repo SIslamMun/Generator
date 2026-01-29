@@ -15,7 +15,7 @@ tool_instruction_generation: |
   Parameters: {parameters}
   Examples: {examples}
 
-  Generate {n_instructions} diverse instructions including:
+  Generate {n_instructions_min}-{n_instructions_max} diverse instructions (adaptive based on tool complexity) including:
   - Simple direct usage (e.g., "Calculate 15% of 200")
   - Complex parameter combinations (e.g., "Find the square root of the sum of 144 and 256")
   - Edge cases (e.g., "What happens if I divide by zero?")

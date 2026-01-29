@@ -17,7 +17,7 @@ class AnthropicClient(BaseLLMClient):
             config: Configuration dict with:
                 - model: Model name (default: claude-sonnet-4-20250514)
                 - temperature: Sampling temperature (default: 0.7)
-                - max_tokens: Maximum tokens to generate (default: 4096)
+                - max_tokens: Maximum tokens to generate (default: 24576)
                 - api_key: Anthropic API key (required, can use ${VAR} syntax)
         """
         super().__init__(config)

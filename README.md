@@ -61,8 +61,9 @@ uv run generator generate-cot /path/to/lancedb -o cot.json --target-pairs 100
 uv run generator curate cot.json -o cot_curated.json --threshold 7.0
 uv run generator export cot_curated.json -o cot_training.jsonl -f chatml
 
-# Or enhance existing QA with CoT reasoning
-uv run generator enhance-cot qa.json -o cot_enhanced.json
+# Or enhance existing QA with CoT reasoning (with resume support)
+uv run generator enhance-cot qa.json -o cot_enhanced.json --workers 24
+# Or use automated script: bash run_cot_enhancement.sh
 ```
 
 ## 📝 QA Pipeline Commands
@@ -166,14 +167,29 @@ uv run generator enhance-cot INPUT.json -o OUTPUT.json [OPTIONS]
 - `--provider TEXT` - Override provider
 - `--model TEXT` - Override model
 - `--batch-size INT` - Pairs per batch (default: 5)
+- `--workers INT` - Parallel workers (default: 1, recommend 24 for Ollama)
+
+**Features:**
+- ✨ **Automatic intermediate saves** every 50 pairs for crash recovery
+- 🔄 **Resume support** via `resume-cot` command (auto-detected by script)
+- 🔧 **Auto-fix failures** via `fix-cot` command (runs automatically after completion)
 
 **Examples:**
 ```bash
-uv run generator enhance-cot qa.json -o cot_enhanced.json
-uv run generator enhance-cot qa.json -o cot_enhanced.json --batch-size 10 --provider claude
+# Fresh enhancement with parallel processing
+uv run generator enhance-cot qa.json -o cot_enhanced.json --workers 24
+
+# Resume from checkpoint (if process was interrupted)
+uv run generator resume-cot qa.json cot_enhanced_intermediate.json -o cot_enhanced.json --workers 24
+
+# Fix pairs with empty reasoning
+uv run generator fix-cot cot_enhanced.json -o cot_enhanced.json --workers 24
+
+# Recommended: Use the automated script
+bash run_cot_enhancement.sh  # Auto-resumes + auto-fixes
 ```
 
-**Output:** Converts QA pairs to CoT format with reasoning field
+**Output:** Converts QA pairs to CoT format with reasoning field. Creates intermediate checkpoint file (`*_intermediate.json`) for resume capability.
 
 ---
 

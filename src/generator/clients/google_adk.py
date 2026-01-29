@@ -17,7 +17,7 @@ class GoogleADKClient(BaseLLMClient):
             config: Configuration dict with:
                 - model: Model name (default: gemini-2.0-flash-exp)
                 - temperature: Sampling temperature (default: 0.7)
-                - max_tokens: Maximum tokens to generate (default: 4096)
+                - max_tokens: Maximum tokens to generate (default: 24576)
                 - api_key: Google API key (required, can use ${VAR} syntax)
         """
         super().__init__(config)

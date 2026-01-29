@@ -15,6 +15,7 @@ import logging
 import numpy as np
 from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
@@ -467,6 +468,7 @@ Return ONLY valid JSON."""
         self,
         pairs: List[Dict[str, Any]],
         incremental_diversity: bool = True,
+        workers: int = 1,
     ) -> List[tuple[Dict[str, Any], MultiScore]]:
         """
         Score multiple QA pairs.
@@ -475,6 +477,7 @@ Return ONLY valid JSON."""
             pairs: List of QA pairs
             incremental_diversity: If True, compute diversity incrementally
                                    (each pair compared to previous)
+            workers: Number of parallel workers (1=sequential)
             
         Returns:
             List of (pair, score) tuples
@@ -484,29 +487,67 @@ Return ONLY valid JSON."""
         
         from rich.progress import TaskProgressColumn, TimeRemainingColumn
         
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TaskProgressColumn(),
-            TextColumn("[cyan]{task.completed}/{task.total}[/cyan]"),
-            TextColumn("[yellow]({task.percentage:>3.0f}%)[/yellow]"),
-            TimeRemainingColumn(),
-            console=console,
-        ) as progress:
-            task = progress.add_task(
-                "[cyan]Scoring pairs...",
-                total=len(pairs),
-            )
-            
-            for pair in pairs:
-                existing = scored_pairs if incremental_diversity else []
-                score = self.score_pair(pair, existing)
+        if incremental_diversity or workers == 1:
+            # Sequential scoring (required for incremental diversity)
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TaskProgressColumn(),
+                TextColumn("[cyan]{task.completed}/{task.total}[/cyan]"),
+                TextColumn("[yellow]({task.percentage:>3.0f}%)[/yellow]"),
+                TimeRemainingColumn(),
+                console=console,
+            ) as progress:
+                task = progress.add_task(
+                    "[cyan]Scoring pairs...",
+                    total=len(pairs),
+                )
                 
-                results.append((pair, score))
-                scored_pairs.append(pair)
+                for pair in pairs:
+                    existing = scored_pairs if incremental_diversity else []
+                    score = self.score_pair(pair, existing)
+                    
+                    results.append((pair, score))
+                    scored_pairs.append(pair)
+                    
+                    progress.advance(task)
+        else:
+            # Parallel scoring (no incremental diversity)
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                TaskProgressColumn(),
+                TextColumn("[cyan]{task.completed}/{task.total}[/cyan]"),
+                TextColumn("[yellow]({task.percentage:>3.0f}%)[/yellow]"),
+                TimeRemainingColumn(),
+                console=console,
+            ) as progress:
+                task = progress.add_task(
+                    "[cyan]Scoring pairs...",
+                    total=len(pairs),
+                )
                 
-                progress.advance(task)
+                with ThreadPoolExecutor(max_workers=workers) as executor:
+                    futures = {}
+                    for i, pair in enumerate(pairs):
+                        future = executor.submit(self.score_pair, pair, [])
+                        futures[future] = (i, pair)
+                    
+                    # Collect results in order
+                    temp_results = [None] * len(pairs)
+                    for future in as_completed(futures):
+                        idx, pair = futures[future]
+                        try:
+                            score = future.result()
+                            temp_results[idx] = (pair, score)
+                            progress.advance(task)
+                        except Exception as e:
+                            console.print(f"[red]Error scoring pair {idx}: {e}[/red]")
+                            progress.advance(task)
+                    
+                    results = [r for r in temp_results if r is not None]
         
         # Print summary
         self._print_summary(results)

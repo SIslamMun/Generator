@@ -17,7 +17,7 @@ class VLLMClient(BaseLLMClient):
                 - model: Model name
                 - base_url: vLLM server URL (default: http://localhost:8000/v1)
                 - temperature: Sampling temperature (default: 0.7)
-                - max_tokens: Maximum tokens to generate (default: 4096)
+                - max_tokens: Maximum tokens to generate (default: 24576)
         """
         super().__init__(config)
 
