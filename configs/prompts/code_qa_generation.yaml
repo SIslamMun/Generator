@@ -1,76 +1,69 @@
 # ============================================================================
 # CODE QA GENERATION PROMPT
-# Optimized for generating QA pairs from source code chunks
+# Generates BOTH code understanding AND user-facing usage questions
 # ============================================================================
 
 prompt: |
   Create question-answer pairs from this source code for LLM training.
 
   Rules:
-  1. Questions must be about the code's functionality, design, and implementation
+  1. Generate a MIX of code understanding AND practical usage questions
   2. Answers must be directly supported by the code
-  3. Create {n_pairs_min}-{n_pairs_max} diverse question-answer pairs (generate as many as warranted by code complexity, up to the max)
+  3. Create {n_pairs_min}-{n_pairs_max} diverse question-answer pairs
   4. IMPORTANT: Work with whatever code is provided, even if incomplete
 
-  **CRITICAL REQUIREMENTS:**
-  - ALWAYS include specific names (function names, class names, variable names) in questions
-  - NEVER ask generic questions like "What is the purpose of this class?" - instead ask "What does the `ClassName` class do?"
-  - Answers MUST be at least 2-3 sentences with specific details from the code
-  - Include code snippets or parameter details in answers when relevant
+  **GENERATE TWO TYPES OF QUESTIONS:**
 
-  **GOOD question examples (domain-agnostic - adapt to your code):**
-  - "What parameters does the `configure_pipeline()` function accept and what do they control?"
-  - "How does the `DataLoader` class handle batch processing based on the `batch_size` parameter?"
-  - "What happens when `retry_count` exceeds `max_retries` in the `fetch_data()` method?"
-  - "What validation does the `parse_config()` method perform before initializing the system?"
-  - "How does the `CacheManager` decide which entries to evict when memory is full?"
+  **TYPE 1 - USER QUESTIONS (prioritize these if CLI/usage info exists):**
+  - "How do I use [feature]?" - practical usage from docstrings/comments
+  - "What command [does action]?" - if CLI commands are shown
+  - "What parameters does [function] accept?" - for user-facing functions
+  - "How do I configure [feature]?" - from config handling code
 
-  **BAD question examples (AVOID):**
-  - "What is the purpose of this class?" (too generic - no class name)
-  - "What does this code do?" (too vague)
-  - "What type of package is this?" (trivial)
+  **TYPE 2 - CODE UNDERSTANDING:**
+  - "What does `function_name()` do?" - internal behavior
+  - "How does `ClassName` handle X?" - implementation details
+  - "What happens when X condition occurs?" - error handling
 
-  **FOCUS ON** these question types:
-  - **Function/Method behavior**: "What does `function_name()` return when given X input?"
-  - **Parameter effects**: "How does the `param_name` parameter affect the behavior of `method()`?"
-  - **Error handling**: "What exception does `function()` raise when X condition occurs?"
-  - **Control flow**: "What is the execution flow when `condition` is True in `process()`?"
-  - **Integration**: "How does `ClassA` interact with `ClassB` through the `method()` call?"
+  **CRITICAL: If code contains CLI commands, argument parsing, or usage examples:**
+  - ALWAYS generate questions about how to USE those commands
+  - Include the exact command syntax in answers
+  - Example: If code has `argparse` with `--output`, ask "What does the --output flag do?"
+
+  **GOOD question examples (adapt to actual code content):**
+  - "How do I [action] using [tool]?" (user-facing)
+  - "What command [does action]?" (CLI usage)
+  - "What does the `method_name()` method do?" (code understanding)
+  - "What parameters does `function_name()` accept?" (both)
 
   **DO NOT** create questions about:
-  - Import statements alone (unless explaining why specific imports are needed)
+  - Import statements alone
   - License headers or copyright notices
   - Author names or version numbers
-  - Trivial variable assignments
   - Questions answerable with single words
-  - **Compilation/build process** without technical API context
-  - **Installation or setup steps** without explaining code behavior
-  - File paths or directory structures alone
 
   **ANSWER REQUIREMENTS:**
   - Minimum 2-3 sentences
-  - Reference specific code elements (functions, variables, parameters)
-  - Explain the "why" not just the "what"
-  - Include relevant parameter names and their effects
+  - For USER questions: Include exact commands/syntax
+  - For CODE questions: Reference specific code elements
+  - Use markdown code formatting for commands
 
   **VALIDATION CHECKLIST (before returning):**
-  Before submitting your QA pairs, verify each one:
-  ✓ Does the question reference specific function/class/variable names from the code?
-  ✓ Is the question about code behavior/logic, not build/installation?
-  ✓ Is the answer 2-3+ sentences with code-specific details?
-  ✓ Does the answer explain HOW or WHY, not just WHAT?
-  ✓ Would this QA pair teach someone how the code works?
+  ✓ Did you generate user-facing questions if CLI/usage info exists?
+  ✓ Do answers include exact command syntax when applicable?
+  ✓ Is each answer 2-3+ sentences with specific details?
+  ✓ Would this help someone USE the tool, not just understand internals?
 
   Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
   [
     {{
-      "question": "What does the `process_batch()` method do when the `validate` parameter is set to True?",
-      "answer": "When `validate` is True, the `process_batch()` method first calls `_validate_input()` to check data integrity before processing. If validation fails, it raises a `ValidationError` with details about the invalid fields. The method uses the `batch_size` configuration to determine how many items to process in each iteration."
+      "question": "How do I [action] using [tool]?",
+      "answer": "To [action], use the command `tool subcommand <args>`. This [explanation of what it does]. You can then [follow-up action] using `tool another-subcommand`."
     }},
     {{
-      "question": "How does the `DataManager` class handle connection failures in the `connect()` method?",
-      "answer": "The `connect()` method implements exponential backoff retry logic using the `max_retries` and `backoff_factor` parameters. On each failed connection attempt, it waits `backoff_factor * (2 ** attempt)` seconds before retrying. After exhausting all retries, it raises a `ConnectionError` with the last error message and logs the failure using the configured logger."
+      "question": "What does the `method_name()` method do in the ClassName class?",
+      "answer": "The `method_name()` method [description of behavior]. It [implementation detail]. If [condition], it [error handling or special case]."
     }}
   ]
 

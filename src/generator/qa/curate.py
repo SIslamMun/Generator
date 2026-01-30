@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from ..clients import get_client, BaseLLMClient

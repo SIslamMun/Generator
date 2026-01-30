@@ -181,7 +181,7 @@ filtering:
     - "build.*step"
   
   # Minimum content length for chunks (characters)
-  min_chunk_length: 300          # Increased from 200 to filter short/problematic chunks
+  min_chunk_length: 50           # Lowered to include short CLI command chunks
   
   # Enable/disable filtering
   enabled: true

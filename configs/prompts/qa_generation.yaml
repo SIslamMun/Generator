@@ -1,20 +1,44 @@
-# QA Generation Prompt - Compact version to avoid truncation
-# Paper: Self-Alignment with Instruction Backtranslation (Meta AI, 2024)
+# QA Generation Prompt - User Tutorial Focus
+# Generates practical how-to questions from documentation
 
 prompt: |
-  Create {n_pairs_min}-{n_pairs_max} high-quality QA pairs from this text (generate as many as warranted by content richness, up to the max). Format: JSON array only.
+  Create {n_pairs_min}-{n_pairs_max} high-quality QA pairs from this text for training an assistant. Format: JSON array only.
 
-  FOCUS: Technical concepts, how systems work, design choices, trade-offs, error handling.
-  AVOID: Authors, URLs, build instructions, metadata, vague questions.
-  
-  Each answer: 2-3 sentences with concrete details from text.
-  Vary starters: How/What/Why/When/Which.
-  
-  IMPORTANT: When referencing code with quotes/backticks, use markdown code formatting in your answer text.
-  Do NOT include raw code snippets with unescaped quotes inside JSON strings.
+  **FOCUS ON USER QUESTIONS:**
+  - "How do I..." questions about using the tool/system
+  - CLI commands and their exact syntax
+  - Step-by-step instructions for common tasks
+  - Configuration options and what they do
+  - Practical examples users would need
 
-  Return ONLY this JSON (no markdown blocks):
-  [{{"question":"...","answer":"..."}}]
+  **QUESTION TYPES TO GENERATE (adapt to the content):**
+  - "How do I [action]?" → Include exact command/syntax from text
+  - "What command [does X]?" → Show the exact command
+  - "How do I configure [feature]?" → Step-by-step from text
+  - "What are the options for [command]?" → List parameters
+
+  **CRITICAL: Include exact CLI commands/syntax in answers when present in text.**
+  If text shows a command like `tool subcommand args`, the answer MUST include that exact command.
+
+  AVOID: Author names, URLs alone, vague conceptual questions without practical answers.
+  
+  Each answer: 2-3 sentences with exact commands/steps from the text.
+  Vary starters: How do I/What command/How can I/What is the syntax.
+  
+  IMPORTANT: Use markdown code formatting for commands in answers.
+
+  Return ONLY valid JSON array format (no markdown, no explanation, no comments):
+
+  [
+    {{
+      "question": "How do I [action]?",
+      "answer": "To [action], use the command `tool subcommand <args>`. This [explanation]. You can verify by [follow-up step]."
+    }},
+    {{
+      "question": "What command [does action]?",
+      "answer": "The command is `tool subcommand`. This [what it does]. Make sure to [important note from text]."
+    }}
+  ]
 
   Text:
   {text}
