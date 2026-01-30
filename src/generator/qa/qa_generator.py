@@ -417,9 +417,10 @@ def _generate_pairs_for_chunk(
     if pairs and isinstance(pairs[0], list):
         pairs = pairs[0]
     
-    # Validate we got some pairs
+    # Validate we got some pairs (empty array is OK - means chunk was unsuitable)
     if not pairs or len(pairs) == 0:
-        raise ValueError(f"No QA pairs generated for chunk {chunk_id}")
+        # Return empty list instead of raising - chunk was intentionally skipped
+        return []
 
     # Add metadata to each pair
     for pair in pairs:
@@ -719,18 +720,22 @@ def _process_chunks_parallel(
             
             completed_chunks = 0
             batch_count = 0
+            null_chunks = []  # Track chunks that returned empty arrays
             
             for future in as_completed(futures):
                 chunk_id = futures[future]
                 try:
                     pairs = future.result()
-                    all_qa_pairs.extend(pairs)
+                    if pairs:  # Non-empty result
+                        all_qa_pairs.extend(pairs)
+                    else:  # Empty array returned - chunk was unsuitable
+                        null_chunks.append(chunk_id)
                     completed_chunks += 1
                     batch_count += 1
                     
                     # Save periodically - check if we crossed a save boundary
                     current_count = len(all_qa_pairs)
-                    previous_count = current_count - len(pairs)
+                    previous_count = current_count - len(pairs) if pairs else current_count
                     if (current_count // save_freq) > (previous_count // save_freq):
                         _save_intermediate(all_qa_pairs, output_file)
                 except Exception as e:
@@ -751,5 +756,12 @@ def _process_chunks_parallel(
                 remaining_chunks = len(chunks_to_process) - completed_chunks
                 progress.update(task, description=f"[cyan]Generating QA pairs... ({len(all_qa_pairs)} pairs | {completed_chunks}/{len(chunks_to_process)} chunks | {remaining_chunks} left)")
                 progress.advance(task, advance=batch_count)
+    
+    # Log null chunks (those that returned empty arrays)
+    if null_chunks:
+        null_log_file = output_file.parent / f"{output_file.stem}_null_chunks.json"
+        with open(null_log_file, 'w') as f:
+            json.dump(null_chunks, f, indent=2)
+        console.print(f"[yellow]📝 {len(null_chunks)} chunks returned empty (logged to {null_log_file})[/yellow]")
     
     return all_qa_pairs

@@ -48,6 +48,11 @@ prompt: |
   - For CODE questions: Reference specific code elements
   - Use markdown code formatting for commands
 
+  **IF THE CODE IS TOO SHORT OR LACKS ACTIONABLE CONTENT:**
+  If the code is just imports, license headers, empty files, or trivial boilerplate
+  with no meaningful functions/classes/documentation, return an empty array: []
+  Do NOT apologize or explain - just return []
+
   **VALIDATION CHECKLIST (before returning):**
   ✓ Did you generate user-facing questions if CLI/usage info exists?
   ✓ Do answers include exact command syntax when applicable?
