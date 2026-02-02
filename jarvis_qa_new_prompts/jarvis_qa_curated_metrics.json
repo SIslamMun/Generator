@@ -1,10 +1,3 @@
-{
-  "total_pairs": 7506,
-  "rated_pairs": 7506,
-  "filtered_pairs": 3911,
-  "retention_rate": 0.5210498268052225,
-  "avg_score": 6.112176925126565,
-  "threshold": 7.0,
-  "original_format": "qa",
-  "curated_at": "2026-02-01T10:25:02.617605"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:969932c2933c2b6363e598add02ff50a94ba99991dec1bf2ae1c3c6749272ba0
+size 241

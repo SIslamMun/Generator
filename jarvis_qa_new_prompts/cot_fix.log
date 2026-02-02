@@ -1,0 +1,113 @@
+========================================================================
+Fixing Failed CoT Pairs for Jarvis QA Datasets
+========================================================================
+
+Timestamp: Mon Feb  2 01:08:53 UTC 2026
+
+========================================================================
+1. Fixing CURATED CoT dataset
+========================================================================
+
+
+🔧 Re-enhancing failed CoT pairs
+
+Loaded 3911 pairs from jarvis_qa_new_prompts/jarvis_qa_curated_cot.json
+Found 195 pairs with empty reasoning (5.0%)
+Re-enhancing 195 failed pairs...
+
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1: timed out
+  Enhancing with CoT... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 195/195 (100%) 0:00:00
+
+✨ Success! Fixed 180/195 pairs
+Remaining failures: 15
+✓ Saved to jarvis_qa_new_prompts/jarvis_qa_curated_cot_fixed.json
+
+
+✓ Curated dataset fixed in 719s (11m)
+
+========================================================================
+2. Fixing RAW CoT dataset
+========================================================================
+
+
+🔧 Re-enhancing failed CoT pairs
+
+Loaded 7521 pairs from jarvis_qa_new_prompts/jarvis_qa_raw_cot.json
+Found 672 pairs with empty reasoning (8.9%)
+Re-enhancing 672 failed pairs...
+
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1: timed out
+Failed to enhance batch 8: timed out
+Failed to enhance batch 13: timed out
+Failed to enhance batch 31: timed out
+Failed to enhance batch 32: timed out
+Failed to enhance batch 40: timed out
+Failed to enhance batch 43: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 49: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 62: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 80: timed out
+Failed to enhance batch 81: timed out
+Failed to enhance batch 92: timed out
+Failed to enhance batch 99: timed out
+Failed to enhance batch 100: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+  Enhancing with CoT... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 672/672 (100%) 0:00:00
+
+✨ Success! Fixed 517/672 pairs
+Remaining failures: 155
+✓ Saved to jarvis_qa_new_prompts/jarvis_qa_raw_cot_fixed.json
+
+
+✓ Raw dataset fixed in 2167s (36m)
+
+========================================================================
+CoT Fix Complete!
+========================================================================
+
+Curated dataset: 719s (11m)
+Raw dataset:     2167s (36m)
+Total time:      2886s (48m)
+
+Output files:
+  - jarvis_qa_new_prompts/jarvis_qa_curated_cot_fixed.json
+  - jarvis_qa_new_prompts/jarvis_qa_raw_cot_fixed.json
+
+Completed at: Mon Feb  2 01:56:59 UTC 2026
+
