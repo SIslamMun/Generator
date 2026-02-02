@@ -1,0 +1,502 @@
+[
+  {
+    "question": "What command cleans data produced by ARLDM?",
+    "reasoning": "Let me think through this step by step:\n\n1. ARLDM produces intermediate data files in the workspace when it runs. \n2. The Jarvis CLI provides a dedicated command to wipe those outputs and restore a clean state.\n3. The appropriate command follows the pattern `jarvis pipeline <action> <name>` and for cleaning, the action is `clean`.",
+    "answer": "The command is `jarvis pipeline clean`. This cleans the data produced by ARLDM. Make sure to run it from the project root."
+  },
+  {
+    "question": "How do I create a pipeline in Jarvis?",
+    "reasoning": "Let me think through this step by step:\n\n1. A pipeline in Jarvis is identified by a unique name and stores configuration needed for ARLDM runs.\n2. The CLI exposes a `create` subcommand under `pipeline` to register a new pipeline.\n3. After running the command, you should verify its creation by listing pipelines or inspecting the configuration files.",
+    "answer": "To create a pipeline, run the command `jarvis pipeline create arldm_test`. This command will store all configuration data needed by ARLDM. Verify the pipeline was created by listing pipelines or checking configuration files."
+  },
+  {
+    "question": "What command does Jarvis use to create a pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. The command follows the general structure of the Jarvis CLI: `jarvis <resource> <action> [options]`.\n2. Creating a pipeline is an action under the `pipeline` resource, requiring a pipeline name.\n3. Therefore the full syntax is `jarvis pipeline create <pipeline_name>`.",
+    "answer": "The command is `jarvis pipeline create <pipeline_name>`. This will set up a new pipeline with the specified name, storing the configuration data for ARLDM. Make sure the name is unique to avoid conflicts."
+  },
+  {
+    "question": "How do I set the hostfile for distributed tests?",
+    "reasoning": "Let me think through this step by step:\n\n1. Distributed tests need to know the list of hosts to run on, which is specified in a hostfile.\n2. Jarvis exposes a dedicated subcommand to register that hostfile path.\n3. After setting it, you can retrieve the current configuration to confirm.",
+    "answer": "Use the command `jarvis hostfile set /path/to/hostfile`. This tells Jarvis where the hostfile is located so it can distribute tests accordingly. Verify by running `jarvis hostfile get` to see the current setting."
+  },
+  {
+    "question": "What command builds the resource graph with a walkthrough?",
+    "reasoning": "Let me think through this step by step:\n\n1. The resource graph represents the test environment and dependencies needed for a pipeline.\n2. Jarvis can build this graph automatically and provide a walkthrough for interactive setup.\n3. The command syntax includes the `resource-graph build` action with a `+walkthrough` flag.",
+    "answer": "The command is ``jarvis resource-graph build +walkthrough``. This builds the resource graph and provides a command‑line tutorial for creating the hostfile. After it finishes, the resource graph will be available for future pipelines."
+  },
+  {
+    "question": "What command unzips the PororoSV dataset?",
+    "reasoning": "Let me think through this step by step:\n\n1. The dataset was downloaded as a single archive file named `pororo.zip`.\n2. To extract its contents we need a tool that understands ZIP archives; the standard `unzip` command on most Unix-like systems does exactly that.\n3. Running `unzip pororo.zip` will decompress all files and directories contained in the archive and place them into a folder named `pororo_png`.\n4. The extracted folder will contain the full 15 GB dataset.",
+    "answer": "after the download finishes, use `unzip pororo.zip` to extract the archive. The extraction will create a 15GB folder named `pororo_png`."
+  },
+  {
+    "question": "How do I rename the extracted folder to `pororo`?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `mv` command in Unix can move or rename files and directories.\n2. After unzipping, the folder is called `pororo_png`.\n3. To rename it to match the expected naming convention (`pororo`), we simply specify the current name followed by the new name.\n4. No additional options are required for a simple rename.",
+    "answer": "run `mv pororo_png pororo` to rename the extracted directory. This step ensures the folder follows the expected naming convention."
+  },
+  {
+    "question": "What is the syntax for moving the zip file to the zippack directory?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `mv` command can also be used to relocate a file to a different directory.\n2. The source file is `pororo.zip` and the destination directory is `$EXPERIMENT_INPUT_PATH/zippack`.\n3. By specifying the full destination path, the file will be moved (not copied) into the `zippack` folder.\n4. This keeps the original dataset archive organized and free of clutter.",
+    "answer": "use `mv pororo.zip $EXPERIMENT_INPUT_PATH/zippack` to relocate the original zip file. This keeps the dataset archive organized in the `zippack` folder."
+  },
+  {
+    "question": "What does the `gdown` command do in this context?",
+    "reasoning": "Let me think through this step by step:\n\n1. `gdown` is a Python-based command‑line utility that downloads files from Google Drive.\n2. The string inside the quotes is a Google Drive URL‑like token: `11Io1_BufAayJ1BpdxxV2uJUvCcirbrNc`.\n3. The `&confirm=t` parameter is appended to bypass any download confirmation dialog that Google might display for large files.\n4. Running this command fetches the file identified by that ID and saves it in the current working directory.",
+    "answer": "the command `gdown \"11Io1_BufAayJ1BpdxxV2uJUvCcirbrNc&confirm=t\"` downloads a Google Drive file identified by the ID `11Io1_BufAayJ1BpdxxV2uJUvCcirbrNc`. The `confirm=t` flag bypasses the download confirmation."
+  },
+  {
+    "question": "How do I download the VISTSIS dataset?",
+    "reasoning": "Let me think through this step by step:\n\n1. We need to be in the experiment input directory so that the downloaded files end up in the correct place. The environment variable `$EXPERIMENT_INPUT_PATH` holds that directory.\n2. The VISTSIS dataset is available as a tarball at the provided URL.\n3. Using `wget` we can fetch the archive (`SIS-with-labels.tar.gz`).\n4. Once downloaded, we extract it with `tar -vxf`, which also shows verbose output of the extraction process.\n5. The extracted top‑level directory is named `sis`; renaming it to `vistsis` matches the convention used in other steps.\n6. Finally, we move the original archive into a dedicated `zippack` subdirectory for cleanliness.",
+    "answer": "first navigate to your experiment input directory with `cd $EXPERIMENT_INPUT_PATH`. Then run the following commands:\n```shell\nwget https://visionandlanguage.net/VIST/json_files/story-in-sequence/SIS-with-labels.tar.gz\ntar -vxf SIS-with-labels.tar.gz\nmv sis vistsis\n```\nFinally, move the archive to a separate folder with `mv SIS-with-labels.tar.gz $EXPERIMENT_INPUT_PATH/zippack`."
+  },
+  {
+    "question": "How do I set up the experiment input and output paths for the Ares cluster?",
+    "reasoning": "Let me think through this step by step:\n\n1. Identify a convenient base directory for all experiment files. This keeps things organized and makes path construction simple.\n2. Store that base directory in a shell variable so it can be reused throughout the script.\n3. Append the standard sub‑directory name (`input_data`) to that base path to create the full input path.\n4. Export the resulting path so it is available to child processes.\n5. Register the exported path with `scspkg` so that the `arldm` environment automatically receives the correct input location.",
+    "answer": "first define the experiment base path:\n```bash\nEXPERIMENT_PATH=~/experiments/arldm_run\n```\nThen export the input path:\n```bash\nexport EXPERIMENT_INPUT_PATH=$EXPERIMENT_PATH/input_data\n```\nFinally set this path in scspkg:\n```bash\nscspkg env set arldm EXPERIMENT_INPUT_PATH=$EXPERIMENT_INPUT_PATH\n```"
+  },
+  {
+    "question": "What does the command `scspkg env set arldm EXPERIMENT_INPUT_PATH=$EXPERIMENT_INPUT_PATH` do?",
+    "reasoning": "Let me think through this step by step:\n\n1. The command targets the `scspkg` environment manager.\n2. `env set` is used to define or update environment variables for a specific package.\n3. `arldm` is the name of the package whose environment we are configuring.\n4. The variable `EXPERIMENT_INPUT_PATH` is being assigned the value of the shell variable `$EXPERIMENT_INPUT_PATH`.\n5. As a result, any process that loads the `arldm` environment will automatically receive this variable, allowing the package to locate its input data.",
+    "answer": "it configures the environment for the `arldm` package by storing the `EXPERIMENT_INPUT_PATH` variable in scspkg’s environment settings. This makes the path available to all processes that load the `arldm` environment, ensuring they know where to find input data."
+  },
+  {
+    "question": "How do I create the required directories for the experiment input data?",
+    "reasoning": "Let me think through this step by step:\n\n1. Determine the absolute path for the input directory (typically `$EXPERIMENT_INPUT_PATH`).\n2. Identify any subdirectories that the experiment will need, such as `zippack` for intermediate files.\n3. Use `mkdir -p` so that all parent directories are created if they are missing.\n4. The `-p` flag also suppresses errors if the directory already exists, making the command idempotent.\n\nUse `mkdir -p` to create the input directory and a subdirectory called `zippack`:\n```bash\nmkdir -p $EXPERIMENT_INPUT_PATH $EXPERIMENT_INPUT_PATH/zippack\n```\nThe `-p` flag creates any missing parent directories and prevents errors if the directories already exist.",
+    "answer": "Let me think through this step by step:\n\n1. Determine the absolute path for the input directory (typically `$EXPERIMENT_INPUT_PATH`).\n2. Identify any subdirectories that the experiment will need, such as `zippack` for intermediate files.\n3. Use `mkdir -p` so that all parent directories are created if they are missing.\n4. The `-p` flag also suppresses errors if the directory already exists, making the command idempotent.\n\nUse `mkdir -p` to create the input directory and a subdirectory called `zippack`:\n```bash\nmkdir -p $EXPERIMENT_INPUT_PATH $EXPERIMENT_INPUT_PATH/zippack\n```\nThe `-p` flag creates any missing parent directories and prevents errors if the directories already exist."
+  },
+  {
+    "question": "How do I configure the EXPERIMENT_INPUT_PATH variable for use with scspkg?",
+    "reasoning": "Let me think through this step by step:\n\n1. Export the desired path as a shell environment variable so that it can be accessed by subsequent commands.\n2. The variable name `EXPERIMENT_INPUT_PATH` should match the one expected by the `arldm` package.\n3. Once exported, pass the variable to `scspkg` when configuring the package environment.\n4. This registers the value inside `scspkg`’s configuration, making it available to all processes that load that environment.\n\nFirst set the environment variable in your shell:\n```bash\nexport EXPERIMENT_INPUT_PATH=$EXPERIMENT_PATH/input_data\n```\nThen pass it to scspkg when setting the environment:\n```bash\nscspkg env set arldm EXPERIMENT_INPUT_PATH=$EXPERIMENT_INPUT_PATH\n```\nThis registers the variable inside scspkg’s configuration.",
+    "answer": "Let me think through this step by step:\n\n1. Export the desired path as a shell environment variable so that it can be accessed by subsequent commands.\n2. The variable name `EXPERIMENT_INPUT_PATH` should match the one expected by the `arldm` package.\n3. Once exported, pass the variable to `scspkg` when configuring the package environment.\n4. This registers the value inside `scspkg`’s configuration, making it available to all processes that load that environment.\n\nFirst set the environment variable in your shell:\n```bash\nexport EXPERIMENT_INPUT_PATH=$EXPERIMENT_PATH/input_data\n```\nThen pass it to scspkg when setting the environment:\n```bash\nscspkg env set arldm EXPERIMENT_INPUT_PATH=$EXPERIMENT_INPUT_PATH\n```\nThis registers the variable inside scspkg’s configuration."
+  },
+  {
+    "question": "How do I clean data produced by ARLDM?",
+    "reasoning": "Let me think through this step by step:\n\n1. Identify the command provided by the ARLDM framework for cleaning intermediate files.\n2. The framework supplies a convenient `jarvis pipeline clean` helper that removes temporary artifacts and resets the pipeline state.\n3. Running this command will delete generated files but preserve the original experiment configuration.\n4. After execution, you can inspect the pipeline log or the experiment directory to confirm that the cleanup was successful.\n\nTo clean the data produced by ARLDM, run the command `jarvis pipeline clean`. This removes intermediate files and resets the pipeline state. You can verify by checking the log output.",
+    "answer": "Let me think through this step by step:\n\n1. Identify the command provided by the ARLDM framework for cleaning intermediate files.\n2. The framework supplies a convenient `jarvis pipeline clean` helper that removes temporary artifacts and resets the pipeline state.\n3. Running this command will delete generated files but preserve the original experiment configuration.\n4. After execution, you can inspect the pipeline log or the experiment directory to confirm that the cleanup was successful.\n\nTo clean the data produced by ARLDM, run the command `jarvis pipeline clean`. This removes intermediate files and resets the pipeline state. You can verify by checking the log output."
+  },
+  {
+    "question": "How do I install gdown with a specific version?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to use `pip` to install a Python package.\n2. When specifying a particular version, I must use the `==` syntax.\n3. I should decide which version I want, e.g., 4.5.1 or 4.6.0.\n4. I then run the command with `python3 -m pip install gdown==<version>`.",
+    "answer": "Use the command `python3 -m pip install gdown==4.5.1` or `python3 -m pip install gdown==4.6.0` depending on your preference. This installs gdown with the chosen version."
+  },
+  {
+    "question": "What command displays information about the installed gdown package?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need a tool that shows metadata about an installed Python package.\n2. The standard tool for this is `pip show`.\n3. I just supply the package name after the command.\n4. Running the command will print details such as version, location, and dependencies.",
+    "answer": "Run `pip show gdown`. This will list details such as the version, location, and dependencies of the installed gdown package."
+  },
+  {
+    "question": "How do I install HDF5 1.14.0 with spack?",
+    "reasoning": "Let me think through this step by step:\n\n1. I want to use Spack to install a specific version of a package.\n2. Spack syntax for a particular version is `@<version>`.\n3. To enable or disable variants I add `+variant` or `~variant`.\n4. For HDF5 1.14.0 with the high‑level (hl) variant enabled and MPI disabled, I use `+hl~mpi`.\n5. The full install command becomes `spack install hdf5@1.14.0+hl~mpi`.\n6. After installation I can verify with `spack find hdf5`.",
+    "answer": "To install HDF5 1.14.0 with spack, run the command `spack install hdf5@1.14.0+hl~mpi`. This command fetches version 1.14.0, enables the high‑level (hl) variant, and disables MPI support. Verify the installation with `spack find hdf5`."
+  },
+  {
+    "question": "What command installs HDF5 with high-level features and without MPI?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need a Spack install command targeting the HDF5 package.\n2. I specify the version (1.14.0) with `@1.14.0`.\n3. I enable the hl variant with `+hl` and disable MPI with `~mpi`.\n4. Combining these gives `spack install hdf5@1.14.0+hl~mpi`.",
+    "answer": "The command is `spack install hdf5@1.14.0+hl~mpi`. It tells Spack to install HDF5 1.14.0, enable the hl variant, and disable the mpi variant."
+  },
+  {
+    "question": "How do I configure the HDF5 installation to enable the hl variant but disable mpi?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to construct a Spack install command.\n2. I specify the HDF5 package name.\n3. I choose the desired version (1.14.0) with `@1.14.0`.\n4. I enable the high‑level API by adding `+hl`.\n5. I disable MPI by adding `~mpi`.\n6. The resulting command is `spack install hdf5@1.14.0+hl~mpi`.\n7. After installation I can confirm the configuration with `spack find hdf5`.",
+    "answer": "Open a terminal and execute `spack install hdf5@1.14.0+hl~mpi`. This configures HDF5 with the high‑level API enabled and MPI support turned off. After installation, check with `spack find hdf5`."
+  },
+  {
+    "question": "What command appends a Hermes POSIX interceptor to the pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. The question is asking for the specific command that adds the Hermes POSIX interceptor to an existing pipeline.\n2. The general syntax for appending a component to a Jarvis pipeline is `jarvis pipeline append <component> [options]`.\n3. The Hermes interceptor is referenced as `hermes_api` in the documentation.\n4. The POSIX-specific variant is indicated by the `+posix` option.\n5. Combining these pieces gives the full command.",
+    "answer": "The command is:\n\n```bash\njarvis pipeline append hermes_api +posix\n```\nThis adds the Hermes POSIX interceptor to the current pipeline. Make sure the interceptor is enabled before running the pipeline."
+  },
+  {
+    "question": "How do I configure the ARLDM runscript to use Hermes?",
+    "reasoning": "Let me think through this step by step:\n\n1. We need to add an ARLDM step to the pipeline.\n2. The ARLDM step is specified with `arldm` and we must reference a particular runscript (e.g., `vistsis`).\n3. To enable Hermes for this runscript we must set the `with_hermes` flag to `true`.\n4. The syntax for appending such a step is `jarvis pipeline append arldm runscript=<name> with_hermes=<value>`.\n5. Plugging in the required values gives the command.",
+    "answer": "Add the ARLDM step with Hermes enabled by executing:\n\n```bash\njarvis pipeline append arldm runscript=vistsis with_hermes=true\n```\nThis configures the ARLDM runscript named `vistsis` and tells it to operate with Hermes. You can confirm the setting by inspecting the pipeline configuration."
+  },
+  {
+    "question": "What are the options available for `jarvis pipeline append hermes_api`?",
+    "reasoning": "Let me think through this step by step:\n\n1. The question is about options for appending the Hermes API component.\n2. The documentation mentions only the `+posix` flag as an additional option.\n3. No other flags or parameters are listed in the provided text.\n4. Therefore, the only option we can mention is `+posix`.",
+    "answer": "The command accepts the `+posix` option, shown as:\n\n```bash\njarvis pipeline append hermes_api +posix\n```\nThe `+posix` flag enables the Hermes POSIX interceptor. Other options are not listed in the provided text."
+  },
+  {
+    "question": "How do I run the experiment?",
+    "reasoning": "Let me think through this step by step:\n\n1. Running an experiment involves executing the entire pipeline that has been assembled.\n2. The standard command to trigger a pipeline run in Jarvis is `jarvis pipeline run`.\n3. After the pipeline completes, it outputs data to the designated output directory.\n4. Thus, the correct command is simply to invoke the run subcommand.",
+    "answer": "To run the experiment, use the command\n\n```bash\njarvis pipeline run\n```\nThis executes the pipeline and generates the output data in the directory `$EXPERIMENT_INPUT_PATH/output_data`."
+  },
+  {
+    "question": "What command starts the pipeline run?",
+    "reasoning": "Let me think through this step by step:\n\n1. Starting a pipeline run means initiating the execution of the entire pipeline configuration.\n2. In Jarvis, this is performed with the `run` subcommand under `pipeline`.\n3. Therefore, the command that starts the pipeline run is the same as the one used to run the experiment.",
+    "answer": "The command that starts the pipeline run is\n\n```bash\njarvis pipeline run\n```\nIt triggers the execution of the experiment and produces output in `$EXPERIMENT_INPUT_PATH/output_data`."
+  },
+  {
+    "question": "What command runs the experiment?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user is asking for the command that initiates the experiment.\n2. In our framework, experiments are started with the `jarvis pipeline run` command.\n3. Once the command completes, the output data is stored in the predefined output directory.",
+    "answer": "The command to run the experiment is ``jarvis pipeline run``. After execution, the results are stored in ``$EXPERIMENT_INPUT_PATH/output_data``."
+  },
+  {
+    "question": "Where are the output files generated after running the experiment?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to know the location of the output files.\n2. The experiment output is always written to the directory defined by the environment variable `$EXPERIMENT_INPUT_PATH` with the subfolder `output_data`.\n3. Therefore, that is the place where the generated files reside.",
+    "answer": "After executing ``jarvis pipeline run``, the output files are generated in ``$EXPERIMENT_INPUT_PATH/output_data``. You can verify the results by checking that directory."
+  },
+  {
+    "question": "How do I install wget using apt-get?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user needs to install the `wget` package on a Debian‑based system.\n2. The standard way is to invoke the package manager `apt-get` with super‑user privileges.\n3. Running `sudo apt-get install wget` will download and install the package, and afterward `which wget` can confirm the executable is available.",
+    "answer": "Run the command `sudo apt-get install wget`. This will install wget on your system. Verify the installation by running `which wget`."
+  },
+  {
+    "question": "How do I install wget using spack?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to use the Spack package manager to install `wget`.\n2. First, they need to request Spack to build and install the package with `spack install wget`.\n3. After installation, the package can be made available to the shell with `spack load wget`, and the location of the executable can be verified with `which wget`.",
+    "answer": "First run `spack install wget` to install the package, then load it with `spack load wget`. After that, you can check the executable with `which wget`."
+  },
+  {
+    "question": "What command checks if wget is usable?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants a quick way to verify that the `wget` program is installed and accessible.\n2. The standard Unix utility for locating executables is `which`.\n3. Running `which wget` will return the full path if the binary is found in the system’s `PATH`.",
+    "answer": "Use the command `which wget`. This will show the path to the wget executable if it is installed."
+  },
+  {
+    "question": "How do I store the current environment in the pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to capture the current environment so it can be reused in later pipeline stages.\n2. The `jarvis` CLI provides a `pipeline env build` command that gathers specified environment variables.\n3. For this particular workflow, the relevant variables are `PRETRAIN_MODEL_PATH`, `EXPERIMENT_INPUT_PATH`, and `ARLDM_PATH`.\n4. The syntax for selecting these variables is to prefix each with a `+` when invoking the command.\n5. Therefore, the command to run is `jarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH`.\n6. After execution, the pipeline context will contain these variables, and you can verify them by inspecting the pipeline configuration or by running a subsequent step that references them.",
+    "answer": "Use the command `jarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH`. This will capture the specified environment variables and save them for later stages of the pipeline. You can verify the saved environment by inspecting the pipeline configuration or running a subsequent step that uses these variables."
+  },
+  {
+    "question": "What command builds the environment for a pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user is asking for the specific command that builds the environment.\n2. In the context of the `jarvis` tool, this is done with `jarvis pipeline env build`.\n3. The command requires the user to specify which environment variables to capture, using the `+` prefix for each variable.\n4. The variables of interest in this example are `PRETRAIN_MODEL_PATH`, `EXPERIMENT_INPUT_PATH`, and `ARLDM_PATH`.\n5. Putting it together, the full command becomes `jarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH`.\n6. Running this command stores those variables in the pipeline context.",
+    "answer": "The command is `jarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH`. It collects the current environment variables specified by the `+` flags and stores them within the pipeline context. Make sure to include all necessary flags before executing the command."
+  },
+  {
+    "question": "What are the options for `jarvis pipeline env build`?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to know what flags can be passed to `jarvis pipeline env build`.\n2. This command uses `+` prefixed flags to indicate which environment variables to capture.\n3. In the current context, the relevant variables are `PRETRAIN_MODEL_PATH`, `EXPERIMENT_INPUT_PATH`, and `ARLDM_PATH`.\n4. Therefore, the options are the `+` prefixed versions of those variables.\n5. The user must provide each `+` flag when invoking the command.",
+    "answer": "The options for this command are the `+` prefixed flags: `+PRETRAIN_MODEL_PATH`, `+EXPERIMENT_INPUT_PATH`, and `+ARLDM_PATH`. Each flag indicates a path that will be saved in the pipeline's environment. You must provide all relevant paths when invoking the command."
+  },
+  {
+    "question": "How can I specify the pretrain model path, experiment input path, and ARLDM path when building the environment?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user needs to include three specific paths when running `jarvis pipeline env build`.\n2. Each path must be referenced with a `+` flag to indicate that it should be captured.\n3. The paths correspond to the environment variables `PRETRAIN_MODEL_PATH`, `EXPERIMENT_INPUT_PATH`, and `ARLDM_PATH`.\n4. The syntax for each is `+VARIABLE_NAME`.\n5. Therefore, the command is `jarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH`, with the placeholders replaced by the actual file system paths.",
+    "answer": "Run the exact command `jarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH`, replacing the placeholder values with your actual file system paths. Each `+` flag must be present and correctly formatted for the pipeline to recognize the environment settings."
+  },
+  {
+    "question": "How do I add a Hermes run step that sleeps for 10 seconds and includes an H5 output file from the experiment input path?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to append a Hermes run step to the pipeline.\n2. The step should include a `--sleep` flag set to `10` seconds.\n3. It should also include a file from the `EXPERIMENT_INPUT_PATH` named with the `RUN_SCRIPT` variable and ending in `_out.h5`.\n4. The syntax for appending a Hermes step is `jarvis pipeline append hermes_run`.\n5. The `--sleep` option takes the number of seconds.\n6. The `include` option specifies the file to include; we need to reference the environment variable using `$EXPERIMENT_INPUT_PATH` and concatenate the script name.\n7. Therefore, the full command is:\n   ```bash\n   jarvis pipeline append hermes_run --sleep=10 include=$EXPERIMENT_INPUT_PATH/${RUN_SCRIPT}_out.h5\n   ```\n8. After running this, the user can verify by listing the pipeline steps.",
+    "answer": "Use the command:\n\n```bash\njarvis pipeline append hermes_run --sleep=10 include=$EXPERIMENT_INPUT_PATH/${RUN_SCRIPT}_out.h5\n```\nThis appends a Hermes run step that waits 10 seconds before execution and includes the specified H5 file. Verify by running `jarvis pipeline list` to see the new step."
+  },
+  {
+    "question": "How do I store the original zip file in a separate folder?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to identify the source location of the zip file (in this case `flintstones_data.zip`).\n2. I want to keep the original archive separate from any extracted contents, so I’ll move it into a dedicated subdirectory.\n3. The target path for the new folder is provided by the environment variable `EXPERIMENT_INPUT_PATH`, and I’ll name the folder `zippack`.\n4. Using the `mv` command will relocate the file atomically, avoiding any accidental overwrites.\n5. After moving, the zip resides in `$EXPERIMENT_INPUT_PATH/zippack`, keeping the raw data isolated from later processing.",
+    "answer": "Use the mv command to move the zip into a dedicated `zippack` directory:\n```shell\nmv flintstones_data.zip $EXPERIMENT_INPUT_PATH/zippack\n```\nThis keeps the raw archive separate from the extracted dataset."
+  },
+  {
+    "question": "How do I load the environment variables needed by ARLDM?",
+    "reasoning": "Let me think through this step by step:\n\n1. ARLDM depends on a specific HDF5 library that must be available in the session.\n2. I should first load that HDF5 package via Spack, ensuring I use the exact version and build options that ARLDM expects (`hdf5@1.14.0+hl~mpi`).\n3. Once the library is available, the ARLDM module itself needs to be loaded so that its own environment variables (paths, flags, etc.) are set.\n4. Loading `module load arldm` pulls in all the necessary runtime settings for the pipeline to run correctly.\n5. After both commands run, the shell will have the correct variables defined for ARLDM.",
+    "answer": "To set up the ARLDM environment, first load the specific hdf5 package with `spack load hdf5@1.14.0+hl~mpi`. Then load the ARLDM module using `module load arldm`. This prepares all required variables for the pipeline."
+  },
+  {
+    "question": "What command stores the current environment in the pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to capture the current set of environment variables that the pipeline will use.\n2. The `jarvis env build` command is designed to serialize a list of variables into the pipeline’s configuration.\n3. I should specify the name of the environment (`arldm`) followed by a space-separated list of the variables to persist.\n4. Each variable is prefixed with a plus sign so that the command knows to include it.\n5. Running the command writes these values into the pipeline definition so later steps can reference them.",
+    "answer": "The environment can be stored with the command `jarvis env build arldm \\\n+EXPERIMENT_PATH +EXPERIMENT_INPUT_PATH +EXPERIMENT_OUTPUT_PATH \\\n+ARLDM_PATH +PRETRAIN_MODEL_PATH`. This records the specified variables in the pipeline's configuration."
+  },
+  {
+    "question": "How do I copy the environment to the pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. After building the environment with `jarvis env build`, the variables are stored locally but not yet attached to the active pipeline.\n2. I need to transfer (copy) this stored environment into the pipeline context so that subsequent jobs can consume it.\n3. The `jarvis pipeline env copy` command does exactly that by taking the environment name (`arldm`) and importing it into the pipeline.\n4. Once copied, the pipeline will expose those variables to all downstream steps, ensuring consistency.",
+    "answer": "After building the environment, copy it into the pipeline with `jarvis pipeline env copy arldm`. This makes the environment variables available for subsequent pipeline steps."
+  },
+  {
+    "question": "What are the options for the jarvis env build command?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `jarvis env build` command is used to capture a set of environment variables under a named environment.\n2. Its primary option is a list of variables that should be stored; each variable is prefixed with a plus sign (`+`) to indicate inclusion.\n3. Typical variables for an ARLDM pipeline include `+EXPERIMENT_PATH`, `+EXPERIMENT_INPUT_PATH`, `+EXPERIMENT_OUTPUT_PATH`, `+ARLDM_PATH`, and `+PRETRAIN_MODEL_PATH`.\n4. The command signature is: `jarvis env build <env-name> <vars…>`.\n5. By listing these variables, the command creates a configuration that the pipeline can later reference.",
+    "answer": "The `jarvis env build` command accepts a list of variables to store, such as `+EXPERIMENT_PATH`, `+EXPERIMENT_INPUT_PATH`, `+EXPERIMENT_OUTPUT_PATH`, `+ARLDM_PATH`, and `+PRETRAIN_MODEL_PATH`. Each variable is prefixed with a plus sign and added to the environment definition."
+  },
+  {
+    "question": "What command sets the PRETRAIN_MODEL_PATH for the training script?",
+    "reasoning": "",
+    "answer": "The command is:\n```bash\nexport PRETRAIN_MODEL_PATH=`realpath model_large.pth`\n```\nIt resolves the absolute path to `model_large.pth` and stores it in the environment variable."
+  },
+  {
+    "question": "How do I configure local experiment and input paths using node‑local NVMe storage?",
+    "reasoning": "",
+    "answer": "Define the local paths like so:\n```bash\nLOCAL_EXPERIMENT_PATH=/mnt/nvme/$USER/arldm_run\nLOCAL_INPUT_PATH=$LOCAL_EXPERIMENT_PATH/input_data\n```"
+  },
+  {
+    "question": "How do I change the RUN_SCRIPT variable to use a different dataset?",
+    "reasoning": "",
+    "answer": "Modify the variable before running the script:\n```bash\nRUN_SCRIPT=other_dataset\n```"
+  },
+  {
+    "question": "How do I create a pipeline?",
+    "reasoning": "",
+    "answer": "To create a pipeline, run the command `jarvis pipeline create arldm_local`. This will store all configuration data needed by ARLDM."
+  },
+  {
+    "question": "What command creates a pipeline?",
+    "reasoning": "",
+    "answer": "The command is `jarvis pipeline create arldm_local`. This command sets up a Jarvis pipeline that will store all configuration data required by ARLDM."
+  },
+  {
+    "question": "How do I create a Jarvis pipeline with ARLDM for a specific RUN_SCRIPT?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to understand the goal: create a pipeline that includes ARLDM with a specific RUN_SCRIPT.\n2. Jarvis provides an `append` command to add a step to the pipeline.\n3. The syntax for adding ARLDM requires specifying the runscript and the local experiment directory.\n4. Using environment variables `$RUN_SCRIPT` and `$LOCAL_INPUT_PATH` makes the command flexible.",
+    "answer": "Run the following command:\n```\njarvis pipeline append arldm runscript=$RUN_SCRIPT local_exp_dir=$LOCAL_INPUT_PATH\n```\nReplace `$RUN_SCRIPT` with your script name; this adds ARLDM to the pipeline and sets the local experiment directory accordingly."
+  },
+  {
+    "question": "How do I run the experiment?",
+    "reasoning": "Let me think through this step by step:\n\n1. Determine what the user wants: start the experiment.\n2. The Jarvis pipeline can be executed with `jarvis pipeline run`.\n3. The command will run all appended steps, including ARLDM.\n4. Output will be stored under `$LOCAL_INPUT_PATH/output_data`.\n5. After the command completes, the user can inspect that folder.",
+    "answer": "To run the experiment, use the command `jarvis pipeline run`. This command executes the pipeline and generates output files in the directory specified by `$LOCAL_INPUT_PATH/output_data`. You can verify the results by checking that folder after the command finishes."
+  },
+  {
+    "question": "What command runs the experiment?",
+    "reasoning": "Let me think through this step by step:\n\n1. Identify the user’s intent: find the command to start the experiment.\n2. In Jarvis, running a pipeline is done with `jarvis pipeline run`.\n3. This will execute all pipeline steps.\n4. The output goes to `$LOCAL_INPUT_PATH/output_data`.\n5. Confirm that the environment variable is set.",
+    "answer": "The command is `jarvis pipeline run`. This initiates the execution of the experiment and writes the output to `$LOCAL_INPUT_PATH/output_data`. Make sure the `$LOCAL_INPUT_PATH` environment variable is set correctly before running."
+  },
+  {
+    "question": "Where are the output data files generated after running the experiment?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to locate output files.\n2. `jarvis pipeline run` creates output under `$LOCAL_INPUT_PATH/output_data`.\n3. The path depends on the environment variable.\n4. To verify, list the folder.",
+    "answer": "After running `jarvis pipeline run`, the output data files are generated in the directory `$LOCAL_INPUT_PATH/output_data`. This path is determined by the `$LOCAL_INPUT_PATH` environment variable. You can confirm the files by listing the contents of that folder."
+  },
+  {
+    "question": "How do I clean data produced by Hermes + ARLDM?",
+    "reasoning": "Let me think through this step by step:\n\n1. Understand that Hermes + ARLDM generate intermediate data.\n2. Jarvis provides a `clean` command to remove temporary data.\n3. Executing `jarvis pipeline clean` will delete those intermediate files.\n4. After completion, check the data folder to confirm cleanup.",
+    "answer": "To clean the data, run the command `jarvis pipeline clean`. This removes the temporary or intermediate data generated during the Hermes + ARLDM pipeline. After running, you can verify that the data folder has been cleaned."
+  },
+  {
+    "question": "How do I add ARLDM to a Jarvis pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. First, I need to identify the correct Jarvis command for adding a package. The command is `jarvis pipeline append`.\n2. Next, I must specify the package name; here it is `arldm`.\n3. Then I need to set any options required. In this case we want to set the runscript to `vistsis`, so I include the option `runscript=vistsis`.\n4. Finally, I should remind the user how to confirm the addition, such as by listing the pipeline.",
+    "answer": "To add ARLDM, run the command `jarvis pipeline append arldm runscript=vistsis`. This appends the ARLDM package to the current pipeline and sets its runscript to `vistsis`. You can verify the addition by listing the pipeline contents."
+  },
+  {
+    "question": "What command appends a package to a Jarvis pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `jarvis pipeline append` command is the generic command used to add a new package to an existing pipeline.\n2. It expects the name of the package to add as its first argument.\n3. After the package name, optional keyword arguments can be supplied to configure that package.\n4. The most common option that appears in the documentation is `runscript`, which tells Jarvis which script should run for that package.\n5. Therefore, the generic syntax is `jarvis pipeline append <package> <options>`.",
+    "answer": "The command is `jarvis pipeline append <package> <options>`. For example, to add ARLDM with a specific runscript, use `jarvis pipeline append arldm runscript=vistsis`. Make sure to replace `<package>` and `<options>` with your desired values."
+  },
+  {
+    "question": "How do I configure the runscript for the ARLDM package in Jarvis?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to construct the command to add the ARLDM package to the pipeline.\n2. The base command is `jarvis pipeline append` followed by the package name.\n3. To configure which script Jarvis should execute for that package, I supply the `runscript` option.\n4. The syntax is therefore `jarvis pipeline append arldm runscript=<scriptname>`.\n5. For example, if the desired script is `vistsis`, the full command becomes `jarvis pipeline append arldm runscript=vistsis`.\n6. This informs Jarvis to run the `vistsis` script when executing the ARLDM package.",
+    "answer": "Use the syntax `jarvis pipeline append arldm runscript=<scriptname>`. An example is `jarvis pipeline append arldm runscript=vistsis`, which sets the runscript to `vistsis`. This option tells Jarvis which script to execute for the ARLDM package."
+  },
+  {
+    "question": "What options can I provide to the `jarvis pipeline append` command?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `jarvis pipeline append` command can accept several options to customize the behavior of the added package.\n2. From the information provided, the only documented option is `runscript`, which specifies the script that should be run for the package.\n3. The syntax for that option is `runscript=<scriptname>`.\n4. No other options are mentioned, so if more options exist they would need to be looked up in the official documentation.",
+    "answer": "The `jarvis pipeline append` command supports at least the `runscript` option, as shown in `jarvis pipeline append arldm runscript=vistsis`. This option specifies the script that should run when the package is executed. No other options are mentioned in the current text."
+  },
+  {
+    "question": "How do I run the experiment pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. To execute the entire experiment pipeline, I need to use the command that triggers the pipeline to run.\n2. The Jarvis CLI provides the `jarvis pipeline run` command for this purpose.\n3. When this command is executed, it launches all stages of the pipeline in the correct order.\n4. The outputs of the pipeline are written to the path specified by the environment variable `$EXPERIMENT_INPUT_PATH/output_data`.\n5. Therefore, running `jarvis pipeline run` will start the experiment and place the resulting data in the expected location.",
+    "answer": "To run the experiment, execute the command `jarvis pipeline run`. This launches the pipeline and the output files are written to `$EXPERIMENT_INPUT_PATH/output_data`."
+  },
+  {
+    "question": "How do I load the specific HDF5 and MPICH versions required by Hermes?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to load specific versions of two libraries.\n2. In Spack, the `spack load` command is used to add a package to the current environment.\n3. We need to specify the exact version and variant for HDF5: `1.14.0` with the high‑level API (`+hl`) and without MPI support (`~mpi`).\n4. MPICH must be version `3.4.3`.\n5. Combining these, the command becomes `spack load hdf5@1.14.0+hl~mpi mpich@3.4.3`.\n6. After loading, the environment variables for those packages will be set, and the user can verify the load with `spack find` or `spack env view`.",
+    "answer": "To load the required libraries, use the command:\n\n```bash\nspack load hdf5@1.14.0+hl~mpi mpich@3.4.3\n```\nThis sets up your environment so that the correct HDF5 (with high‑level API and without MPI) and MPICH 3.4.3 are available for subsequent builds.\nYou can verify the loaded packages with `spack find` or `spack env view`."
+  },
+  {
+    "question": "What command installs hermes_shm with its dependencies?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to install the `hermes_shm` package along with specific dependency versions.\n2. In Spack, the `spack install` command is used for installation.\n3. To override dependencies, we prefix them with `^` and provide the desired version and variants.\n4. For HDF5 we need `1.14.0+hl~mpi` and for MPICH we need `3.4.3`.\n5. Therefore the install command will be:\n   `spack install hermes_shm ^hdf5@1.14.0+hl~mpi ^mpich@3.4.3`.\n6. After installation, one can confirm the presence of the package with `spack find hermes_shm`.",
+    "answer": "The command to install Hermes with the specific dependency versions is:\n\n```bash\nspack install hermes_shm ^hdf5@1.14.0+hl~mpi ^mpich@3.4.3\n```\nThis instructs Spack to override the default dependencies of hermes_shm with the exact HDF5 and MPICH versions you loaded.\nAfter installation, you can confirm with `spack find hermes_shm`."
+  },
+  {
+    "question": "What are the options for overriding dependencies when installing a package with Spack?",
+    "reasoning": "Let me think through this step by step:\n\n1. Overriding dependencies is a common requirement when a package needs a specific variant or version.\n2. In Spack, dependency overrides are specified by prefixing the package name with a caret (`^`).\n3. Following the caret, you include the package name, optionally a version, and any variant flags.\n4. For example, `^hdf5@1.14.0+hl~mpi` tells Spack to use HDF5 version 1.14.0 with the high‑level API enabled and MPI disabled.\n5. Similarly, `^mpich@3.4.3` forces MPICH version 3.4.3.\n6. These overrides are appended to the install command for the main package.",
+    "answer": "When installing a package, you can override its dependencies by prefixing them with `^`. For example:\n\n```bash\nspack install hermes_shm ^hdf5@1.14.0+hl~mpi ^mpich@3.4.3\n```\nHere `^hdf5@1.14.0+hl~mpi` tells Spack to use HDF5 version 1.14.0 with the high‑level API and no MPI support, and `^mpich@3.4.3` forces the MPICH 3.4.3 variant. These overrides ensure the installed hermes_shm is built against the exact versions you need."
+  },
+  {
+    "question": "How do I build Hermes with the POSIX adaptor using scspkg?",
+    "reasoning": "Let me think through this step by step:\n\n1. First, the user must have a spack environment that includes `hermes_shm`.\n2. Next, the scspkg tool is used to create a project skeleton for Hermes.\n3. After creating the skeleton, we clone the Hermes source repository into the expected source directory.\n4. Then we create a build directory and run CMake with the appropriate flags:\n   * Set `CMAKE_BUILD_TYPE` to `Release`.\n   * Set the install prefix to the scspkg root via `scspkg pkg root hermes`.\n   * Enable MPICH with `-DHERMES_MPICH=\"ON\"`.\n   * Enable the POSIX adaptor with `-DHERMES_ENABLE_POSIX_ADAPTER=\"ON\"`.\n5. Finally, the build is executed and the resulting binaries are installed into the scspkg root.",
+    "answer": "First load the required module and create the package:\n```bash\nspack load hermes_shm\nscspkg create hermes\n```\nNavigate to the source directory, clone the repo, and run:\n```bash\ncd `scspkg pkg src hermes`\ngit clone https://github.com/HDFGroup/hermes\ncd hermes\nmkdir build\ncd build\ncmake ../ -DCMAKE_BUILD_TYPE=\"Release\" \\\n    -DCMAKE_INSTALL_PREFIX=`scspkg pkg root hermes` \\\n    -DHERMES_MPICH=\"ON\" \\\n    -DHERMES_ENABLE_POSIX_ADAPTER=\"ON\"\n```\nThis builds Hermes with the POSIX adaptor and installs it to the scspkg root."
+  },
+  {
+    "question": "What command creates a new Hermes package with scspkg?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to create a new package skeleton for Hermes.\n2. The `scspkg create` command is used to generate the directory structure and basic files.\n3. Providing the package name after the command tells scspkg which package to create.\n4. The command is simple: `scspkg create hermes`.",
+    "answer": "The command is `scspkg create hermes`. This creates a new scspkg package named **hermes** in the current working directory, setting up the basic directory structure for the project."
+  },
+  {
+    "question": "What command does vist_img_download.py use to download VIST images?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user is asking which command vist_img_download.py uses.\n2. I recall that the script is invoked with the --json_dir and --img_dir flags and a --num_process flag.\n3. The repository documentation shows the standard invocation uses 12 parallel workers.\n4. Thus the full command includes those three arguments with the appropriate environment variables.",
+    "answer": "the image download is performed with the following command:\n```shell\npython data_script/vist_img_download.py --json_dir $EXPERIMENT_INPUT_PATH/vistdii --img_dir $EXPERIMENT_INPUT_PATH/visit_img --num_process 12\n```\nThis script pulls images based on the JSON metadata in `vistdii` and stores them in `visit_img`."
+  },
+  {
+    "question": "How do I configure the image download script to use 8 processes?",
+    "reasoning": "Let me think through this step by step:\n\n1. The question asks how to configure the script to use 8 processes.\n2. The script accepts a --num_process argument that controls the number of parallel workers.\n3. To change to 8, simply set --num_process 8.\n4. All other arguments remain unchanged.",
+    "answer": "adjust the --num_process flag in the command. For example:\n```shell\npython data_script/vist_img_download.py --json_dir $EXPERIMENT_INPUT_PATH/vistdii --img_dir $EXPERIMENT_INPUT_PATH/visit_img --num_process 8\n```\nThis tells the script to spawn 8 parallel workers for downloading."
+  },
+  {
+    "question": "What are the options for vist_img_download.py?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to know the options for vist_img_download.py.\n2. Looking at the script, it uses argparse to define three primary flags: --json_dir, --img_dir, and --num_process.\n3. These correspond to the JSON metadata location, the destination image directory, and the number of parallel processes.\n4. The script also accepts any other default flags such as --help.",
+    "answer": "the script accepts three primary options:\n- `--json_dir`: directory containing the JSON metadata files.\n- `--img_dir`: destination directory for downloaded images.\n- `--num_process`: number of parallel download processes to run.\nYou can view all options by running `python data_script/vist_img_download.py --help`."
+  },
+  {
+    "question": "How can I save the downloaded VIST-DII package to a different directory?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to save the downloaded VIST-DII package to a different directory.\n2. The package is first downloaded as a tarball, typically named DII-with-labels.tar.gz.\n3. After extraction, the user might want to move the archive itself to a separate folder to keep it separate from the extracted data.\n4. The simplest way is to move the tar.gz file using mv.",
+    "answer": "after extracting the archive, move it to another folder with:\n```shell\nmv DII-with-labels.tar.gz $EXPERIMENT_INPUT_PATH/zippack\n```\nThis keeps the downloaded archive separate from the extracted data."
+  },
+  {
+    "question": "How do I install MPICH using Spack?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user asks how to install MPICH using Spack.\n2. Spack is a package manager that can install MPICH with a specific version.\n3. The common version required is 3.4.3.\n4. The Spack command to install that version is `spack install mpich@3.4.3`.",
+    "answer": "to install MPICH with Spack, run the command\n```bash\nspack install mpich@3.4.3\n```\nThis will fetch and build MPICH version 3.4.3, which is required by Hermes and mpi4py."
+  },
+  {
+    "question": "What command installs MPICH 3.4.3?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to install MPICH version 3.4.3.\n2. In Spack, packages are referenced by name, and a specific version is appended with an `@` symbol.\n3. Therefore, the command that will pull that exact version is `spack install mpich@3.4.3`.",
+    "answer": "The command to install MPICH 3.4.3 is\n```bash\nspack install mpich@3.4.3\n```\nRunning this will pull the specific version needed for Hermes and mpi4py."
+  },
+  {
+    "question": "What is the syntax for installing a specific version of MPICH with Spack?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user asks for syntax for installing a specific version of MPICH with Spack.\n2. Spack uses the `name@version` format for specifying a particular version.\n3. So the general syntax is `spack install mpich@<version>`.\n4. For example, to install 3.4.3 we would use `spack install mpich@3.4.3`.",
+    "answer": "Use the format `spack install mpich@<version>`. For example, to install version 3.4.3, run\n```bash\nspack install mpich@3.4.3\n```\nThis ensures the correct MPI implementation is available for Hermes and mpi4py."
+  },
+  {
+    "question": "How do I download the FlintstonesSV dataset?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to download a dataset that lives on Google Drive.\n2. Typically we first change to the directory where the experiment expects input files.\n3. Then we use `gdown` because the file is shared via Google Drive and requires a confirmation token.\n4. The command to download the file is `gdown \"1kG4esNwabJQPWqadSDaugrlF4dRaV33_&confirm=t\"`.",
+    "answer": "First navigate to the input directory:\n```shell\ncd $EXPERIMENT_INPUT_PATH\n```\nThen use gdown with the confirmation token:\n```shell\ngdown \"1kG4esNwabJQPWqadSDaugrlF4dRaV33_&confirm=t\"\n```\nThis will download the `flintstones_data.zip` file to the current directory."
+  },
+  {
+    "question": "What command extracts the downloaded dataset?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user has a downloaded ZIP file named `flintstones_data.zip`.\n2. To extract the contents we use the `unzip` command.\n3. The command is `unzip flintstones_data.zip`.",
+    "answer": "To unzip the file, run:\n```shell\nunzip flintstones_data.zip\n```\nThis will unpack the 4.9 GB archive in about 2 minutes on Ares."
+  },
+  {
+    "question": "How do I rename the extracted folder to `flintstones`?",
+    "reasoning": "Let me think through this step by step:\n\n1. After unzipping, we have a directory named `flintstones_data`.\n2. To give it a more convenient name we use the `mv` command to rename it.\n3. The command `mv flintstones_data flintstones` will rename the folder.",
+    "answer": "Move the unpacked folder with:\n```shell\nmv flintstones_data flintstones\n```\nAfter this step the data will be accessible under the `flintstones` directory."
+  },
+  {
+    "question": "What command loads the Hermes and ARLDM modules?",
+    "reasoning": "Let me think through this step by step:\n\n1. The question asks which command loads the Hermes and ARLDM modules.\n2. In a typical environment that uses modulefiles, the command to load modules is `module load <module-name> ...`.\n3. The modules we need are called `hermes` and `arldm`.\n4. Therefore the command is `module load hermes arldm`.",
+    "answer": "Execute `module load hermes arldm`. This loads both the Hermes and ARLDM modules into your environment."
+  },
+  {
+    "question": "How do I change the dataset used by RUN_SCRIPT?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to change which dataset the RUN_SCRIPT uses.\n2. In this context RUN_SCRIPT is a shell variable that tells the script which dataset to operate on.\n3. To modify the dataset, we simply assign a new value to that variable before executing the script.\n4. The shell syntax for assigning a variable is `VARIABLE=value`.\n5. Thus we set `RUN_SCRIPT=other_dataset` and then run the script.",
+    "answer": "Modify the variable before running your scripts: `\nRUN_SCRIPT=other_dataset\n`. Replace `other_dataset` with the desired dataset name."
+  },
+  {
+    "question": "How do I create a new Jarvis pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user is asking how to create a new Jarvis pipeline.\n2. In Jarvis, a pipeline is created with the `jarvis pipeline create <name>` command.\n3. The name chosen in the example is `hermes_arldm_test`.\n4. Executing this command registers a pipeline and stores configuration data required by Hermes and ARLDM.",
+    "answer": "To create a new pipeline, run the command\n\n```bash\njarvis pipeline create hermes_arldm_test\n```\nThis command registers a pipeline named `hermes_arldm_test` and stores all the configuration data required by Hermes and ARLDM."
+  },
+  {
+    "question": "What does the command `jarvis pipeline create hermes_arldm_test` do?",
+    "reasoning": "Let me think through this step by step:\n\n1. The question is about the purpose of `jarvis pipeline create hermes_arldm_test`.\n2. The `jarvis pipeline create` command initializes a new pipeline context.\n3. The argument `hermes_arldm_test` is the pipeline name.\n4. When the command runs, it creates an entry that will hold all configuration data needed by Hermes and ARLDM.\n5. Thus it effectively sets up the environment for subsequent pipeline operations.",
+    "answer": "The command `jarvis pipeline create hermes_arldm_test` creates a pipeline that will hold all configuration data needed by Hermes and ARLDM. It effectively initializes the pipeline context for subsequent operations."
+  },
+  {
+    "question": "How do I configure a pipeline for Hermes and ARLDM?",
+    "reasoning": "Let me think through this step by step:\n\n1. The user wants to know how to configure a pipeline for Hermes and ARLDM.\n2. In this system, configuration is achieved by creating the pipeline with the appropriate name.\n3. The command to create the pipeline is `jarvis pipeline create hermes_arldm_test`.\n4. Running this command stores the necessary configuration data for both Hermes and ARLDM.\n5. Once the pipeline is created, it is ready for use.",
+    "answer": "Configure the pipeline by creating it with the exact command\n\n```bash\njarvis pipeline create hermes_arldm_test\n```\nThis step stores the necessary configuration data for both Hermes and ARLDM, making the pipeline ready for use."
+  },
+  {
+    "question": "How do I build a pipeline environment with custom variable paths?",
+    "reasoning": "",
+    "answer": "Invoke the jarvis pipeline environment build command with the desired variables:\n\n```bash\njarvis pipeline env build +PRETRAIN_MODEL_PATH +EXPERIMENT_INPUT_PATH +ARLDM_PATH\n```\n\nEach `+VARIABLE` flag adds that environment variable to the stored pipeline configuration."
+  },
+  {
+    "question": "How do I add the data_stagein package to the pipeline for RUN_SCRIPT=vistsis?",
+    "reasoning": "",
+    "answer": "Use the command:\n```\njarvis pipeline append data_stagein dest_data_path=$LOCAL_INPUT_PATH \\\nuser_data_paths=$SHARED_INPUT_PATH/vistdii,$SHARED_INPUT_PATH/vistsis,$SHARED_INPUT_PATH/visit_img,$PRETRAIN_MODEL_PATH \\\nmkdir_datapaths=$LOCAL_INPUT_PATH\n```\nThis stages in the three required directories for the vistsis script."
+  },
+  {
+    "question": "What command does `jarvis pipeline append data_stagein` do?",
+    "reasoning": "",
+    "answer": "The command `jarvis pipeline append data_stagein` adds the data_stagein package to the pipeline, configuring where data is copied from and where it is created locally. The parameters `dest_data_path`, `user_data_paths`, and `mkdir_datapaths` define the destination, source directories, and directories to create."
+  },
+  {
+    "question": "How do I configure the user_data_paths option for other RUN_SCRIPT values?",
+    "reasoning": "",
+    "answer": "For scripts other than vistsis, run:\n```\nRUN_SCRIPT=pororo\njarvis pipeline append data_stagein dest_data_path=$LOCAL_INPUT_PATH \\\nuser_data_paths=$SHARED_INPUT_PATH/$RUN_SCRIPT \\\nmkdir_datapaths=$LOCAL_INPUT_PATH\n```\nThis stages only the directory specific to the chosen RUN_SCRIPT."
+  },
+  {
+    "question": "What are the options for the `jarvis pipeline append arldm` command?",
+    "reasoning": "",
+    "answer": "The command `jarvis pipeline append arldm` accepts `runscript=$RUN_SCRIPT` and `local_exp_dir=$LOCAL_INPUT_PATH` as options. It appends the ARLDM package to the pipeline, linking the run script and the local experiment directory."
+  },
+  {
+    "question": "How do I find the HDF5 directory path?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to find where the `h5cc` compiler wrapper is installed, because it is located inside the HDF5 installation.\n2. Running `which h5cc` will give the full path to the executable, e.g. `/opt/hdf5/bin/h5cc`.\n3. The installation prefix is everything before the `bin/h5cc` part. I can strip the last nine characters (`/bin/h5cc`) using `sed`.\n4. The resulting string is the directory where HDF5 is installed.",
+    "answer": "Execute ``YOUR_HDF5_DIR=`which h5cc |sed 's/.\\\\{9\\\\}$//'` ``. This stores the HDF5 installation prefix in the variable `YOUR_HDF5_DIR` for later use."
+  },
+  {
+    "question": "How do I download the Miniconda installer for Linux?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need a reliable way to download a file from the internet.\n2. `wget` is a command‑line utility that fetches URLs.\n3. The Miniconda team publishes a single shell script for each platform.\n4. By pointing `wget` at the official Miniconda URL for Linux x86_64 I can fetch the latest installer.\n5. After the download finishes I can list the file to confirm it was created.",
+    "answer": "Use the `wget` command: ```wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh```. This fetches the latest Miniconda installer. After downloading, you can verify the file exists with `ls -l`."
+  },
+  {
+    "question": "What command runs the Miniconda installer script?",
+    "reasoning": "Let me think through this step by step:\n\n1. The installer script is just a POSIX shell file.\n2. To run it I need a shell that can interpret its syntax, typically `bash`.\n3. The script must be executable; if it isn’t, I can add the execute bit with `chmod +x`.\n4. Invoking it with `bash <script>` will launch the interactive installation wizard.",
+    "answer": "Execute the script with `bash`: ```bash Miniconda3-latest-Linux-x86_64.sh```. This launches the installer and guides you through the setup. Make sure the script has execute permissions (`chmod +x` if needed)."
+  },
+  {
+    "question": "How do I install Conda on a Linux system using the provided script?",
+    "reasoning": "Let me think through this step by step:\n\n1. I first need to obtain the Miniconda installer.\n2. I can download it with `wget` from the official repository.\n3. Once the file is on disk, I should ensure it has execute permission.\n4. Running the script with `bash` will start the interactive Conda installation.\n5. I just follow the prompts to finish setting up Conda.",
+    "answer": "First download the installer: ```wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh```. Then run it with ```bash Miniconda3-latest-Linux-x86_64.sh```. Follow the on‑screen prompts to complete the Conda installation."
+  },
+  {
+    "question": "How do I create an arldm scs package?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `scspkg` tool is used to create and manage SCS packages.\n2. To start a new package I call `scspkg create` with the package name.\n3. After creation, the package’s source directory is under `scspkg pkg src <pkgname>`.\n4. I navigate into that directory and set up the repository (e.g., clone a Git repo) so that the package can be built.\n5. The subsequent `scspkg` commands will operate relative to that source tree.",
+    "answer": "To create an arldm scs package, run `scspkg create arldm`. Then navigate to the source directory with `cd `scspkg pkg src arldm``. Finally, clone the repository and set the environment with the subsequent commands."
+  },
+  {
+    "question": "How do I execute the Hermès pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. First, I need to identify the framework that manages the Hermès pipeline. Hermès is built on top of the Jarvis toolchain, so the pipeline execution command will be a Jarvis command.\n2. The typical command to start any pipeline defined in Jarvis is `jarvis pipeline run`. This will trigger the execution of all stages that have already been added to the pipeline.\n3. While the pipeline is running, I want to provide a way for the user to monitor progress. Jarvis offers a status command, `jarvis pipeline status`, which shows the current state of each stage.\n4. Summarizing the steps: run the pipeline with `jarvis pipeline run` and optionally check its progress with `jarvis pipeline status`.",
+    "answer": "Execute `jarvis pipeline run` to start the pipeline. This runs all stages that have been appended to the pipeline. You can monitor progress with `jarvis pipeline status`."
+  },
+  {
+    "question": "How do I install Intel OneAPI compilers with Spack?",
+    "reasoning": "Let me think through this step by step:\n\n1. I know that Spack uses package names to refer to software. The Intel OneAPI compilers are available as a Spack package named `intel-oneapi-compilers`.\n2. To install a package with Spack, the standard command is `spack install <package>`. In this case, we want to install the OneAPI compiler suite.\n3. After the installation finishes, the user might want to confirm that the compiler was added to the Spack database. The command `spack find intel-oneapi-compilers` will list the installed instance.",
+    "answer": "To install Intel OneAPI compilers, run the command:\n```bash\nspack install intel-oneapi-compilers\n```\nThis downloads and builds the compiler suite. You can verify the installation with `spack find intel-oneapi-compilers`."
+  },
+  {
+    "question": "How do I load Intel OneAPI compilers after installation?",
+    "reasoning": "Let me think through this step by step:\n\n1. Once the Intel OneAPI compilers are installed, Spack can load the compiler environment so that subsequent builds pick it up.\n2. Spack provides the `spack load <package>` command to activate a package in the current shell. Loading a compiler also sets the appropriate environment variables (`CC`, `CXX`, `FC`, etc.) for the compiler.\n3. Therefore, the user should run `spack load intel-oneapi-compilers` to bring the compiler into the environment.\n\nAfter installing, activate the compiler environment with:\n```bash\nspack load intel-oneapi-compilers\n```\nThis sets the appropriate environment variables so subsequent builds use the Intel compiler.",
+    "answer": "Let me think through this step by step:\n\n1. Once the Intel OneAPI compilers are installed, Spack can load the compiler environment so that subsequent builds pick it up.\n2. Spack provides the `spack load <package>` command to activate a package in the current shell. Loading a compiler also sets the appropriate environment variables (`CC`, `CXX`, `FC`, etc.) for the compiler.\n3. Therefore, the user should run `spack load intel-oneapi-compilers` to bring the compiler into the environment.\n\nAfter installing, activate the compiler environment with:\n```bash\nspack load intel-oneapi-compilers\n```\nThis sets the appropriate environment variables so subsequent builds use the Intel compiler."
+  },
+  {
+    "question": "How do I add a compiler to Spack's compiler database?",
+    "reasoning": "Let me think through this step by step:\n\n1. Spack maintains a list of known compilers in its configuration. Adding a compiler requires scanning the system for compiler executables.\n2. Spack provides a dedicated command to do this: `spack compilers add`. Running this command will search the system PATH and any configured compiler search directories, then register any found compilers in Spack’s database.\n3. After the scan, the user can confirm the addition with `spack compilers`. \n\nTo add any available compiler, run:\n```bash\nspack compilers add\n```\nThis scans your system for compilers and registers them in Spack’s configuration so they can be used in future packages.",
+    "answer": "Let me think through this step by step:\n\n1. Spack maintains a list of known compilers in its configuration. Adding a compiler requires scanning the system for compiler executables.\n2. Spack provides a dedicated command to do this: `spack compilers add`. Running this command will search the system PATH and any configured compiler search directories, then register any found compilers in Spack’s database.\n3. After the scan, the user can confirm the addition with `spack compilers`. \n\nTo add any available compiler, run:\n```bash\nspack compilers add\n```\nThis scans your system for compilers and registers them in Spack’s configuration so they can be used in future packages."
+  },
+  {
+    "question": "How do I install the h5z-zfp package using the Intel compiler?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to install the `h5z-zfp` package with a specific compiler. In Spack, the compiler can be specified by adding a `%` suffix to the package name.\n2. The Intel compiler package in Spack is named `intel`, so the syntax for forcing the Intel compiler is `%intel`.\n3. Therefore, the user should invoke `spack install h5z-zfp%intel`.\n4. After installation, they can verify that the correct compiler was used by running `spack find h5z-zfp`.\n\nInstall h5z-zfp with the Intel compiler by executing:\n```bash\nspack install h5z-zfp%intel\n```\nThe `%intel` suffix forces Spack to build the package with the Intel compiler. Verify the install with `spack find h5z-zfp`.",
+    "answer": "Let me think through this step by step:\n\n1. I need to install the `h5z-zfp` package with a specific compiler. In Spack, the compiler can be specified by adding a `%` suffix to the package name.\n2. The Intel compiler package in Spack is named `intel`, so the syntax for forcing the Intel compiler is `%intel`.\n3. Therefore, the user should invoke `spack install h5z-zfp%intel`.\n4. After installation, they can verify that the correct compiler was used by running `spack find h5z-zfp`.\n\nInstall h5z-zfp with the Intel compiler by executing:\n```bash\nspack install h5z-zfp%intel\n```\nThe `%intel` suffix forces Spack to build the package with the Intel compiler. Verify the install with `spack find h5z-zfp`."
+  },
+  {
+    "question": "How do I download the pretrain model?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need to run inside the experiment directory so that all artifacts go in the right place. I do that with `cd $EXPERIMENT_PATH`.\n2. The pretrain model lives in a Conda environment called `arldm`, so I activate it with `conda activate arldm`.\n3. Now I can fetch the large model from the Google Cloud storage bucket. I use `wget https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_large.pth` which pulls the 3.63 GB file.\n4. Finally I should confirm the file is present by listing the current directory or checking `model_large.pth` exists.",
+    "answer": "First, navigate to your experiment directory with `cd $EXPERIMENT_PATH`, then activate the `arldm` conda environment using `conda activate arldm`. Next, run `wget https://storage.googleapis.com/sfr-vision-language-research/BLIP/models/model_large.pth` to download the 3.63 GB model. Finally, you can verify the download by checking that `model_large.pth` exists in your current directory."
+  },
+  {
+    "question": "What command sets the PRETRAIN_MODEL_PATH environment variable?",
+    "reasoning": "Let me think through this step by step:\n\n1. I need an absolute path to the downloaded model file so that the environment variable can be used reliably.\n2. I obtain that path by running `export PRETRAIN_MODEL_PATH=$(realpath model_large.pth)`.\n3. That sets the variable for the current shell session, but I also want it to persist whenever the `arldm` environment is activated.\n4. I use the package tool `scspkg` to bind the variable to the environment with `scspkg env set arldm PRETRAIN_MODEL_PATH=$PRETRAIN_MODEL_PATH`.\n5. After this, any process that starts under `arldm` will see `PRETRAIN_MODEL_PATH` pointing to the correct file.",
+    "answer": "After downloading the model, use `export PRETRAIN_MODEL_PATH=`realpath model_large.pth`` to create an absolute path. Then, persist this setting for the `arldm` environment with `scspkg env set arldm PRETRAIN_MODEL_PATH=$PRETRAIN_MODEL_PATH`. This ensures the variable is available to any process running under `arldm`."
+  },
+  {
+    "question": "How do I configure the arldm environment to use the pretrain model?",
+    "reasoning": "Let me think through this step by step:\n\n1. I first need to be inside the `arldm` Conda environment so that any environment variables I set affect the right processes.\n2. I activate it with `conda activate arldm`.\n3. I then export the absolute path to the pretrain model so that the shell knows where the file is: `export PRETRAIN_MODEL_PATH=$(realpath model_large.pth)`.\n4. To make sure the variable stays set whenever `arldm` is activated, I bind it with `scspkg env set arldm PRETRAIN_MODEL_PATH=$PRETRAIN_MODEL_PATH`.\n5. Finally I deactivate the environment to finish the setup, as that leaves the environment ready for the next step.",
+    "answer": "First activate the environment: `conda activate arldm`. Then set the variable as described: `export PRETRAIN_MODEL_PATH=`realpath model_large.pth`` followed by `scspkg env set arldm PRETRAIN_MODEL_PATH=$PRETRAIN_MODEL_PATH`. Finally, deactivate the environment with `conda deactivate` to finish the setup."
+  },
+  {
+    "question": "What command changes the working directory to the experiment path?",
+    "reasoning": "Let me think through this step by step:\n\n1. I want to move into the directory where I will keep all experiment data.\n2. The experiment path is stored in the environment variable `EXPERIMENT_PATH`.\n3. I simply change directories with `cd $EXPERIMENT_PATH`.\n4. After that I can proceed with activating environments or downloading files.",
+    "answer": "Use the command `cd $EXPERIMENT_PATH` to navigate to the directory where you want to store the experiment artifacts. This is the first step before activating the environment or downloading files."
+  },
+  {
+    "question": "What command deactivates the current conda environment?",
+    "reasoning": "Let me think through this step by step:\n\n1. When I'm done working in a Conda environment I need to exit back to the base shell.\n2. Conda provides a built‑in command for that: `conda deactivate`.\n3. Running it removes the environment from the shell's context and clears any variables set by that environment.",
+    "answer": "Simply run `conda deactivate` to leave the currently active environment. This will return you to the base shell and clear any environment variables set by the `arldm` session."
+  },
+  {
+    "question": "What command cleans the data produced by Hermes + ARLDM?",
+    "reasoning": "Let me think through this step by step:\n\n1. The Hermes + ARLDM pipeline generates intermediate artifacts and output files.\n2. In the JARVIS toolset, the usual way to remove these artifacts is through a dedicated cleanup step.\n3. The cleanup step is invoked with the command `jarvis pipeline clean`, which removes all data files that were produced during the pipeline run.\n4. It is important to run this command from the correct working directory, typically the root of the pipeline workspace, to avoid accidentally deleting unrelated files.",
+    "answer": "the command is `jarvis pipeline clean`. This removes the data artifacts created by the Hermes + ARLDM process. Ensure you have the correct working directory before executing."
+  },
+  {
+    "question": "How do I stage the input directories for a Hermes pipeline?",
+    "reasoning": "Let me think through this step by step:\n\n1. Staging input data means copying required directories from shared storage to the local node where the pipeline will run.\n2. The JARVIS pipeline provides a `data_stagein` step that handles these copies.\n3. We need to specify the destination path (`dest_data_path`), the source paths (`user_data_paths`), and any directories that should be created if missing (`mkdir_datapaths`).\n4. In practice we copy the three datasets (`vistdii`, `vistsis`, `visit_img`) plus a pretrained model, all from the shared input location.\n5. After the pipeline starts, we can verify the copy by listing the contents of `$LOCAL_INPUT_PATH`.\n\nTo stage the input directories you add a `data_stagein` step to the pipeline:\n\n```bash\njarvis pipeline append data_stagein dest_data_path=$LOCAL_INPUT_PATH \\\nuser_data_paths=$SHARED_INPUT_PATH/vistdii,$SHARED_INPUT_PATH/vistsis,$SHARED_INPUT_PATH/visit_img,$PRETRAIN_MODEL_PATH \\\nmkdir_datapaths=$LOCAL_INPUT_PATH\n```\nThis copies the three datasets and the pretrained model into the local input path. Verify the copy by listing `$LOCAL_INPUT_PATH` after the pipeline starts.",
+    "answer": "Let me think through this step by step:\n\n1. Staging input data means copying required directories from shared storage to the local node where the pipeline will run.\n2. The JARVIS pipeline provides a `data_stagein` step that handles these copies.\n3. We need to specify the destination path (`dest_data_path`), the source paths (`user_data_paths`), and any directories that should be created if missing (`mkdir_datapaths`).\n4. In practice we copy the three datasets (`vistdii`, `vistsis`, `visit_img`) plus a pretrained model, all from the shared input location.\n5. After the pipeline starts, we can verify the copy by listing the contents of `$LOCAL_INPUT_PATH`.\n\nTo stage the input directories you add a `data_stagein` step to the pipeline:\n\n```bash\njarvis pipeline append data_stagein dest_data_path=$LOCAL_INPUT_PATH \\\nuser_data_paths=$SHARED_INPUT_PATH/vistdii,$SHARED_INPUT_PATH/vistsis,$SHARED_INPUT_PATH/visit_img,$PRETRAIN_MODEL_PATH \\\nmkdir_datapaths=$LOCAL_INPUT_PATH\n```\nThis copies the three datasets and the pretrained model into the local input path. Verify the copy by listing `$LOCAL_INPUT_PATH` after the pipeline starts."
+  },
+  {
+    "question": "What command does `jarvis pipeline append hermes_run` do?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `jarvis pipeline append hermes_run` command adds a step that will execute Hermes during the pipeline run.\n2. The `--sleep=10` flag tells the pipeline to pause for 10 seconds before launching Hermes, giving the environment a chance to settle.\n3. The `include=$LOCAL_INPUT_PATH/${RUN_SCRIPT}_out.h5` argument tells Hermes to load a specific output file from the local input directory.\n4. For this to work, the environment variable `${RUN_SCRIPT}` must be set to the name of the script that produced the `.h5` file.\n5. The step will be queued and run automatically when the pipeline reaches it.",
+    "answer": "the command `jarvis pipeline append hermes_run --sleep=10 include=$LOCAL_INPUT_PATH/${RUN_SCRIPT}_out.h5` schedules a Hermes run step. It pauses for 10 seconds before executing Hermes and tells it to include the output file `${RUN_SCRIPT}_out.h5` from the local input directory. Make sure the `${RUN_SCRIPT}` variable is set before running the pipeline."
+  },
+  {
+    "question": "How do I configure ARLDM to run with Hermes using the runscript vistsis?",
+    "reasoning": "Let me think through this step by step:\n\n1. ARLDM can be run as a pipeline step by appending an `arldm` command.\n2. To enable Hermes integration, we need to set the `with_hermes` flag to true.\n3. The `runscript` parameter tells ARLDM which configuration script to use—in this case `vistsis`.\n4. We also need to point ARLDM to its source code location via `arldm_path`, which we obtain with `scspkg pkg src arldm`.\n5. Finally, the local experiment directory should be set to the staged input path (`$LOCAL_INPUT_PATH`) so that ARLDM has access to the data.\n\nAdd an `arldm` step to the pipeline with Hermes enabled:\n\n```bash\njarvis pipeline append arldm runscript=vistsis arldm_path=\"`scspkg pkg src arldm`/ARLDM\" with_hermes=true local_exp_dir=$LOCAL_INPUT_PATH\n```\nThis tells ARLDM to use the `vistsis` runscript, points it to the source package, enables Hermes integration, and sets the local experiment directory to the staged input path.",
+    "answer": "Let me think through this step by step:\n\n1. ARLDM can be run as a pipeline step by appending an `arldm` command.\n2. To enable Hermes integration, we need to set the `with_hermes` flag to true.\n3. The `runscript` parameter tells ARLDM which configuration script to use—in this case `vistsis`.\n4. We also need to point ARLDM to its source code location via `arldm_path`, which we obtain with `scspkg pkg src arldm`.\n5. Finally, the local experiment directory should be set to the staged input path (`$LOCAL_INPUT_PATH`) so that ARLDM has access to the data.\n\nAdd an `arldm` step to the pipeline with Hermes enabled:\n\n```bash\njarvis pipeline append arldm runscript=vistsis arldm_path=\"`scspkg pkg src arldm`/ARLDM\" with_hermes=true local_exp_dir=$LOCAL_INPUT_PATH\n```\nThis tells ARLDM to use the `vistsis` runscript, points it to the source package, enables Hermes integration, and sets the local experiment directory to the staged input path."
+  },
+  {
+    "question": "What are the options for `jarvis pipeline append data_stagein`?",
+    "reasoning": "Let me think through this step by step:\n\n1. The `data_stagein` step is used to copy input data from shared locations to the local node.\n2. The command accepts three main parameters:\n   - `dest_data_path`: the target directory on the local node where the data should be copied.\n   - `user_data_paths`: a comma‑separated list of source paths that should be staged in.\n   - `mkdir_datapaths`: a path that should be created if it does not already exist.\n3. These parameters are typically combined in a single command, specifying all required source directories and the destination.\n4. After the step runs, the data will be available under `$LOCAL_INPUT_PATH`.",
+    "answer": "the `data_stagein` command accepts the following parameters:\n- `dest_data_path`: the destination directory on the local node.\n- `user_data_paths`: a comma‑separated list of source paths to copy.\n- `mkdir_datapaths`: the destination path to create if it does not exist.\nUse them together like:\n\n```bash\njarvis pipeline append data_stagein dest_data_path=$LOCAL_INPUT_PATH \\\nuser_data_paths=$SHARED_INPUT_PATH/vistdii,$SHARED_INPUT_PATH/vistsis,$SHARED_INPUT_PATH/visit_img,$PRETRAIN_MODEL_PATH \\\nmkdir_datapaths=$LOCAL_INPUT_PATH\n```"
+  }
+]

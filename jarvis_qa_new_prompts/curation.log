@@ -1,0 +1,23 @@
+
+🎯 Curating QA pairs with LLM-as-Judge
+
+
+📊 Loading data from: jarvis_qa_new_prompts/jarvis_qa.json
+→ Detected format: qa
+→ Converting to conversation format...
+→ Pre-filtered 14 pairs by question patterns
+✓ Loaded 7506 pairs
+
+🤖 Initializing Judge LLM: ollama
+✓ Judge ready: gpt-oss:20b
+
+  Rating pairs... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+→ Restoring to original format (qa)...
+
+✓ Curated 3911 / 7506 pairs
+✓ Retention rate: 52.1%
+✓ Average score: 6.11/10
+✓ Saved to: jarvis_qa_new_prompts/jarvis_qa_curated.json
+
+✨ Success! Filtered 3911 / 7506 pairs (52.1%)
+

@@ -1,0 +1,201 @@
+
+🚀 Generating QA pairs from LanceDB
+
+
+📊 Processing table: text_chunks
+⚡ Parallel mode: 24 workers
+
+📊 Connecting to LanceDB: /home/cc/Jarvis_QA_Generator/lancedb
+✓ Found 1749 chunks in 'text_chunks'
+→ Wiggle room: 5-10 pairs per chunk (adaptive)
+
+🤖 Initializing LLM: ollama
+→ Rate limit delay: 0.0s, Save every: 50 pairs
+✓ LLM ready: gpt-oss:20b
+
+→ Using text prompt template
+⚡ Resuming: Found 2100 existing pairs from 347 chunks
+⚡ Using parallel processing with 24 workers
+Processing 938 chunks with 24 workers...
+✗ FAILED: README.md:0:bb118f4c - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "How do I create a new ddmd scs package?",
+    "answ
+💾 Saved 2152 pairs to intermediate file
+💾 Saved 2201 pairs to intermediate file
+💾 Saved 2251 pairs to intermediate file
+💾 Saved 2305 pairs to intermediate file
+💾 Saved 2350 pairs to intermediate file
+💾 Saved 2404 pairs to intermediate file
+💾 Saved 2454 pairs to intermediate file
+💾 Saved 2500 pairs to intermediate file
+💾 Saved 2553 pairs to intermediate file
+💾 Saved 2604 pairs to intermediate file
+💾 Saved 2650 pairs to intermediate file
+💾 Saved 2700 pairs to intermediate file
+💾 Saved 2750 pairs to intermediate file
+💾 Saved 2801 pairs to intermediate file
+💾 Saved 2850 pairs to intermediate file
+💾 Saved 2901 pairs to intermediate file
+💾 Saved 2952 pairs to intermediate file
+💾 Saved 3002 pairs to intermediate file
+💾 Saved 3056 pairs to intermediate file
+💾 Saved 3105 pairs to intermediate file
+💾 Saved 3151 pairs to intermediate file
+💾 Saved 3204 pairs to intermediate file
+💾 Saved 3250 pairs to intermediate file
+💾 Saved 3304 pairs to intermediate file
+💾 Saved 3350 pairs to intermediate file
+💾 Saved 3402 pairs to intermediate file
+💾 Saved 3453 pairs to intermediate file
+💾 Saved 3504 pairs to intermediate file
+  Generating QA pairs... (3545 pairs | 938/938 chunks | 0 left) ━━━━━━━━━━━ 100%
+📝 701 chunks returned empty (logged to 
+jarvis_qa_new_prompts/jarvis_qa_text_chunks_null_chunks.json)
+
+✓ Generated 3545 QA pairs
+✓ Saved to: jarvis_qa_new_prompts/jarvis_qa_text_chunks.json
+⏱️  Total time: 18m 37s
+
+
+📊 Processing table: code_chunks
+⚡ Parallel mode: 24 workers
+
+📊 Connecting to LanceDB: /home/cc/Jarvis_QA_Generator/lancedb
+✓ Found 800 chunks in 'code_chunks'
+→ Wiggle room: 5-10 pairs per chunk (adaptive)
+
+🤖 Initializing LLM: ollama
+→ Rate limit delay: 0.0s, Save every: 50 pairs
+✓ LLM ready: gpt-oss:20b
+
+→ Using code prompt template
+⚡ Using parallel processing with 24 workers
+Processing 677 chunks with 24 workers...
+💾 Saved 55 pairs to intermediate file
+💾 Saved 106 pairs to intermediate file
+💾 Saved 152 pairs to intermediate file
+💾 Saved 204 pairs to intermediate file
+💾 Saved 250 pairs to intermediate file
+💾 Saved 300 pairs to intermediate file
+💾 Saved 351 pairs to intermediate file
+💾 Saved 403 pairs to intermediate file
+💾 Saved 455 pairs to intermediate file
+💾 Saved 504 pairs to intermediate file
+💾 Saved 552 pairs to intermediate file
+💾 Saved 606 pairs to intermediate file
+💾 Saved 650 pairs to intermediate file
+💾 Saved 703 pairs to intermediate file
+💾 Saved 754 pairs to intermediate file
+💾 Saved 805 pairs to intermediate file
+💾 Saved 850 pairs to intermediate file
+💾 Saved 901 pairs to intermediate file
+💾 Saved 955 pairs to intermediate file
+💾 Saved 1001 pairs to intermediate file
+💾 Saved 1052 pairs to intermediate file
+💾 Saved 1102 pairs to intermediate file
+💾 Saved 1151 pairs to intermediate file
+💾 Saved 1202 pairs to intermediate file
+💾 Saved 1251 pairs to intermediate file
+✗ FAILED: logging.py:0:820376a4 - ValueError: Failed to parse JSON response: All
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What does the `Color` enum represent, and how are i
+💾 Saved 1303 pairs to intermediate file
+💾 Saved 1351 pairs to intermediate file
+💾 Saved 1402 pairs to intermediate file
+💾 Saved 1454 pairs to intermediate file
+💾 Saved 1500 pairs to intermediate file
+💾 Saved 1555 pairs to intermediate file
+💾 Saved 1602 pairs to intermediate file
+💾 Saved 1652 pairs to intermediate file
+✗ FAILED: pkg.py:0:a9779bf8 - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [{"question":"What parameters does `_configure(**kwargs)` 
+accept?","answer
+💾 Saved 1703 pairs to intermediate file
+💾 Saved 1751 pairs to intermediate file
+💾 Saved 1800 pairs to intermediate file
+💾 Saved 1854 pairs to intermediate file
+💾 Saved 1901 pairs to intermediate file
+💾 Saved 1951 pairs to intermediate file
+💾 Saved 2003 pairs to intermediate file
+💾 Saved 2056 pairs to intermediate file
+💾 Saved 2102 pairs to intermediate file
+💾 Saved 2153 pairs to intermediate file
+💾 Saved 2203 pairs to intermediate file
+💾 Saved 2253 pairs to intermediate file
+💾 Saved 2303 pairs to intermediate file
+💾 Saved 2351 pairs to intermediate file
+💾 Saved 2403 pairs to intermediate file
+💾 Saved 2450 pairs to intermediate file
+💾 Saved 2504 pairs to intermediate file
+💾 Saved 2554 pairs to intermediate file
+💾 Saved 2602 pairs to intermediate file
+💾 Saved 2653 pairs to intermediate file
+✗ FAILED: resource_graph.py:0:d3e30d3a - ValueError: Failed to parse JSON 
+response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "What does the inner function `collect_from_node` do
+💾 Saved 2703 pairs to intermediate file
+💾 Saved 2751 pairs to intermediate file
+💾 Saved 2801 pairs to intermediate file
+💾 Saved 2852 pairs to intermediate file
+💾 Saved 2908 pairs to intermediate file
+💾 Saved 2958 pairs to intermediate file
+💾 Saved 3004 pairs to intermediate file
+✗ FAILED: logger.py:0:3b6d7ca3 - ValueError: Failed to parse JSON response: All 
+parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "How do I print an info message using the global log
+💾 Saved 3050 pairs to intermediate file
+💾 Saved 3103 pairs to intermediate file
+💾 Saved 3151 pairs to intermediate file
+💾 Saved 3206 pairs to intermediate file
+💾 Saved 3252 pairs to intermediate file
+✗ FAILED: test_module_integration.py:0:6bfc5aeb - ValueError: Failed to parse 
+JSON response: All parsing strategies failed
+Extraction failed: All parsing strategies failed
+Extracted JSON: [
+  {
+    "question": "How do I use the `jarvis mod profile` command to wr
+💾 Saved 3302 pairs to intermediate file
+💾 Saved 3356 pairs to intermediate file
+💾 Saved 3401 pairs to intermediate file
+💾 Saved 3450 pairs to intermediate file
+💾 Saved 3505 pairs to intermediate file
+💾 Saved 3556 pairs to intermediate file
+💾 Saved 3603 pairs to intermediate file
+💾 Saved 3656 pairs to intermediate file
+💾 Saved 3701 pairs to intermediate file
+💾 Saved 3751 pairs to intermediate file
+💾 Saved 3805 pairs to intermediate file
+💾 Saved 3855 pairs to intermediate file
+💾 Saved 3902 pairs to intermediate file
+💾 Saved 3952 pairs to intermediate file
+  Generating QA pairs... (3975 pairs | 677/677 chunks | 0 left) ━━━━━━━━━━━ 100%
+📝 120 chunks returned empty (logged to 
+jarvis_qa_new_prompts/jarvis_qa_code_chunks_null_chunks.json)
+
+✓ Generated 3975 QA pairs
+✓ Saved to: jarvis_qa_new_prompts/jarvis_qa_code_chunks.json
+⏱️  Total time: 43m 49s
+
+
+✓ Total pairs from all tables: 7520
+✓ Saved to: jarvis_qa_new_prompts/jarvis_qa.json
+✨ Success! Generated 7520 QA pairs
+
+💡 Tip: Use 'generator curate jarvis_qa_new_prompts/jarvis_qa.json --topic 
+"TOPIC"' for topic filtering
+

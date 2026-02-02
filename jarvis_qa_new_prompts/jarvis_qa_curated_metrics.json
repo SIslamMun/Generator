@@ -1,0 +1,10 @@
+{
+  "total_pairs": 7506,
+  "rated_pairs": 7506,
+  "filtered_pairs": 3911,
+  "retention_rate": 0.5210498268052225,
+  "avg_score": 6.112176925126565,
+  "threshold": 7.0,
+  "original_format": "qa",
+  "curated_at": "2026-02-01T10:25:02.617605"
+}

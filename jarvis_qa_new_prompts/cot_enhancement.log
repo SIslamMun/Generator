@@ -1,0 +1,312 @@
+========================================================================
+Starting CoT Enhancement for Jarvis QA Datasets
+========================================================================
+
+Timestamp: Sun Feb  1 10:28:48 UTC 2026
+
+========================================================================
+1. Enhancing CURATED dataset (3911 pairs)
+========================================================================
+
+
+🧠 Adding Chain-of-Thought reasoning to QA pairs
+
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 83: timed out
+Failed to enhance batch 101: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 249: timed out
+Failed to enhance batch 274: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 319: timed out
+Failed to enhance batch 326: timed out
+Failed to enhance batch 329: timed out
+Failed to enhance batch 334: timed out
+Failed to enhance batch 345: timed out
+Failed to enhance batch 349: timed out
+Failed to enhance batch 352: timed out
+Failed to enhance batch 354: timed out
+Could not parse conversations as list
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 452: timed out
+Failed to enhance batch 471: timed out
+Failed to enhance batch 481: timed out
+Failed to enhance batch 487: timed out
+Failed to enhance batch 571: timed out
+Failed to enhance batch 599: timed out
+Failed to enhance batch 620: timed out
+Failed to enhance batch 633: timed out
+Failed to enhance batch 665: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 708: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 747: timed out
+  Enhancing with CoT... ━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 3911/3911 (100%) 0:00:00
+✨ Success! Enhanced 3911 pairs with CoT reasoning
+
+
+✓ Curated dataset enhanced in 9603s (160m)
+
+========================================================================
+2. Enhancing RAW dataset (7520 pairs)
+========================================================================
+
+
+🧠 Adding Chain-of-Thought reasoning to QA pairs
+
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 31: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 81: timed out
+Failed to enhance batch 85: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 86: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 113: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 159: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 162: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 181: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 242: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 249: timed out
+Failed to enhance batch 270: timed out
+Failed to enhance batch 279: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 294: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 319: timed out
+Failed to enhance batch 326: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 352: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 390: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 392: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 407: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 418: timed out
+Failed to enhance batch 423: timed out
+Failed to enhance batch 425: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 430: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 451: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 517: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 827: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 863: timed out
+Failed to enhance batch 871: timed out
+Failed to enhance batch 879: timed out
+Failed to enhance batch 882: timed out
+Failed to enhance batch 889: timed out
+Failed to enhance batch 904: timed out
+Failed to enhance batch 934: timed out
+Failed to enhance batch 952: timed out
+Failed to enhance batch 966: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 975: timed out
+Failed to enhance batch 1020: timed out
+Failed to enhance batch 1041: timed out
+Failed to enhance batch 1093: timed out
+Failed to enhance batch 1100: timed out
+Failed to enhance batch 1132: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1181: timed out
+Failed to enhance batch 1182: timed out
+Failed to enhance batch 1183: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1234: timed out
+Failed to enhance batch 1236: timed out
+Failed to enhance batch 1271: timed out
+Failed to enhance batch 1299: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1333: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1371: timed out
+No matching closing bracket found
+Parsing failed for batch of 5 conversations
+Failed to enhance batch 1418: timed out
+Failed to enhance batch 1421: timed out
+Failed to enhance batch 1427: timed out
+Failed to enhance batch 1433: timed out
+Failed to enhance batch 1444: timed out
+Failed to enhance batch 1459: timed out
+Failed to enhance batch 1478: timed out
+  Enhancing with CoT... ━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 7520/7520 (100%) 0:00:00
+✨ Success! Enhanced 7521 pairs with CoT reasoning
+
+
+✓ Raw dataset enhanced in 17413s (290m)
+
+========================================================================
+CoT Enhancement Complete!
+========================================================================
+
+Curated dataset: 9603s (160m)
+Raw dataset:     17413s (290m)
+Total time:      27016s (450m)
+
+Output files:
+  - jarvis_qa_new_prompts/jarvis_qa_curated_cot.json
+  - jarvis_qa_new_prompts/jarvis_qa_raw_cot.json
+
+Completed at: Sun Feb  1 17:59:04 UTC 2026
+
