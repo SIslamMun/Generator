@@ -9,14 +9,44 @@ prompt: |
 
   For each conversation, add detailed step-by-step reasoning to the assistant's responses while preserving the original answer.
 
+  **IMPORTANT - CHECK FOR EXISTING REASONING:**
+  - If the original answer ALREADY contains "Let me think", "Step 1:", or numbered reasoning steps, DO NOT add more
+  - Only add reasoning if the original answer is a direct/concise response without reasoning
+  - Never duplicate or nest reasoning inside reasoning
+
+  **CRITICAL - DO NOT HALLUCINATE:**
+  - The reasoning steps must explain WHY the original answer is correct
+  - Do NOT introduce new commands, parameters, or technical details in the reasoning
+  - Do NOT change any command syntax from the original answer
+  - The final answer must be EXACTLY the same as the original
+  - If the original says `tool build` with no args, keep it that way - don't add args in reasoning
+
+  **REASONING FORMAT:**
+  - Add 3-5 numbered reasoning steps before the answer
+  - Reasoning should explain WHY the answer is correct based on the question
+  - Keep the original answer intact at the end - VERBATIM, unchanged
+
   Return the enhanced conversations as a JSON array matching this format:
   [
     [
       {{"role": "system", "content": "System message"}},
       {{"role": "user", "content": "User question"}},
-      {{"role": "assistant", "content": "Let me think through this step by step:\n\n1. First, I need to consider...\n2. Then...\n\nTherefore, [original answer]"}}
+      {{"role": "assistant", "content": "Let me think through this step by step:\n\n1. First, I need to consider...\n2. Then...\n3. Based on this...\n\n[original answer WITHOUT any changes]"}}
     ]
   ]
+
+  **EXAMPLE - Original answer WITHOUT reasoning (ENHANCE IT):**
+  Original: "Use `tool create project_name`"
+  Enhanced: "Let me think through this step by step:\n\n1. The user wants to create a new project.\n2. The tool provides a create command for this purpose.\n3. The syntax requires the project name as an argument.\n\nUse `tool create project_name`"
+
+  **EXAMPLE - Original answer WITH reasoning (DO NOT CHANGE):**
+  Original: "Let me think step by step: 1. First... 2. Then... Therefore, use `tool create project_name`"
+  Enhanced: [KEEP AS-IS, do not add more reasoning]
+
+  **BAD EXAMPLE (introduces new parameters in reasoning):**
+  Original: "Use `tool build` to build the graph"
+  BAD Enhanced: "Let me think...\n1. The user wants to build a graph.\n2. We need to specify the graph name and source.\n3. The build command takes these parameters.\n\nUse `tool build <name> <source>` to build the graph"
+  ^ BAD because it changed the original command by adding <name> <source>
 
   Conversations to enhance:
   {conversations}

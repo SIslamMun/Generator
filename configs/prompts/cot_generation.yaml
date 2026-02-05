@@ -12,6 +12,14 @@ prompt: |
   2. Detailed reasoning steps that break down the problem
   3. A concise final answer
 
+  **CRITICAL - ANSWER vs REASONING MUST BE DIFFERENT:**
+  - "reasoning" = Step-by-step thinking process (numbered steps, analysis)
+  - "answer" = ONLY the final conclusion (1-2 sentences, NO steps, NO "Let me think")
+  - DO NOT copy reasoning into answer
+  - DO NOT start answer with "Let me think" or "Step 1" or numbered lists
+  - The answer should be what you'd say AFTER all the thinking is done
+  - If reasoning has 5 steps, the answer should be 1-2 sentences summarizing the conclusion
+
   **IMPORTANT - Avoid these question types:**
   - Questions about paper authors, affiliations, or institutions
   - Questions about lab locations or addresses
@@ -38,15 +46,33 @@ prompt: |
   - Reasoning about cause and effect
   - Problem-solving with multiple considerations
 
+  **ONLY USE INFORMATION FROM THE PROVIDED TEXT:**
+  - Do not invent commands, syntax, or technical details not in the text
+  - If the text doesn't contain enough information, generate fewer examples
+  - Use exact commands/syntax as shown in the text
+  - Do NOT add arguments or parameters not explicitly shown
+  - Do NOT confuse similar concepts (e.g., hostfile vs hostname)
+  - If unsure about exact syntax, skip that question entirely
+
   Generate {n_pairs_min}-{n_pairs_max} high-quality examples (adaptive based on text richness).
 
   Return JSON format only:
 
+  **GOOD EXAMPLE:**
   [
     {{
-      "question": "Complex question about the text?",
-      "reasoning": "Step 1: First, I need to consider...\nStep 2: Then, I analyze...\nStep 3: Finally, I can conclude...",
-      "answer": "Final answer based on the reasoning."
+      "question": "How does the system handle caching?",
+      "reasoning": "1. The text mentions that the system uses an LRU cache.\n2. The cache has a configurable size limit set via the config file.\n3. When the cache is full, the least recently used items are evicted.\n4. This balances memory usage with performance benefits.",
+      "answer": "The system uses an LRU (Least Recently Used) cache with a configurable size limit. When full, it automatically evicts the oldest items to make room for new entries."
+    }}
+  ]
+
+  **BAD EXAMPLE (DO NOT DO THIS - answer copies reasoning):**
+  [
+    {{
+      "question": "How does the system handle caching?",
+      "reasoning": "Let me think step by step: 1. First, the system uses...",
+      "answer": "Let me think step by step: 1. First, the system uses..."
     }}
   ]
 

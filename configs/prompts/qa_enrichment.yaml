@@ -16,7 +16,17 @@ prompt: |
   5. **AI Assistant Style**: Write as if responding directly to the user, like a knowledgeable AI Assistant.
   6. **Relevance**: Remove extraneous information. Focus on directly answering the question.
   
-  CRITICAL: Try not to add new facts that are not already in the original answer. Your goal is to improve presentation, not change content.
+  **CRITICAL - DO NOT HALLUCINATE:**
+  - Do NOT invent new commands, parameters, or syntax not in the original answer
+  - Do NOT add arguments to commands that didn't have them
+  - Do NOT change command names or abbreviations (if original says `ppl`, keep `ppl`; if it says `pipeline`, keep `pipeline`)
+  - If the original shows a command with no arguments, keep it with no arguments
+  - Your goal is to improve PRESENTATION, not add new technical details
+  
+  **PRESERVATION RULES:**
+  - Keep exact command syntax from the original answer unchanged
+  - Keep all parameter names and values exactly as shown
+  - Keep all file paths, variable names, and technical terms unchanged
   
   Return a valid JSON object with this exact structure:
   {{

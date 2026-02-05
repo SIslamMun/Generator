@@ -4,6 +4,30 @@
 prompt: |
   Create {n_pairs_min}-{n_pairs_max} high-quality QA pairs from this text for training an assistant. Format: JSON array only.
 
+  **CRITICAL - ONLY USE INFORMATION FROM THE TEXT:**
+  - ONLY generate QA pairs using information EXPLICITLY stated in the provided text
+  - If a command is shown as `tool subcommand`, use EXACTLY that syntax
+  - If exact syntax isn't shown in the text, DO NOT guess or invent it
+  - Never make up commands, flags, arguments, or parameters not in the text
+  - If unsure about exact syntax, skip that question or return []
+
+  **PREVENTING HALLUCINATIONS - VERY IMPORTANT:**
+  
+  1. **DO NOT INVENT ARGUMENTS:**
+     - If text shows a command with no arguments, keep it with NO arguments
+     - If text shows `command action`, do NOT change it to `command action <arg1> <arg2>`
+     - Only include arguments/parameters that are EXPLICITLY shown in the text
+  
+  2. **DO NOT CONFLATE SIMILAR CONCEPTS:**
+     - A file path is NOT the same as a direct value (e.g., "config file" ≠ "config value")
+     - Read carefully what the text describes and preserve the exact meaning
+     - If text says "set the file path", don't change it to "set the value"
+  
+  3. **USE EXACT COMMAND FORMS:**
+     - If text shows an abbreviated command, use the abbreviation
+     - If text shows the full command name, use the full name
+     - Do NOT substitute abbreviations or expand them unless text explicitly states they're equivalent
+
   **FOCUS ON USER QUESTIONS:**
   - "How do I..." questions about using the tool/system
   - CLI commands and their exact syntax
@@ -15,10 +39,18 @@ prompt: |
   - "How do I [action]?" → Include exact command/syntax from text
   - "What command [does X]?" → Show the exact command
   - "How do I configure [feature]?" → Step-by-step from text
-  - "What are the options for [command]?" → List parameters
+  - "What are the options for [command]?" → List parameters ONLY if shown in text
 
-  **CRITICAL: Include exact CLI commands/syntax in answers when present in text.**
-  If text shows a command like `tool subcommand args`, the answer MUST include that exact command.
+  **COMMAND ACCURACY IS CRITICAL:**
+  - Copy commands EXACTLY as shown in the text (same spelling, same flags, same order)
+  - Do NOT rename commands or change their spelling
+  - Do NOT abbreviate or expand command names
+  - Do NOT add flags or arguments not shown in the text
+
+  **WHEN IN DOUBT:**
+  - If the text doesn't explicitly show arguments for a command, assume it takes NO arguments
+  - If the text mentions a concept but doesn't explain the exact usage, skip it
+  - Better to generate fewer accurate pairs than many inaccurate ones
 
   **IF THE TEXT IS TOO SHORT OR LACKS ACTIONABLE CONTENT:**
   If the text is just a title, header, license text, or lacks any commands/instructions,
@@ -26,24 +58,39 @@ prompt: |
   Do NOT apologize or explain - just return []
 
   AVOID: Author names, URLs alone, vague conceptual questions without practical answers.
-  
+
   Each answer: 2-3 sentences with exact commands/steps from the text.
   Vary starters: How do I/What command/How can I/What is the syntax.
-  
+
   IMPORTANT: Use markdown code formatting for commands in answers.
 
   Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
+  **GOOD EXAMPLE (uses exact syntax from text):**
   [
     {{
-      "question": "How do I [action]?",
-      "answer": "To [action], use the command `tool subcommand <args>`. This [explanation]. You can verify by [follow-up step]."
-    }},
-    {{
-      "question": "What command [does action]?",
-      "answer": "The command is `tool subcommand`. This [what it does]. Make sure to [important note from text]."
+      "question": "How do I initialize the project?",
+      "answer": "To initialize the project, use the command `tool init <directory>`. This creates the necessary configuration files. You can verify by checking the generated config file."
     }}
   ]
+
+  **BAD EXAMPLE (invents arguments not in text):**
+  [
+    {{
+      "question": "How do I build the project?",
+      "answer": "Use `tool build <name> <output_path>` to build."
+    }}
+  ]
+  ^ BAD: If the text only showed `tool build`, don't invent <name> <output_path> arguments
+
+  **BAD EXAMPLE (conflates concepts):**
+  [
+    {{
+      "question": "How do I set the configuration?",
+      "answer": "Use `tool config <key> <value>` to set configuration."
+    }}
+  ]
+  ^ BAD: If the text showed `tool config /path/to/file`, don't change it to key-value syntax
 
   If text lacks actionable content, return: []
 

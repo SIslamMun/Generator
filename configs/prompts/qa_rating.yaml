@@ -8,12 +8,26 @@ prompt: |
   You are an expert evaluator. Rate these question-answer pairs on a scale of 1-10.
 
   Criteria:
-  - Clarity (0-3): Question clear? Answer understandable?
+  - Clarity (0-2): Question clear? Answer understandable?
   - Accuracy (0-3): Answer correct and supported by evidence?
   - Usefulness (0-2): Valuable for training end-users (not DevOps)?
-  - Difficulty (0-2): Appropriate complexity?
+  - Difficulty (0-1): Appropriate complexity?
+  - Factual Grounding (0-2): Does the answer appear factually grounded without invented details?
 
   Rate STRICTLY - most pairs should score 5-7. Only exceptional pairs score 8+.
+
+  **HALLUCINATION WARNING SIGNS (REDUCE ACCURACY SCORE):**
+  - Commands with many placeholder arguments like `<name> <path> <type>` that seem generic
+  - Arguments that don't match the question's context
+  - Conflating similar but different concepts (e.g., file path vs direct value)
+  - Commands that sound plausible but use invented syntax
+  - Answers that add technical details not implied by the question
+  
+  **IF ANSWER LOOKS POTENTIALLY HALLUCINATED:**
+  - Set accuracy to 0-1
+  - Set factual_grounding to 0
+  - Add "potential_hallucination": true to the output
+  - Explain in reasoning what looks suspicious
 
   **AUTOMATIC LOW SCORES (max score: 3) for:**
   - Questions about GitHub workflows, CI/CD pipelines, or build automation
@@ -29,12 +43,14 @@ prompt: |
   - Infrastructure/CI/CD/Build focus: Reduce usefulness to 0 (max score 6)
   - Compilation/installation without technical API context: Reduce usefulness to 0
   - Too specific (version numbers, file names, commit hashes): Reduce difficulty to 0
-  - Overly generic questions without specific component names: Reduce clarity to 1
+  - Overly generic questions without specific component names: Reduce clarity to 0
+  - Potential hallucination detected: Reduce accuracy to 0-1, factual_grounding to 0
 
   For each pair, provide:
   1. Individual criteria scores
   2. Total rating (sum of criteria, max 10)
   3. Brief reasoning explaining the rating
+  4. Whether potential hallucination was detected
 
   Return valid JSON with detailed ratings:
   [
@@ -46,19 +62,23 @@ prompt: |
       "accuracy": 3,
       "usefulness": 1,
       "difficulty": 1,
+      "factual_grounding": 2,
       "topic_relevant": true,
-      "reasoning": "Clear question with accurate, well-supported answer. Moderately useful for training."
+      "potential_hallucination": false,
+      "reasoning": "Clear question with accurate, well-supported answer. Command syntax appears correct."
     }},
     {{
-      "question": "Original question",
-      "answer": "Original answer",
-      "rating": 5,
+      "question": "How do I initialize the tool?",
+      "answer": "Use `tool init <project> <config> <data>` to initialize.",
+      "rating": 2,
       "clarity": 2,
-      "accuracy": 2,
-      "usefulness": 1,
+      "accuracy": 0,
+      "usefulness": 0,
       "difficulty": 0,
+      "factual_grounding": 0,
       "topic_relevant": true,
-      "reasoning": "Question is clear but answer lacks depth and complexity."
+      "potential_hallucination": true,
+      "reasoning": "Suspicious: Multiple placeholder arguments that seem unrelated to init command context. Appears to be hallucinated arguments."
     }}
   ]
 

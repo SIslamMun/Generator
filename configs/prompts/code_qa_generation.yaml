@@ -12,6 +12,30 @@ prompt: |
   3. Create {n_pairs_min}-{n_pairs_max} diverse question-answer pairs
   4. IMPORTANT: Work with whatever code is provided, even if incomplete
 
+  **CRITICAL - ONLY USE INFORMATION FROM THE CODE:**
+  - ONLY generate QA pairs using information EXPLICITLY shown in the code
+  - Use function/class/variable names EXACTLY as they appear in the code
+  - Do NOT invent function parameters, return types, or behaviors not shown
+  - If a command is shown as `tool cmd`, use exactly that - don't change it
+  - Never guess or make up details not present in the source code
+
+  **PREVENTING HALLUCINATIONS - VERY IMPORTANT:**
+  
+  1. **DO NOT INVENT ARGUMENTS:**
+     - If code shows `def build():` with no params, don't add `build(name, path)`
+     - If CLI shows `tool build`, don't add `tool build <arg1> <arg2>`
+     - Only include parameters that are EXPLICITLY defined in the code
+  
+  2. **DO NOT CONFLATE CONCEPTS:**
+     - Parameters in one function don't automatically apply to other functions
+     - A variable for a file path is different from a direct value
+     - Don't mix up parameters from different classes or functions
+  
+  3. **DISTINGUISH CONTEXT CAREFULLY:**
+     - Parameters defined in one class/function are specific to THAT class/function
+     - Configuration for one module doesn't apply to other modules
+     - Each function/class has its own specific parameters - don't cross-contaminate
+
   **GENERATE TWO TYPES OF QUESTIONS:**
 
   **TYPE 1 - USER QUESTIONS (prioritize these if CLI/usage info exists):**
@@ -27,8 +51,13 @@ prompt: |
 
   **CRITICAL: If code contains CLI commands, argument parsing, or usage examples:**
   - ALWAYS generate questions about how to USE those commands
-  - Include the exact command syntax in answers
+  - Include the EXACT command syntax as shown in the code
   - Example: If code has `argparse` with `--output`, ask "What does the --output flag do?"
+
+  **WHEN IN DOUBT:**
+  - If you're not 100% sure about exact syntax/parameters, skip that question
+  - Better to generate fewer accurate pairs than many with invented details
+  - If code only shows partial info, only describe what's actually visible
 
   **GOOD question examples (adapt to actual code content):**
   - "How do I [action] using [tool]?" (user-facing)
@@ -44,7 +73,7 @@ prompt: |
 
   **ANSWER REQUIREMENTS:**
   - Minimum 2-3 sentences
-  - For USER questions: Include exact commands/syntax
+  - For USER questions: Include exact commands/syntax from the code
   - For CODE questions: Reference specific code elements
   - Use markdown code formatting for commands
 
@@ -58,9 +87,11 @@ prompt: |
   ✓ Do answers include exact command syntax when applicable?
   ✓ Is each answer 2-3+ sentences with specific details?
   ✓ Would this help someone USE the tool, not just understand internals?
+  ✓ Are ALL parameters/arguments taken EXACTLY from the code, not invented?
 
   Return ONLY valid JSON array format (no markdown, no explanation, no comments):
 
+  **GOOD EXAMPLE:**
   [
     {{
       "question": "How do I [action] using [tool]?",
@@ -71,6 +102,15 @@ prompt: |
       "answer": "The `method_name()` method [description of behavior]. It [implementation detail]. If [condition], it [error handling or special case]."
     }}
   ]
+
+  **BAD EXAMPLE (cross-contaminating parameters from different parts of code):**
+  [
+    {{
+      "question": "How do I initialize the tool?",
+      "answer": "Use `tool init <param_a> <param_b>` to initialize."
+    }}
+  ]
+  ^ BAD: If param_a and param_b are from a DIFFERENT function/class, don't use them for init!
 
   Source Code:
   {text}
