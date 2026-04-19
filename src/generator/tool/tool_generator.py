@@ -650,6 +650,185 @@ class ToolGenerator:
             logger.debug(f"Query synthesis failed: {e}")
             return None
     
+    # =========================================================================
+    # ERROR-RECOVERY GENERATION
+    # One-shot full examples from the catalog (no seed file required).
+    # =========================================================================
+
+    def generate_error_recovery_examples(
+        self,
+        tools: List[Tool],
+        n: int = 10,
+    ) -> List[ToolExample]:
+        """
+        Generate error-recovery examples where step 1 fails with a realistic
+        error and subsequent steps show recovery. The LLM picks the scenario
+        from the tool catalog — no external seed file needed.
+        """
+        console.print(f"\n[bold]Error-Recovery Generation[/bold]")
+        console.print(f"[dim]Target: {n} examples[/dim]\n")
+
+        docs = "\n\n".join([t.to_documentation() for t in tools])
+        tools_json = json.dumps([t.to_schema() for t in tools], indent=2)
+        prompt_template = self._get_prompt("tool_error_recovery_full")
+
+        examples: List[ToolExample] = []
+        attempts = 0
+        max_attempts = n * 3
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+            console=console,
+        ) as progress:
+            task = progress.add_task("[cyan]Generating error-recovery...", total=n)
+
+            while len(examples) < n and attempts < max_attempts:
+                attempts += 1
+                prompt = prompt_template.format(
+                    api_documentation=docs,
+                    tools_json=tools_json,
+                )
+                try:
+                    response = self.llm.generate(prompt, temperature=0.8)
+                    result = self._parse_json_response(response)
+                except Exception as e:
+                    logger.debug(f"error-recovery gen attempt failed: {e}")
+                    continue
+
+                if isinstance(result, list):
+                    result = result[0] if result else None
+                if not result or not result.get("reasoning_path"):
+                    continue
+
+                instruction = result.get("instruction", "")
+                if not instruction:
+                    continue
+
+                steps = []
+                for i, sd in enumerate(result["reasoning_path"]):
+                    steps.append(ReasoningStep(
+                        step=sd.get("step", i + 1),
+                        thought=sd.get("thought", ""),
+                        tool=sd.get("tool", ""),
+                        args=sd.get("args", {}),
+                        expected_result=sd.get("expected_result"),
+                        actual_result=sd.get("actual_result"),
+                        status=sd.get("status", "pending"),
+                        error_message=sd.get("error_message"),
+                    ))
+
+                # Require at least one failure step for this to count as
+                # an error-recovery example
+                if not any(s.status == "failure" for s in steps):
+                    continue
+
+                solution = Solution(
+                    instruction=instruction,
+                    reasoning_path=steps,
+                    final_answer=result.get("final_answer", ""),
+                    api_documentation=docs,
+                    method="error_recovery",
+                )
+
+                md = result.get("metadata", {}) or {}
+                examples.append(ToolExample(
+                    instruction=instruction,
+                    solution=solution,
+                    metadata={
+                        "generation_method": "error_recovery",
+                        "error_category": md.get("error_category", "unknown"),
+                        "difficulty": md.get("difficulty", "complex"),
+                    },
+                ))
+                progress.update(task, completed=len(examples))
+
+        console.print(f"[green]✓ Generated {len(examples)} error-recovery examples[/green]")
+        return examples
+
+    # =========================================================================
+    # FULL-MIX GENERATION
+    # One call → balanced corpus across single / multi / chain / error.
+    # Designed for a single long run (e.g. on Delta-AI with a local model).
+    # =========================================================================
+
+    def generate_full_mix(
+        self,
+        tools: List[Tool],
+        target_pairs: int = 100,
+        ratio_single: float = 0.30,
+        ratio_multi: float = 0.30,
+        ratio_chain: float = 0.25,
+        ratio_error: float = 0.15,
+        max_steps: int = 5,
+    ) -> List[ToolExample]:
+        """
+        Generate a balanced mix of single, multi, chain-first, and
+        error-recovery examples in one run.
+
+        Ratios should sum to ~1.0. The function normalizes and converts to
+        integer counts. Any remainder goes to single-step.
+        """
+        # Normalize ratios
+        total_ratio = ratio_single + ratio_multi + ratio_chain + ratio_error
+        if total_ratio <= 0:
+            raise ValueError("Ratios must sum to a positive number")
+        ratio_single /= total_ratio
+        ratio_multi  /= total_ratio
+        ratio_chain  /= total_ratio
+        ratio_error  /= total_ratio
+
+        n_single = int(target_pairs * ratio_single)
+        n_multi  = int(target_pairs * ratio_multi)
+        n_chain  = int(target_pairs * ratio_chain)
+        n_error  = int(target_pairs * ratio_error)
+        # Put any rounding remainder into single
+        leftover = target_pairs - (n_single + n_multi + n_chain + n_error)
+        n_single += max(0, leftover)
+
+        console.print(f"\n[bold]🎯 Full-Mix Tool Generation[/bold]")
+        console.print(f"[dim]Target: {target_pairs} examples[/dim]")
+        console.print(f"[dim]  single: {n_single}  multi: {n_multi}  chain: {n_chain}  error: {n_error}[/dim]\n")
+
+        all_examples: List[ToolExample] = []
+
+        # ── Single-step ─────────────────────────────────────────────
+        if n_single > 0:
+            console.print("[cyan]━━ Section 1/4: SINGLE-STEP ━━[/cyan]")
+            n_per_tool = max(1, n_single // len(tools))
+            single_ex = self.generate_examples(
+                tools, n_per_tool=n_per_tool, mode="single", max_steps=max_steps,
+            )
+            all_examples.extend(single_ex[:n_single])
+
+        # ── Multi-step (forced multi mode) ──────────────────────────
+        if n_multi > 0:
+            console.print("\n[cyan]━━ Section 2/4: MULTI-STEP ━━[/cyan]")
+            n_per_tool = max(1, n_multi // len(tools))
+            multi_ex = self.generate_examples(
+                tools, n_per_tool=n_per_tool, mode="multi", max_steps=max_steps,
+            )
+            all_examples.extend(multi_ex[:n_multi])
+
+        # ── Chain-first ─────────────────────────────────────────────
+        if n_chain > 0:
+            console.print("\n[cyan]━━ Section 3/4: CHAIN-FIRST ━━[/cyan]")
+            chain_ex = self.generate_chain_first(
+                tools, n_chains=n_chain, min_steps=2, max_steps=max_steps,
+            )
+            all_examples.extend(chain_ex)
+
+        # ── Error-recovery ──────────────────────────────────────────
+        if n_error > 0:
+            console.print("\n[cyan]━━ Section 4/4: ERROR-RECOVERY ━━[/cyan]")
+            err_ex = self.generate_error_recovery_examples(tools, n=n_error)
+            all_examples.extend(err_ex)
+
+        console.print(f"\n[bold green]✓ Full-mix complete: {len(all_examples)} examples[/bold green]")
+        return all_examples
+
     def generate_examples_hybrid(
         self,
         tools: List[Tool],

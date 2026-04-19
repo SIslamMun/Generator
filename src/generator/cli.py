@@ -1392,6 +1392,82 @@ def tool_generate_from_topic(topic, output, docs, n_tools, config, provider, mod
     console.print(f"     [bold]--target-pairs 300 --hybrid[/bold]")
 
 
+@main.command("tool-generate-full")
+@click.argument("tools_path", type=click.Path(exists=True))
+@click.option("-o", "--output", required=True, help="Output JSON file path")
+@click.option("--config", type=click.Path(exists=True), help="Config YAML file")
+@click.option("--target-pairs", type=int, default=100, help="Total examples")
+@click.option("--ratio-single", type=float, default=0.30, help="Fraction single-step")
+@click.option("--ratio-multi", type=float, default=0.30, help="Fraction multi-step")
+@click.option("--ratio-chain", type=float, default=0.25, help="Fraction chain-first")
+@click.option("--ratio-error", type=float, default=0.15, help="Fraction error-recovery")
+@click.option("--max-steps", type=int, default=5, help="Max steps for multi/chain")
+@click.option("--provider", help="LLM provider (override config)")
+@click.option("--model", help="LLM model (override config)")
+def tool_generate_full(tools_path, output, config, target_pairs,
+                       ratio_single, ratio_multi, ratio_chain, ratio_error,
+                       max_steps, provider, model):
+    """
+    Generate a balanced tool-use corpus across categories in ONE run.
+
+    Produces a mix of single-step, multi-step, chain-first, and
+    error-recovery examples according to the provided ratios. Designed for
+    a single long run (e.g. on Delta-AI with a local model).
+
+    Default ratios sum to 1.00:
+      --ratio-single 0.30   (single-tool baseline)
+      --ratio-multi  0.30   (multi-step success chains)
+      --ratio-chain  0.25   (chain-first, ToolGrad style)
+      --ratio-error  0.15   (error-recovery — failure + recovery)
+
+    Ratios are auto-normalized if they don't sum to 1.0.
+
+    \b
+    Examples:
+      uv run generator tool-generate-full tools.json -o mix.json
+      uv run generator tool-generate-full tools.json -o mix.json \\
+        --target-pairs 2000 --provider ollama --model gpt-oss:20b
+    """
+    from pathlib import Path
+    from .tool.tool_schemas import load_tools, save_examples
+    from .tool.tool_generator import ToolGenerator
+    from .prompt_loader import load_prompts
+    from collections import Counter
+
+    console.print("\n[bold]🎯 Full-Mix Tool Generation[/bold]\n")
+
+    config_path = Path(config) if config else Path(__file__).parent.parent.parent / "configs" / "config.yaml"
+    with open(config_path, "r") as f:
+        cfg = yaml.safe_load(f)
+
+    prompts = load_prompts(Path(config_path).parent)
+    llm_config = _extract_llm_config(cfg, provider, model)
+    tools = load_tools(tools_path)
+
+    console.print(f"[cyan]Tools: {tools_path}[/cyan]")
+    console.print(f"[cyan]Provider: {llm_config.get('provider', 'ollama')}[/cyan]")
+    console.print(f"[cyan]Model: {llm_config.get('model', 'default')}[/cyan]")
+    console.print(f"[cyan]Target: {target_pairs} | ratios s={ratio_single} m={ratio_multi} c={ratio_chain} e={ratio_error}[/cyan]")
+    console.print(f"[green]✓ Loaded {len(tools)} tools[/green]")
+
+    generator = ToolGenerator(llm_config.copy(), prompts)
+    examples = generator.generate_full_mix(
+        tools=tools,
+        target_pairs=target_pairs,
+        ratio_single=ratio_single,
+        ratio_multi=ratio_multi,
+        ratio_chain=ratio_chain,
+        ratio_error=ratio_error,
+        max_steps=max_steps,
+    )
+
+    save_examples(examples, output)
+
+    by_method = Counter(ex.solution.method for ex in examples)
+    console.print(f"\n[bold green]✨ Generated {len(examples)} examples → {output}[/bold green]")
+    console.print(f"[dim]By method: {dict(by_method)}[/dim]\n")
+
+
 @main.command("tool-generate-chain")
 @click.argument("tools_path", type=click.Path(exists=True))
 @click.option("-o", "--output", required=True, help="Output JSON file path")

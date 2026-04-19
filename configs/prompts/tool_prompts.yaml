@@ -1,500 +1,599 @@
-# ============================================================================
-# TOOL USE PROMPTS - Phase 3
-# Based on Toolformer, Gorilla, and ToolLLM methodologies
-# ============================================================================
+# ==============================================================================
+# TOOL-USE PROMPTS
+# ==============================================================================
+# Design principles:
+#
+#   1. GENERIC and DOMAIN-AGNOSTIC. No tool names, parameter names, or example
+#      values are hardcoded for any specific MCP server. Domain data is
+#      injected via format variables that the calling Python code fills:
+#        {tool_name}, {tool_description}, {parameters}, {examples}
+#        {api_documentation}, {instruction}, {tools_json}, {tools_documentation}
+#
+#   2. COMPACT. Small teachers (gpt-oss:20b, haiku, qwen2.5:7b) lose attention
+#      on long prompts. Each active prompt is <~80 lines. Keep it tight.
+#
+#   3. PARSER-COMPATIBLE. Output schemas match what
+#      src/generator/tool/tool_generator.py already parses. Do NOT change
+#      field names — the Python code depends on them.
+#
+#   4. GROUNDED REASONING. Every `thought` field must name the tool being
+#      called and quote the specific parameter values it uses. Generic
+#      "the user wants X" reasoning is rejected — small fine-tuned models
+#      trained on ungrounded thoughts hallucinate at inference time.
+#
+#   5. ANTI-HALLUCINATION. The teacher must NOT invent tools, parameter
+#      names, parameter types, or return shapes that aren't in the provided
+#      API documentation / examples.
+#
+#   6. RESULT SHAPES MUST MATCH REAL TOOL RETURNS. The `examples` field on
+#      each tool in the catalog contains real captured input/output pairs.
+#      The teacher must model its `expected_result` on those literal shapes,
+#      not invent generic "success/message" wrappers.
+# ==============================================================================
+
 
 # ------------------------------------------------------------------------------
-# INSTRUCTION GENERATION
-# Generate diverse user instructions for tool usage
+# INSTRUCTION GENERATION — SINGLE TOOL
+# Called from tool_generator.py:81
+# vars: {tool_name}, {tool_description}, {parameters}, {examples},
+#       {n_instructions_min}, {n_instructions_max}
 # ------------------------------------------------------------------------------
 tool_instruction_generation: |
-  Generate diverse user instructions that would require this tool.
+  Generate {n_instructions_min}-{n_instructions_max} realistic user requests
+  that each require exactly ONE call to the tool below.
 
-  Tool: {tool_name}
-  Description: {tool_description}
-  Parameters: {parameters}
-  Examples: {examples}
+  TOOL
+    name:        {tool_name}
+    description: {tool_description}
+    parameters:  {parameters}
+    real_examples_of_usage: {examples}
 
-  Generate {n_instructions_min}-{n_instructions_max} diverse instructions (adaptive based on tool complexity) including:
-  - Simple direct usage (e.g., "Calculate 15% of 200")
-  - Complex parameter combinations (e.g., "Find the square root of the sum of 144 and 256")
-  - Edge cases (e.g., "What happens if I divide by zero?")
-  - Real-world scenarios (e.g., "I need to split a $127.50 bill among 3 people")
+  Rules:
+    1. Each request must cleanly map to ONE call of THIS tool — not another
+       tool, not multiple tools.
+    2. Mix phrasing: ~40% direct commands ("Do X"), ~40% polite/indirect
+       ("Could you set up X..."), ~20% contextual/terse ("For tonight's
+       run, X" or "new X").
+    3. Mix difficulty: ~40% simple (one obvious parameter), ~40% medium
+       (parameter buried in natural prose), ~20% complex (implicit naming
+       or multiple distractors).
+    4. Mix success vs error-triggering: roughly ~80% of requests should
+       succeed cleanly. The remaining ~20% should be ERROR-TRIGGERING —
+       requests that LOOK normal but point at a resource/config that
+       doesn't exist OR use an invalid value for a parameter. Mark these
+       with difficulty="complex" and phrase them so they sound like a real
+       user making an honest mistake. Examples of error-triggering patterns:
+         - reference a pipeline/package/repo name that probably doesn't
+           exist yet ("Show me the config of the hermes package in the
+           gromacs_bench pipeline" — hermes may not have been appended)
+         - use an invalid value ("Add the 'pandas_v99' package to my
+           pipeline" — pandas_v99 is not a known package type)
+         - skip a prerequisite ("Configure the lammps package in my new
+           pipeline md_sim" — user forgot to append lammps first)
+       Do NOT flag these as errors in the instruction text — the user
+       still sounds confident. The failure will happen when the downstream
+       tool is invoked.
+    5. Use CONCRETE, PLAUSIBLE parameter values appropriate to the tool's
+       domain — draw inspiration from real_examples_of_usage. Never use
+       placeholders like "test", "foo", "my_thing", "value1".
+    6. Every request is distinct — no near-duplicates.
 
-  Return JSON array:
+  Output: ONE JSON array, no markdown fences, no prose.
   [
-    {{
-      "instruction": "Natural language user request",
-      "difficulty": "simple|medium|complex",
-      "scenario": "Brief context explaining the use case"
-    }}
+    {{"instruction": "<user request>", "difficulty": "simple|medium|complex", "scenario": "<one sentence context>"}}
   ]
 
-  Return ONLY valid JSON, no explanation.
+  Anti-examples (do NOT produce these):
+    "Use the tool"                    → FAIL: no parameter value
+    "Create a pipeline called test"   → FAIL: "test" is a placeholder
+    "Do X and then do Y"              → FAIL: requires multiple tools
+    "Add a nonexistent package"       → FAIL: user wouldn't phrase it this
+                                         way; instead name a plausible-sounding
+                                         but unknown package ("Add the
+                                         hdf5-ng package")
+
+  Return ONLY the JSON array.
+
 
 # ------------------------------------------------------------------------------
-# MULTI-TOOL INSTRUCTION GENERATION
-# Generate instructions requiring multiple tools
+# INSTRUCTION GENERATION — MULTI-TOOL
+# Called from tool_generator.py:228
+# vars: {tools_documentation}
 # ------------------------------------------------------------------------------
 multi_tool_instruction_generation: |
-  Generate a realistic user instruction that requires using MULTIPLE tools together.
+  Generate ONE realistic user request that requires 2-5 of the tools below,
+  used in sequence or in parallel.
 
-  Available Tools:
+  AVAILABLE TOOLS:
   {tools_documentation}
 
-  The instruction should:
-  1. Require 2-3 tools to complete
-  2. Have a logical flow where outputs chain together
-  3. Be a realistic task a user might actually need
+  Rules:
+    1. Tools must chain logically — earlier tools' effects enable later ones.
+    2. Do NOT name tools explicitly in the request ("call X then Y" is
+       rejected). The model under training must infer which tools to use.
+    3. Every parameter the request mentions must be a concrete, plausible
+       value (no placeholders like "foo", "test", "name1").
+    4. The request must have a clear end state (a resource is ready, a run
+       is launched, a report is generated).
+    5. `expected_tools` must be a subset of the tools listed above — never
+       invent a tool not in the catalog.
 
-  Return JSON:
+  Output: ONE JSON object, no fences, no prose.
   {{
-    "instruction": "Natural language user request",
+    "instruction": "<natural language request>",
     "difficulty": "medium|complex",
-    "scenario": "Brief context",
-    "expected_tools": ["tool1", "tool2"]
+    "scenario": "<one sentence context>",
+    "expected_tools": ["<tool_name>", "<tool_name>"]
   }}
 
-  Return ONLY valid JSON.
+  Anti-examples:
+    "Call create then run" → FAIL: names tool verbs explicitly
+    expected_tools contains a tool not in tools_documentation → FAIL
+
+  Return ONLY the JSON object.
+
 
 # ------------------------------------------------------------------------------
-# SOLUTION ANNOTATION - SINGLE STEP (Unified)
-# Single tool call with documentation grounding
+# SOLUTION ANNOTATION — SINGLE STEP
+# Called from tool_generator.py:310
+# vars: {api_documentation}, {instruction}
+# Parser (tool_generator.py:322-328) expects:
+#   {thought, tool, args, expected_result, final_answer}
 # ------------------------------------------------------------------------------
 tool_solution_single: |
-  Use this API documentation for reference:
+  Produce the canonical single-step solution for the user request below.
+  This becomes training data for a tool-calling model — quality matters.
 
+  API DOCUMENTATION (the ONLY tools that exist — do not invent others):
   {api_documentation}
 
-  ---
+  USER REQUEST: {instruction}
 
-  User Request: {instruction}
+  Hard rules:
+    1. `thought` MUST reference the specific parameter values from the user
+       request AND name the tool chosen AND explain why it matches the
+       tool's schema. Generic "the user wants X" reasoning is REJECTED.
+    2. `tool` MUST be a name from api_documentation. No invented tools.
+    3. `args` keys MUST exactly match the tool's parameter names in
+       api_documentation. No renaming, no abbreviating, no adding keys the
+       schema doesn't declare.
+    4. `args` values must be CORRECTLY TYPED: integers for ints, strings
+       for strings (including size/duration strings with unit suffixes if
+       the tool's examples show them that way), booleans as true/false.
+    5. `expected_result` MUST match the shape shown in the tool's real
+       example outputs from api_documentation — same keys, same value
+       types. Do NOT invent generic wrappers like {{"success": true}}
+       unless that's literally the real return shape.
+    6. `final_answer` is 1-2 sentences of natural language to the user that
+       names the actual parameter values. NO raw JSON, NO code blocks, NO
+       "I called the tool" meta-talk.
 
-  Generate the correct API call to fulfill this request.
-  Ground your answer in the documentation above.
-
-  Think step by step:
-  1. What is the user asking for?
-  2. Which tool can fulfill this request?
-  3. What arguments should be passed?
-
-  Respond with JSON:
+  Output: ONE JSON object, no fences, no prose.
   {{
-    "thought": "Reasoning about which API to use and why",
-    "tool": "api_name",
-    "args": {{"param1": "value1", "param2": "value2"}},
-    "expected_result": "Expected output based on API description",
-    "final_answer": "Natural language answer to give the user"
+    "thought": "<grounded reasoning — references specific values AND tool AND schema fit>",
+    "tool": "<tool name from api_documentation>",
+    "args": {{"<exact param name>": <correctly typed value>}},
+    "expected_result": {{"<shape matching the tool's real example output>"}},
+    "final_answer": "<1-2 sentence natural reply to the user>"
   }}
 
-  Return ONLY valid JSON.
+  Anti-examples (do NOT produce these):
+    "thought": "The user wants to perform an action"
+      → FAIL: content-free, not grounded
+    "tool": "invented_tool_name"
+      → FAIL: not in api_documentation
+    "args": {{"target": "foo"}} when schema says parameter is "name"
+      → FAIL: wrong key, and "foo" is a placeholder
+    "expected_result": {{"success": true, "message": "ok"}}
+      → FAIL: invented shape if the real tool returns something else
+    "final_answer": "Called the tool with the given arguments."
+      → FAIL: robotic meta-talk instead of answering the user
+
+  Return ONLY the JSON object.
+
 
 # ------------------------------------------------------------------------------
-# SOLUTION ANNOTATION - MULTI STEP (Unified)
-# Multi-step reasoning with documentation and chaining
+# SOLUTION ANNOTATION — MULTI STEP
+# Called from tool_generator.py:350
+# vars: {api_documentation}, {instruction}, {tools_json}, {max_steps}
+# Parser (tool_generator.py:366-380) expects:
+#   {reasoning_path: [{step, thought, tool, args, expected_result,
+#                      actual_result?, status?, error_message?}],
+#    final_answer}
 # ------------------------------------------------------------------------------
 tool_solution_multi: |
-  You are an expert at solving tasks using available tools.
+  Produce a multi-step solution for the user request below using the
+  NEXT-ACTION PREDICTOR pattern: each step reasons about the ONE correct
+  next action given what has already happened — NOT a pre-planned sequence.
 
-  API Documentation:
+  API DOCUMENTATION:
   {api_documentation}
 
-  User Instruction: {instruction}
-
-  Available Tools (JSON Schema):
+  TOOLS (JSON schema):
   {tools_json}
 
-  Generate a step-by-step solution using the available tools.
-  For each step:
-  1. Think about what needs to be done next
-  2. Choose the appropriate tool from the documentation
-  3. Specify the arguments
-  4. Predict the expected result (which may feed into next step)
+  USER INSTRUCTION: {instruction}
 
-  Return JSON:
+  Hard rules:
+    1. Use the MINIMUM number of steps needed, up to {max_steps}. No padding.
+    2. Step 1's thought reasons from the user request alone.
+    3. Every step after step 1 MUST reference the PRIOR step's result in
+       its thought — e.g. "Step 1 returned status=created, so now I
+       need..." or "The previous call failed with <error>, so...". Steps
+       that don't reference prior state are rejected.
+    4. Every thought is 1-3 sentences, grounded in specific parameter
+       values and tool names. Generic phrases rejected.
+    5. Tool names, arg keys, and expected_result shapes must come from
+       api_documentation / tools_json. Never invent.
+    6. Do NOT embed the tool's response text inside your own thought. The
+       tool's output belongs in `expected_result` only.
+    7. ERROR-RECOVERY HANDLING (important for training data balance):
+
+       Before writing step 1, decide whether this instruction is likely to
+       fail. Signals that it WILL fail:
+         - the instruction references a resource by name that was never
+           created/appended in prior context
+         - the instruction uses an unusual-looking parameter value that
+           probably isn't a real known type (e.g. a package name like
+           "hdf5-ng" that doesn't match known types)
+         - the instruction skips a normal prerequisite (configure before
+           append, run before build_env, etc.)
+
+       If ANY of the above apply, you MUST produce a FAILING step 1:
+         - set `status` to "failure"
+         - put the real error payload in `actual_result` — use realistic
+           error shapes like "404: <thing> not found" or "500: Could not
+           find pkg: <value>" or "500: <reason>"
+         - put a short human-readable error summary in `error_message`
+         - then in step 2's thought, quote the error verbatim and justify
+           a concrete recovery action (retry with corrected args, append
+           the missing prerequisite, destroy+recreate, or give up
+           gracefully via final_answer if no recovery is possible)
+         - the recovery step itself should use `status: "success"` unless
+           it also fails (in which case continue the chain)
+
+       If the instruction is straightforwardly correct, OMIT status /
+       actual_result / error_message entirely — those are only for the
+       failure case.
+    8. `final_answer` is 1-2 sentences summarizing what was accomplished or
+       — if the task failed — what went wrong and what the user should do.
+
+  Output: ONE JSON object, no fences, no prose.
   {{
     "reasoning_path": [
       {{
         "step": 1,
-        "thought": "Why this step is needed",
-        "tool": "tool_name",
-        "args": {{"param": "value"}},
-        "expected_result": "What we expect back"
+        "thought": "<grounded reasoning from the user request>",
+        "tool": "<tool name>",
+        "args": {{"<param>": <value>}},
+        "expected_result": {{"<shape matching the tool's real return>"}}
       }},
       {{
         "step": 2,
-        "thought": "Next step based on previous result",
-        "tool": "another_tool",
+        "thought": "<references step 1's result by its actual field name>",
+        "tool": "<tool name>",
         "args": {{}},
-        "expected_result": "..."
+        "expected_result": {{}}
       }}
     ],
-    "final_answer": "Natural language answer that would be given to the user"
+    "final_answer": "<1-2 sentence summary>"
   }}
 
-  Maximum {max_steps} steps. Return ONLY valid JSON.
+  Anti-examples:
+    Step 2 thought: "Next I'll do X"
+      → FAIL: doesn't reference step 1's result
+    Step 1 thought: "I'll do A, then B, then C"
+      → FAIL: planning ahead, not next-action reasoning
+    `args` keys that aren't in the tool schema
+      → FAIL: invented args
+    Recovery step that just retries the exact same failing call
+      → FAIL: not actually recovering
+
+  Return ONLY the JSON object.
+
 
 # ------------------------------------------------------------------------------
-# LEGACY: SOLUTION ANNOTATION - TOOLFORMER STYLE
-# Single-step tool call with reasoning
+# CHAIN-FIRST GENERATION (ToolGrad)
+# Called from tool_generator.py:589
+# vars: {tools_json}, {min_steps}, {max_steps}
 # ------------------------------------------------------------------------------
-tool_solution_toolformer: |
-  Given this user request, determine which tool to use and generate the tool call.
-
-  User Request: {instruction}
-
-  Available Tools:
-  {tools_list}
-
-  Think step by step:
-  1. What is the user asking for?
-  2. Which tool can fulfill this request?
-  3. What arguments should be passed?
-
-  Respond with JSON:
-  {{
-    "thought": "Reasoning about why this tool is needed",
-    "tool": "tool_name",
-    "args": {{"param1": "value1", "param2": "value2"}},
-    "expected_result": "Description of expected output"
-  }}
-
-  Return ONLY valid JSON.
-
-# ------------------------------------------------------------------------------
-# LEGACY: SOLUTION ANNOTATION - GORILLA STYLE
-# With API documentation context
-# ------------------------------------------------------------------------------
-tool_solution_gorilla: |
-  Use this API documentation for reference:
-
-  {api_documentation}
-
-  ---
-
-  User Request: {instruction}
-
-  Generate the correct API call to fulfill this request. Ground your answer in the documentation.
-
-  Respond with JSON:
-  {{
-    "thought": "Reasoning about which API to use and why, referencing the documentation",
-    "tool": "api_name",
-    "args": {{"param1": "value1"}},
-    "expected_result": "Expected output based on API description"
-  }}
-
-  Return ONLY valid JSON.
-
-# ------------------------------------------------------------------------------
-# LEGACY: SOLUTION ANNOTATION - TOOLLLM STYLE (DFSDT)
-# Multi-step reasoning with backtracking capability
-# ------------------------------------------------------------------------------
-tool_solution_toolllm: |
-  You are an expert at solving tasks using available tools.
-
-  User Instruction: {instruction}
-
-  Available Tools:
-  {tools_json}
-
-  Generate a step-by-step solution using the available tools.
-  For each step:
-  1. Think about what needs to be done next
-  2. Choose the appropriate tool
-  3. Specify the arguments
-  4. Predict the expected result
-
-  If a step might fail, consider alternatives (DFSDT approach).
-
-  Return JSON:
-  {{
-    "reasoning_path": [
-      {{
-        "step": 1,
-        "thought": "Why this step is needed",
-        "tool": "tool_name",
-        "args": {{"param": "value"}},
-        "expected_result": "What we expect back"
-      }},
-      {{
-        "step": 2,
-        "thought": "Next step based on previous result",
-        "tool": "another_tool",
-        "args": {{}},
-        "expected_result": "..."
-      }}
-    ],
-    "final_answer": "Natural language answer that would be given to the user"
-  }}
-
-  Maximum {max_steps} steps. Return ONLY valid JSON.
-
-# ------------------------------------------------------------------------------
-# QUALITY RATING - LLM-as-Judge
-# Based on AlpaGasus methodology
-# ------------------------------------------------------------------------------
-tool_quality_rating: |
-  You are an expert evaluator of tool-calling examples for LLM training.
-
-  Rate this example on a scale of 1-10.
-
-  **Instruction:** {instruction}
-
-  **Tool Usage:**
-  {tool_calls}
-
-  **Execution Result:** {result}
-
-  **Final Answer:** {answer}
-
-  **Rating Criteria:**
-  - Tool Selection (0-3): Are the right tools chosen for the task?
-  - Parameter Correctness (0-3): Are arguments valid and appropriate?
-  - Reasoning Quality (0-2): Is the thought process clear and logical?
-  - Result Usefulness (0-2): Does the result actually solve the instruction?
-
-  **Scoring Guide:**
-  - 9-10: Perfect - correct tool, valid params, clear reasoning, useful result
-  - 7-8: Good - minor issues but fundamentally correct
-  - 5-6: Acceptable - works but has noticeable problems
-  - 3-4: Poor - significant issues with tool choice or parameters
-  - 1-2: Unusable - completely wrong or broken
-
-  Return JSON:
-  {{
-    "rating": 8,
-    "tool_selection": 3,
-    "parameter_correctness": 3,
-    "reasoning_quality": 1,
-    "result_usefulness": 2,
-    "reasoning": "Brief explanation of the rating"
-  }}
-
-  Return ONLY valid JSON.
-
-# ------------------------------------------------------------------------------
-# STEP QUALITY RATING (Turn-Level Filtering)
-# Based on ToolMind (Nov 2025): Rate individual reasoning steps
-# Paper: https://arxiv.org/abs/2511.15718
-# ------------------------------------------------------------------------------
-step_quality_rating: |
-  Rate this individual reasoning step for tool-use training data quality.
-  
-  **User Instruction:** {instruction}
-  
-  **Step {step_number} of {total_steps}:**
-  - Thought: {thought}
-  - Tool: {tool}
-  - Arguments: {args}
-  - Result: {result}
-  
-  **Previous Context:**
-  {previous_context}
-  
-  **Evaluation Criteria:**
-  1. Is the thought logically sound given the instruction and previous context?
-  2. Is the tool choice appropriate for this step?
-  3. Are the arguments correct, complete, and properly typed?
-  4. Does the result make sense for the given arguments?
-  5. Does this step advance toward the goal without introducing errors?
-  
-  **Rating Guide:**
-  - 0.9-1.0: Excellent - perfect reasoning, correct tool and args
-  - 0.7-0.8: Good - minor issues but fundamentally sound
-  - 0.5-0.6: Acceptable - works but has noticeable problems
-  - 0.3-0.4: Poor - significant issues that compound errors
-  - 0.0-0.2: Bad - wrong tool, invalid args, or misleading
-  
-  Return JSON:
-  {{
-    "rating": 0.85,
-    "issues": ["list", "of", "problems", "if any"],
-    "is_misleading": false,
-    "reasoning": "Brief explanation of the rating"
-  }}
-  
-  Return ONLY valid JSON.
-
-# ------------------------------------------------------------------------------
-# SEMANTIC VERIFICATION
-# Verify execution result semantically solves the instruction
-# ------------------------------------------------------------------------------
-tool_semantic_verification: |
-  Evaluate if this tool execution correctly solves the user's request.
-
-  **User Request:** {instruction}
-
-  **Execution Steps:**
-  {steps_summary}
-
-  **Final Answer:** {final_answer}
-
-  Consider:
-  1. Were the right tools selected for this task?
-  2. Are the execution results relevant to the request?
-  3. Does the final answer accurately address the user's need?
-  4. Is there any hallucination or made-up information?
-
-  Respond with JSON:
-  {{
-    "correct": true,
-    "confidence": 0.95,
-    "issues": [],
-    "reasoning": "Brief explanation"
-  }}
-
-  If NOT correct:
-  {{
-    "correct": false,
-    "confidence": 0.85,
-    "issues": ["Issue 1", "Issue 2"],
-    "reasoning": "Why this doesn't correctly solve the request"
-  }}
-
-  Return ONLY valid JSON.
-
-# ------------------------------------------------------------------------------
-# TOOL SIMULATION - Multi-Agent
-# For simulating tool responses when real execution isn't available
-# ------------------------------------------------------------------------------
-tool_simulation: |
-  You are simulating the {tool_name} API.
-
-  Your role is to act AS the API and return realistic responses.
-
-  API Specification:
-  - Name: {tool_name}
-  - Description: {tool_description}
-  - Expected return type: {return_type}
-
-  API Call: {tool_name}({args_json})
-
-  Context from previous calls: {context}
-
-  Generate a realistic response that this API would return.
-  The response should:
-  1. Be consistent with the API description
-  2. Use the provided arguments appropriately
-  3. Return the correct data type
-  4. Be plausible (not obviously fake data)
-
-  Return ONLY the API response (JSON format if object/array, plain value if primitive).
-
-# ------------------------------------------------------------------------------
-# CHAIN-FIRST GENERATION (ToolGrad Aug 2025)
-# Generate valid tool chains first, then synthesize queries
-# Reduces invalid samples by 40%+ compared to query-first
-# ------------------------------------------------------------------------------
-
 chain_generation: |
-  Generate a VALID tool chain where each step builds on previous results.
+  Generate a VALID tool chain of {min_steps}-{max_steps} steps using the
+  tools below. Design the mechanically-valid sequence now; a natural-
+  language query will be synthesized for it separately.
 
-  Available Tools:
+  AVAILABLE TOOLS:
   {tools_json}
 
-  Requirements:
-  - Generate {min_steps} to {max_steps} steps
-  - Each step must use a real tool from the list
-  - Arguments must be valid for that tool
-  - Steps should chain together logically (output from one feeds into next)
-  - Use $step_N_result notation to reference previous results
+  Hard rules:
+    1. Every tool must exist in tools_json.
+    2. Every argument name must match the tool's schema exactly.
+    3. Argument VALUES must be CONCRETE. Do not use "<placeholder>",
+       "$step_N_result", "your_value_here", or "{{step1.output}}" —
+       resolve each value to a literal string/integer/bool.
+    4. Steps must be executable in order — tool N-1's effect makes tool N
+       valid (you can't run something before creating it, etc.).
+    5. All steps should share a common context (same resource id, same
+       pipeline, same dataset) unless the task genuinely spans multiple.
+    6. `expected_result` per step is a short string describing what the
+       tool returns — this is a chain sketch, not a full solution.
 
-  Example chain structure:
-  - Step 1: Get some data → result is available as $step_1_result
-  - Step 2: Process $step_1_result → result is $step_2_result
-  - Step 3: Use $step_2_result to produce final output
-
-  Return JSON:
+  Output: ONE JSON object, no fences, no prose.
   {{
     "steps": [
       {{
         "step": 1,
-        "thought": "Why this tool and these arguments",
-        "tool": "tool_name",
-        "args": {{"param": "value"}},
-        "expected_result": "What this step produces"
-      }},
-      {{
-        "step": 2,
-        "thought": "Using result from step 1 to do X",
-        "tool": "another_tool",
-        "args": {{"input": "$step_1_result", "other": "value"}},
-        "expected_result": "What this produces"
+        "thought": "<why this is the right first action>",
+        "tool": "<tool name>",
+        "args": {{"<param>": <concrete value>}},
+        "expected_result": "<short description of what the tool returns>"
       }}
     ],
-    "final_answer": "What the complete chain accomplishes"
+    "final_answer": "<one sentence describing the chain's outcome>"
   }}
 
-  IMPORTANT:
-  - Use only tools from the list above
-  - Arguments must match tool parameter names exactly
-  - The chain must be executable in sequence
+  Anti-examples:
+    "args": {{"id": "<your_id>"}}         → FAIL: placeholder
+    "args": {{"id": "$step_1_result.id"}} → FAIL: reference, not a value
+    Step 1: run_something, Step 2: create_something → FAIL: impossible order
 
-  Return ONLY valid JSON.
+  Return ONLY the JSON object.
 
+
+# ------------------------------------------------------------------------------
+# QUERY SYNTHESIS
+# Called from tool_generator.py:627
+# vars: {chain_steps}, {tools_used}, {final_result}
+# ------------------------------------------------------------------------------
 query_synthesis: |
-  Create a natural user query that would require this tool chain.
+  Write a natural-language user request that would require the tool chain
+  below. The model under training must infer the tools — the query should
+  NOT name them.
 
-  Tool Chain:
+  CHAIN:
   {chain_steps}
 
-  Tools Used: {tools_used}
-  Final Result: {final_result}
+  TOOLS USED: {tools_used}
+  EXPECTED OUTCOME: {final_result}
 
-  Generate a realistic user request that:
-  1. Would naturally lead to this sequence of tool calls
-  2. Sounds like something a real user would ask
-  3. Does NOT mention the specific tools or steps
-  4. Is clear about what the user wants to accomplish
+  Hard rules:
+    1. Do NOT mention tool names in the query.
+    2. Every CONCRETE value used in the chain's args MUST appear in the
+       query in natural form — nothing may be silently dropped.
+    3. 1-3 sentences. No essays. No bullet points.
+    4. The query must be unambiguous enough that THIS chain is clearly
+       the right interpretation.
 
-  Return JSON:
-  {{
-    "query": "Natural language user request"
-  }}
+  Output: ONE JSON object, no fences.
+  {{"query": "<natural language user request>"}}
 
-  Return ONLY valid JSON.
+  Anti-examples:
+    "Call tool X then Y"                              → FAIL: names tools
+    Query omits a parameter used in the chain         → FAIL
+    Query mentions a value the chain doesn't use      → FAIL
+
+  Return ONLY the JSON object.
+
 
 # ------------------------------------------------------------------------------
-# ERROR HANDLING ANNOTATION
-# Generate examples with error recovery
+# ERROR-RECOVERY EXAMPLE (one-shot full generation)
+# Given the tool catalog, produce a complete ToolExample: instruction, a
+# failing first step with realistic error, and a recovery chain.
+# vars: {api_documentation}, {tools_json}
 # ------------------------------------------------------------------------------
-tool_error_handling: |
-  Generate a tool-use example that includes error handling and recovery.
+tool_error_recovery_full: |
+  You are generating a single ERROR-RECOVERY training example from the tool
+  catalog below. Pick a realistic scenario where a tool call fails and the
+  model must recover.
 
-  User Instruction: {instruction}
+  API DOCUMENTATION (all tools that exist — do NOT invent others):
+  {api_documentation}
 
-  Available Tools:
-  {tools_list}
+  TOOLS (JSON schema):
+  {tools_json}
 
-  Create a scenario where:
-  1. The first approach encounters an error
-  2. The model recovers and tries an alternative
-  3. Eventually succeeds
+  Your task (ONE output):
+    1. Pick ONE realistic FAILURE scenario that a real user would stumble
+       into. Good scenarios:
+         - Asking for config/info about a resource they haven't created yet
+           ("Show me config of X in pipeline Y" where X was never added)
+         - Running/operating on a resource before it was built
+           ("Run pipeline Z" before build_env was called)
+         - Using a value that sounds plausible but isn't real
+           (pkg_type "hdf5-ng" instead of "hdf5", hostname that doesn't exist)
+         - Acting on a resource with a slightly-wrong name (typo)
+         - Skipping a prerequisite (configure before append)
+    2. Write a natural USER INSTRUCTION that leads to the failing call.
+       The user is confident — they do NOT know the call will fail.
+    3. Produce the full reasoning_path: step 1 fails with a realistic
+       error payload, subsequent steps RECOVER (retry with corrected args,
+       add the missing prerequisite, destroy+recreate, or gracefully
+       report what went wrong via final_answer).
 
-  Return JSON:
+  Rules for the failure step (step 1):
+    - `status` MUST be "failure"
+    - `actual_result` MUST contain a realistic error payload in one of
+      these shapes (pick the one that fits the tool's likely failure):
+        "404: <resource> not found"
+        "500: <operation> failed: <specific reason>"
+        "500: <operation> failed: Could not find pkg: <value>"
+        "500: <operation> failed: 'NoneType' object is not iterable"
+    - `error_message` = short human-readable summary
+    - `expected_result` = the OPTIMISTIC shape the caller expected
+
+  Rules for recovery steps (step 2+):
+    - `status` MUST be "success" (unless recovery itself fails — rare)
+    - `thought` MUST quote the actual error and justify the recovery
+    - `tool` and `args` must come from the catalog
+    - NEVER just retry the same call with the same args — that's not
+      recovery
+
+  Tool-name rules (apply to EVERY step):
+    - `tool` MUST be a name from the catalog.
+    - Argument KEYS must match the tool's declared parameter names
+      EXACTLY (no renaming, no abbreviating).
+    - Result shapes match what the tool's description says it returns.
+
+  Output: ONE JSON object, no fences, no prose.
   {{
+    "instruction": "<natural language user request>",
+    "metadata": {{
+      "error_category": "<short_tag_like 'missing_resource' or 'invalid_pkg_type'>",
+      "difficulty": "complex"
+    }},
     "reasoning_path": [
       {{
         "step": 1,
-        "thought": "Initial approach",
-        "tool": "tool_name",
-        "args": {{}},
-        "expected_result": "...",
-        "actual_result": {{"error": "Error message"}},
-        "status": "failure"
+        "thought": "<pre-failure plan, references user's request>",
+        "tool": "<failing tool name>",
+        "args": {{"<param>": <value>}},
+        "expected_result": {{"<shape the caller expected>"}},
+        "actual_result": "<realistic error payload as a JSON string>",
+        "status": "failure",
+        "error_message": "<short error summary>"
       }},
       {{
         "step": 2,
-        "thought": "Recovery: trying alternative approach",
-        "tool": "alternative_tool",
+        "thought": "<quotes the error, justifies recovery>",
+        "tool": "<recovery tool>",
         "args": {{}},
-        "expected_result": "...",
-        "actual_result": {{}},
+        "expected_result": {{}},
         "status": "success"
       }}
     ],
-    "final_answer": "Answer after recovery"
+    "final_answer": "<1-2 sentence summary: what went wrong and how it was fixed or why not>"
   }}
 
-  Return ONLY valid JSON.
+  Anti-examples:
+    Step 2 retries exact same failing call → FAIL: not recovery
+    Step 1 thought references the error before it happens → FAIL
+    Invented tool not in catalog → FAIL
+    `actual_result` is vague ("An error occurred") → FAIL
+
+  Return ONLY the JSON object.
+
+
+# ------------------------------------------------------------------------------
+# TOOL SIMULATION
+# Called from tool_executor.py:145, 179
+# vars: {tool_name}, {tool_description}, {return_type}, {args_json}, {context}
+# ------------------------------------------------------------------------------
+tool_simulation: |
+  You are simulating the tool `{tool_name}`. Return the EXACT JSON shape
+  the real tool produces. You are the SERVER, not an assistant.
+
+  TOOL
+    name:        {tool_name}
+    description: {tool_description}
+    return type: {return_type}
+
+  CALL:
+    {tool_name}({args_json})
+
+  PRIOR CONTEXT (recent tool calls — keep state consistent):
+  {context}
+
+  HARD RULES — violating these produces garbage training data:
+
+    1. MATCH THE REAL SHAPE. The tool's description tells you the exact
+       return shape (e.g. "Returns {{pipeline_id, status='destroyed'}}").
+       Produce ONLY those keys. Do NOT add "message", "details", "success",
+       "timestamp", "metadata", "resources_released", or any other field
+       the description does not mention.
+
+    2. STATUS LITERALS ARE EXACT. If the description says `status='created'`
+       use exactly "created", not "success", not "ok", not "Pipeline
+       created successfully".
+
+    3. NO INVENTED ENRICHMENT. Do not add fake execution metadata like
+       timestamps, byte counts, duration, or URLs unless the tool's
+       description literally says it returns them.
+
+    4. CONFIGURATION-READ tools (e.g. get-config style) return the actual
+       known keys for that resource. Do not invent new keys.
+
+    5. If prior context shows a state change (configure call happened),
+       reflect it in subsequent reads.
+
+    6. REALISTIC VALUES ONLY. Never "foo", "bar", "test".
+
+    7. If the call would realistically fail given inputs and context,
+       return the error as a JSON STRING with a status code and message
+       (e.g. "404: <name> not found", "500: <specific reason>"). Use
+       realistic error messages that tie back to the args — not generic
+       "An error occurred".
+
+  Output: ONE JSON value (object, array, string, or primitive), nothing
+  else. No prose. No fences. No explanation. No markdown.
+
+  Anti-examples (do NOT produce these):
+    Call: destroy_pipeline({{"pipeline_id": "foo"}})
+      BAD:  {{"status":"success", "message":"destroyed", "details": {{...}}}}
+      GOOD: {{"pipeline_id":"foo", "status":"destroyed"}}
+
+    Call: append_pkg({{"pipeline_id":"p","pkg_type":"ior"}})
+      BAD:  {{"status":"success", "pkg_id":"ior","configured":true}}
+      GOOD: {{"pipeline_id":"p","appended":"ior"}}
+
+
+# ==============================================================================
+# QUALITY / CURATION PROMPTS (orthogonal — used by the curator and evaluator,
+# not by the generator pipeline itself).
+# ==============================================================================
+
+tool_quality_rating: |
+  Rate this tool-calling training example 1-10.
+
+  Instruction: {instruction}
+  Tool Usage:  {tool_calls}
+  Result:      {result}
+  Answer:      {answer}
+
+  Score each (0-3, 0-3, 0-2, 0-2), sum to rating:
+    - Tool Selection: right tool for the task?
+    - Parameter Correctness: arg names match the tool schema?
+    - Reasoning Quality: thought references specific values?
+    - Result Realism: result shape matches real tool return?
+
+  Output: ONE JSON object, no fences.
+  {{"rating": 8, "tool_selection": 3, "parameter_correctness": 3, "reasoning_quality": 1, "result_realism": 1, "reasoning": "<brief>"}}
+
+  Return ONLY the JSON.
+
+
+step_quality_rating: |
+  Rate this individual reasoning step 0.0-1.0.
+
+  Instruction: {instruction}
+  Step {step_number} of {total_steps}:
+    Thought:  {thought}
+    Tool:     {tool}
+    Args:     {args}
+    Result:   {result}
+  Previous context:
+  {previous_context}
+
+  Criteria: grounded reasoning, correct tool for the state, arg names match
+  schema, realistic result, advances the workflow.
+
+  Output: ONE JSON object.
+  {{"rating": 0.85, "issues": [], "is_misleading": false, "reasoning": "<brief>"}}
+
+  Return ONLY the JSON.
+
+
+tool_semantic_verification: |
+  Evaluate whether this tool execution correctly solves the user's request.
+
+  User Request: {instruction}
+  Steps:
+  {steps_summary}
+  Final Answer: {final_answer}
+
+  Check: right tools, every part of request addressed, realistic results,
+  no hallucinated tool/arg/return names.
+
+  Output: ONE JSON object.
+  {{"correct": true, "confidence": 0.95, "issues": [], "reasoning": "<brief>"}}
+
+  Return ONLY the JSON.

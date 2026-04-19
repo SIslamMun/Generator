@@ -644,6 +644,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
+    { name = "claude-agent-sdk" },
     { name = "click" },
     { name = "httpx" },
     { name = "json5" },
@@ -699,6 +700,7 @@ requires-dist = [
     { name = "anthropic", marker = "extra == 'all'", specifier = ">=0.40.0" },
     { name = "anthropic", marker = "extra == 'apis'", specifier = ">=0.40.0" },
     { name = "black", marker = "extra == 'dev'", specifier = ">=23.0.0" },
+    { name = "claude-agent-sdk", specifier = ">=0.1.18" },
     { name = "claude-agent-sdk", marker = "extra == 'all'", specifier = ">=0.1.18" },
     { name = "claude-agent-sdk", marker = "extra == 'free'", specifier = ">=0.1.18" },
     { name = "click", specifier = ">=8.0.0" },
