@@ -10,7 +10,7 @@ Generate high-quality training data for LLM fine-tuning: QA pairs from documents
 **CoT Support**: Generate or enhance with Chain-of-Thought reasoning  
 **Formats**: ChatML, Alpaca, ShareGPT, JSONL  
 
-### Tool-Use Pipeline (Agentic Training)
+### Tool-Use Pipeline (Agentic Training) ⭐ UPDATED
 **Pipeline**: Parse → Generate → Execute → Curate  
 **Modes**: Single-step, Multi-step, or Auto (complexity-based)  
 **Output**: Instruction → Reasoning → Tool Calls with API documentation  
@@ -46,6 +46,11 @@ uv run generator pipeline /path/to/lancedb -o training.jsonl
 **3. Run Tool-Use Pipeline** (for agentic capabilities):
 ```bash
 uv run generator tool-pipeline configs/hdf5_tools.json -o tool_training.json
+
+# Balanced mix (single + multi + chain + error-recovery) in ONE run
+uv run generator tool-generate-full configs/jarvis_tools.json \
+  -o outputs/training.json --target-pairs 2000 \
+  --provider ollama --model gpt-oss:20b
 ```
 
 **4. Or Run Steps Individually**:
@@ -533,6 +538,73 @@ uv run generator tool-generate-chain configs/hdf5_tools.json -o examples.json --
 ```
 
 **Use Case:** Generate high-quality multi-tool training examples where tools chain together logically (output from one feeds into the next).
+
+---
+
+### `tool-generate-full` - Balanced mix in one command ⭐ NEW
+
+```bash
+uv run generator tool-generate-full TOOLS.json -o OUTPUT.json [OPTIONS]
+```
+
+**What it does:**
+Generates a **balanced corpus** across four categories in a single run:
+- **single-step** calls (one tool per example)
+- **multi-step** workflows (tool chain that must be executed in order)
+- **chain-first** (ToolGrad-style: generate valid chain → synthesize user query)
+- **error-recovery** (failure → reason about the error → take a recovery action)
+
+Designed for **one-shot runs on HPC / Delta-AI** with a local model.
+
+**Options:**
+- `--target-pairs INT` - Total examples to generate (default: 100)
+- `--ratio-single FLOAT` - Fraction single-step (default: 0.30)
+- `--ratio-multi FLOAT` - Fraction multi-step (default: 0.30)
+- `--ratio-chain FLOAT` - Fraction chain-first (default: 0.25)
+- `--ratio-error FLOAT` - Fraction error-recovery (default: 0.15)
+- `--max-steps INT` - Max steps per multi/chain example (default: 5)
+- `--provider TEXT` - LLM provider (override config)
+- `--model TEXT` - LLM model (override config)
+
+Ratios are auto-normalized if they don't sum to 1.0.
+
+**Examples:**
+```bash
+# Default mix, 100 examples
+uv run generator tool-generate-full configs/jarvis_tools.json -o mix.json
+
+# 2000-example run on Delta with a local teacher (recommended for training)
+uv run generator tool-generate-full configs/jarvis_tools.json \
+  -o outputs/training.json \
+  --target-pairs 2000 \
+  --ratio-single 0.30 --ratio-multi 0.30 \
+  --ratio-chain  0.25 --ratio-error 0.15 \
+  --provider ollama --model gpt-oss:20b
+
+# More error-recovery emphasis
+uv run generator tool-generate-full configs/jarvis_tools.json \
+  -o mix.json --target-pairs 500 \
+  --ratio-error 0.25 --ratio-single 0.20
+```
+
+**Error-recovery example (real generated data):**
+```
+User: "Run the data_analysis pipeline"
+Step 1 [failure]  run_pipeline(...)       → 500: "environment not built"
+Step 2 [success]  build_pipeline_env(...) → environment_built
+Step 3 [success]  run_pipeline(...)       → running
+Final: Initial run failed because env wasn't built. I built it first, then
+       successfully ran the pipeline.
+```
+
+**Expected distribution at --target-pairs 60 (tested with Haiku):**
+```
+by method: {'single': 18, 'multi': 18, 'chain_first': 15, 'error_recovery': 9}
+reasoning in every step: 60/60
+error-recovery traces:   9/60  (15%)
+```
+
+**Use Case:** Single long run on HPC that produces a training-ready corpus covering single calls, multi-step workflows, chains, and error recovery — all grounded in real tool-return shapes from `tools.json`.
 
 ---
 
