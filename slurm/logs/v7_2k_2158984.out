@@ -1,0 +1,110 @@
+═══════════════════════════════════════════════════════════
+ v7 PILOT: 2000 tool-use examples
+ Host: gh010.hsn.cm.delta.internal.ncsa.edu | Job: 2158984 | Sun Apr 19 03:04:09 AM CDT 2026
+═══════════════════════════════════════════════════════════
+
+Starting Ollama server...
+Ollama ready after 5x2 seconds
+Available models:
+NAME              ID              SIZE      MODIFIED    
+phi4-mini:3.8b    78fad5d182a7    2.5 GB    2 weeks ago    
+gemma2:2b         8ccf136fdd52    1.6 GB    2 weeks ago    
+qwen3:1.7b        8f68893c685c    1.4 GB    2 weeks ago    
+llama3.2:3b       a80c4f17acd5    2.0 GB    2 weeks ago    
+qwen3:4b          359d7dd4bcda    2.5 GB    2 weeks ago    
+gpt-oss:120b      a951a23b46a1    65 GB     2 weeks ago    
+gpt-oss:20b       17052f91a42e    13 GB     2 weeks ago    
+
+═══════════════════════════════════════════════════════════
+ Generating 2000 examples — Sun Apr 19 03:04:36 AM CDT 2026
+═══════════════════════════════════════════════════════════
+
+🎯 Full-Mix Tool Generation
+
+Tools: configs/tools/jarvis_tools.yaml
+Provider: ollama
+Model: gpt-oss:120b
+Target: 2000 | ratios s=0.3 m=0.3 c=0.25 e=0.15
+Subset: 10 tools/example | strategy: mixed
+Checkpoint: every 100 examples
+✓ Loaded 29 tools
+
+🎯 Full-Mix Tool Generation
+Target: 2000 examples
+  single: 600  multi: 600  chain: 500  error: 300
+  tools_per_example: 10  distractor_strategy: mixed
+
+Computing tool embeddings for subset selection...
+━━ Section 1/4: SINGLE-STEP (600 needed, 0 done) ━━
+Computing tool embeddings for subset selection...
+  Generating instructions... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+Generating multi-tool instructions...
+✓ Generated 590 instructions
+  💾 Checkpoint: 100 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 200 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 300 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 400 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 500 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  Annotating solutions... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+✓ Generated 589 examples
+
+━━ Section 2/4: MULTI-STEP (600 needed, 0 done) ━━
+Computing tool embeddings for subset selection...
+  Generating instructions... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+Generating multi-tool instructions...
+✓ Generated 590 instructions
+  💾 Checkpoint: 600 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 700 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 800 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 900 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1000 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1100 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  Annotating solutions... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+✓ Generated 590 examples
+
+━━ Section 3/4: CHAIN-FIRST (500 needed, 0 done) ━━
+Computing tool embeddings for subset selection...
+
+Chain-First Generation (ToolGrad)
+Building 500 valid chains (2-5 steps)...
+
+  💾 Checkpoint: 1200 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1300 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1400 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1500 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1600 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  Generating chains... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+
+✓ Generated 500 chain-first examples
+Success rate: 100.0% (500/500)
+
+━━ Section 4/4: ERROR-RECOVERY (300 needed, 0 done) ━━
+Computing tool embeddings for subset selection...
+
+Error-Recovery Generation
+Target: 300 examples
+
+  💾 Checkpoint: 1700 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1800 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  💾 Checkpoint: 1900 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+  Generating error-recovery... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100%
+✓ Generated 300 error-recovery examples
+  💾 Checkpoint: 1979 examples → outputs/v7_2k/jarvis_v7_2000_intermediate.json
+
+✓ Full-mix complete: 1979 examples
+
+✨ Generated 1979 examples → outputs/v7_2k/jarvis_v7_2000.json
+By method: {'single': 589, 'multi': 590, 'chain_first': 500, 'error_recovery': 
+300}
+
+
+═══════════════════════════════════════════════════════════
+ v7 PILOT COMPLETE — Sun Apr 19 06:40:00 AM CDT 2026
+═══════════════════════════════════════════════════════════
+Total examples: 1979
+By method: {'single': 589, 'multi': 590, 'chain_first': 500, 'error_recovery': 300}
+Unique tools used: 30
+Top 5 tools: [('append_pkg', 338), ('create_pipeline', 289), ('configure_pkg', 272), ('run_pipeline', 265), ('get_pkg_config', 231)]
+
+Cleaning up Ollama (PID 3309819)...
+Job finished: Sun Apr 19 06:40:01 AM CDT 2026

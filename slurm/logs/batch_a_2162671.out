@@ -1,0 +1,36 @@
+═══ BATCH A — gh047.hsn.cm.delta.internal.ncsa.edu — Mon Apr 20 01:46:25 AM CDT 2026 ═══
+Job ID: 2162671
+
+Starting Ollama server...
+Ollama ready after 5x2 seconds
+Available models:
+NAME              ID              SIZE      MODIFIED    
+gemma2:2b         8ccf136fdd52    1.6 GB    2 weeks ago    
+phi4-mini:3.8b    78fad5d182a7    2.5 GB    2 weeks ago    
+llama3.2:3b       a80c4f17acd5    2.0 GB    2 weeks ago    
+qwen3:1.7b        8f68893c685c    1.4 GB    2 weeks ago    
+qwen3:4b          359d7dd4bcda    2.5 GB    2 weeks ago    
+gpt-oss:120b      a951a23b46a1    65 GB     2 weeks ago    
+gpt-oss:20b       17052f91a42e    13 GB     2 weeks ago    
+
+═══════════════════════════════════════════════════
+ RUN 1/2: 4000 examples — Mon Apr 20 01:46:54 AM CDT 2026
+═══════════════════════════════════════════════════
+
+🎯 Full-Mix Tool Generation
+
+Tools: configs/tools/jarvis_tools.yaml
+Provider: ollama
+Model: gpt-oss:120b
+Target: 4000 | ratios s=0.3 m=0.3 c=0.25 e=0.15
+Subset: 10 tools/example | strategy: mixed
+Checkpoint: every 100 examples
+✓ Loaded 29 tools
+
+🎯 Full-Mix Tool Generation
+Target: 4000 examples
+  single: 1200  multi: 1200  chain: 1000  error: 600
+  tools_per_example: 10  distractor_strategy: mixed
+
+Computing tool embeddings for subset selection...
+━━ Section 1/4: SINGLE-STEP (1200 needed, 0 done) ━━

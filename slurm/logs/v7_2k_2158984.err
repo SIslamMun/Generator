@@ -1,0 +1,20 @@
+PyTorch conda environment for use with DeltaAI (CUDA 12.9)
+
+Includes: jupyter, jupyterlab, matplotlib, pandas, scipy,
+          scikit-learn, nvitop, mpi4py, tensorboard, wandb
+
+Quick start (on compute node):
+  module load python/miniforge3_pytorch/2.10.0
+  conda activate base
+  python -c "import torch; print(torch.cuda.is_available())"
+
+For Jupyter notebook support (Open OnDemand):
+  setup-kernel
+
+sentence-transformers not installed; falling back to random distractors
+sentence-transformers not installed; falling back to random distractors
+Failed to parse JSON response: {"thought":"The user wants to change settings of package 'pkg-7' in pipeline 'pipeline-42' (enable caching, timeout 300) which matches the configure_pkg tool (requires pipeline_id, pkg_id, extra_args)
+Single-step annotation failed: list index out of range
+sentence-transformers not installed; falling back to random distractors
+sentence-transformers not installed; falling back to random distractors
+sentence-transformers not installed; falling back to random distractors
