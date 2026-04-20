@@ -1,10 +1,11 @@
 # Jarvis MCP Tools Configuration
-# Based on https://github.com/iowarp/agent-toolkit/tree/main/agent-toolkit-mcp-servers/jarvis
+# Based on https://github.com/iowarp/clio-kit/tree/main/clio-kit-mcp-servers/jarvis
+# Return shapes verified against jarvis_handler.py and server.py source code
 
 tools:
-  # Pipeline Lifecycle Management
+  # ═══ Pipeline Lifecycle Management ═══════════════════════════════════
   - name: create_pipeline
-    description: Create a new pipeline environment for data-centric workflows
+    description: Create a new Jarvis-CD pipeline environment
     parameters:
       - name: pipeline_id
         type: string
@@ -13,10 +14,13 @@ tools:
     examples:
       - instruction: "Create a new HPC pipeline called 'performance_test' for running performance benchmarks"
         input: '{"pipeline_id": "performance_test"}'
-        output: '{"status": "success", "pipeline_id": "performance_test", "message": "Pipeline created successfully"}'
+        output: '{"pipeline_id": "performance_test", "status": "created"}'
+      - instruction: "Set up a fresh pipeline named ior_bench for IOR benchmarks"
+        input: '{"pipeline_id": "ior_bench"}'
+        output: '{"pipeline_id": "ior_bench", "status": "created"}'
 
   - name: load_pipeline
-    description: Load an existing pipeline environment by ID, or the current one if not specified
+    description: Load an existing Jarvis-CD pipeline environment by ID, or the current one if not specified
     parameters:
       - name: pipeline_id
         type: string
@@ -25,7 +29,10 @@ tools:
     examples:
       - instruction: "Load the data_analysis pipeline to work with it"
         input: '{"pipeline_id": "data_analysis"}'
-        output: '{"status": "success", "pipeline_id": "data_analysis", "packages": ["pandas", "numpy"]}'
+        output: '{"pipeline_id": "data_analysis", "status": "loaded"}'
+      - instruction: "Open the ior_bench pipeline"
+        input: '{"pipeline_id": "ior_bench"}'
+        output: '{"pipeline_id": "ior_bench", "status": "loaded"}'
 
   - name: update_pipeline
     description: Re-apply environment and configuration to every package in a Jarvis pipeline
@@ -37,10 +44,10 @@ tools:
     examples:
       - instruction: "Update all packages in the ml_pipeline to ensure configurations are current"
         input: '{"pipeline_id": "ml_pipeline"}'
-        output: '{"status": "success", "updated_packages": 5}'
+        output: '{"pipeline_id": "ml_pipeline", "status": "updated"}'
 
   - name: build_pipeline_env
-    description: Build the pipeline execution environment for a given pipeline
+    description: Rebuild a pipeline's env.yaml, capturing CMAKE_PREFIX_PATH and PATH from the current shell
     parameters:
       - name: pipeline_id
         type: string
@@ -49,10 +56,10 @@ tools:
     examples:
       - instruction: "Build the execution environment for the performance_test pipeline"
         input: '{"pipeline_id": "performance_test"}'
-        output: '{"status": "success", "environment_built": true}'
+        output: '{"pipeline_id": "performance_test", "status": "environment_built"}'
 
   - name: run_pipeline
-    description: Execute the pipeline, running all configured steps
+    description: Execute a Jarvis-CD pipeline end-to-end, running all configured steps
     parameters:
       - name: pipeline_id
         type: string
@@ -61,10 +68,10 @@ tools:
     examples:
       - instruction: "Execute the performance_test pipeline with all configured benchmarks"
         input: '{"pipeline_id": "performance_test"}'
-        output: '{"status": "success", "execution_time": "125.3s", "results": "completed"}'
+        output: '{"pipeline_id": "performance_test", "status": "running"}'
 
   - name: destroy_pipeline
-    description: Destroy a pipeline and clean up all associated files and resources
+    description: Destroy a pipeline environment and clean up all associated files and resources
     parameters:
       - name: pipeline_id
         type: string
@@ -73,11 +80,11 @@ tools:
     examples:
       - instruction: "Destroy the test_pipeline and clean up all resources"
         input: '{"pipeline_id": "test_pipeline"}'
-        output: '{"status": "success", "message": "Pipeline destroyed and resources cleaned"}'
+        output: '{"pipeline_id": "test_pipeline", "status": "destroyed"}'
 
-  # Package Management
+  # ═══ Package Management ══════════════════════════════════════════════
   - name: append_pkg
-    description: Add a package to a pipeline for execution or analysis
+    description: Append a package to a Jarvis-CD pipeline for execution or analysis
     parameters:
       - name: pipeline_id
         type: string
@@ -85,11 +92,11 @@ tools:
         required: true
       - name: pkg_type
         type: string
-        description: Type of package to add (e.g., ior, mpi_application)
+        description: Type of package to add (e.g., ior, mdtest, orangefs, hdf5)
         required: true
       - name: pkg_id
         type: string
-        description: ID for the new package
+        description: Optional ID for the new package (defaults to pkg_type)
         required: false
       - name: do_configure
         type: boolean
@@ -100,9 +107,12 @@ tools:
         description: Additional configuration arguments
         required: false
     examples:
-      - instruction: "Add the IOR package to the performance_test pipeline with 16 processes"
-        input: '{"pipeline_id": "performance_test", "pkg_type": "ior", "do_configure": true, "extra_args": {"nprocs": 16}}'
-        output: '{"status": "success", "pkg_id": "ior", "configured": true}'
+      - instruction: "Add the IOR package to the performance_test pipeline"
+        input: '{"pipeline_id": "performance_test", "pkg_type": "ior"}'
+        output: '{"pipeline_id": "performance_test", "appended": "ior"}'
+      - instruction: "Append an mdtest package to ior_bench with 16 processes"
+        input: '{"pipeline_id": "ior_bench", "pkg_type": "mdtest", "do_configure": true, "extra_args": {"nprocs": 16}}'
+        output: '{"pipeline_id": "ior_bench", "appended": "mdtest"}'
 
   - name: get_pkg_config
     description: Retrieve the configuration of a specific package in a pipeline
@@ -116,12 +126,15 @@ tools:
         description: ID of the package
         required: true
     examples:
-      - instruction: "Show me the configuration of the pandas package in data_analysis pipeline"
-        input: '{"pipeline_id": "data_analysis", "pkg_id": "pandas"}'
-        output: '{"status": "success", "config": {"memory": "16GB", "threads": 8}}'
+      - instruction: "Show me the configuration of the ior package in the performance_test pipeline"
+        input: '{"pipeline_id": "performance_test", "pkg_id": "ior"}'
+        output: '{"pipeline_id": "performance_test", "pkg_id": "ior", "config": {"nprocs": 16, "transfer_size": "1m"}}'
+      - instruction: "What is the mdtest config in ior_bench?"
+        input: '{"pipeline_id": "ior_bench", "pkg_id": "mdtest"}'
+        output: '404: Package ''mdtest'' not found'
 
   - name: configure_pkg
-    description: Configure a package in a pipeline with new settings
+    description: Configure a package in a Jarvis-CD pipeline with new settings
     parameters:
       - name: pipeline_id
         type: string
@@ -138,7 +151,7 @@ tools:
     examples:
       - instruction: "Update the IOR package to use 32 processes for the benchmark"
         input: '{"pipeline_id": "performance_test", "pkg_id": "ior", "extra_args": {"nprocs": 32}}'
-        output: '{"status": "success", "updated": true}'
+        output: '{"pipeline_id": "performance_test", "configured": "ior"}'
 
   - name: unlink_pkg
     description: Unlink a package from a pipeline without deleting its files
@@ -152,12 +165,12 @@ tools:
         description: ID of the package to unlink
         required: true
     examples:
-      - instruction: "Unlink the tensorflow package from ml_pipeline but keep the files"
-        input: '{"pipeline_id": "ml_pipeline", "pkg_id": "tensorflow"}'
-        output: '{"status": "success", "unlinked": true, "files_preserved": true}'
+      - instruction: "Unlink the orangefs package from ml_pipeline but keep the files"
+        input: '{"pipeline_id": "ml_pipeline", "pkg_id": "orangefs"}'
+        output: '{"pipeline_id": "ml_pipeline", "unlinked": "orangefs"}'
 
   - name: remove_pkg
-    description: Remove a package and its files from a pipeline
+    description: Remove a package entirely from a pipeline, deleting its files
     parameters:
       - name: pipeline_id
         type: string
@@ -168,13 +181,13 @@ tools:
         description: ID of the package to remove
         required: true
     examples:
-      - instruction: "Completely remove the outdated_tool package and all its files"
-        input: '{"pipeline_id": "ml_pipeline", "pkg_id": "outdated_tool"}'
-        output: '{"status": "success", "removed": true}'
+      - instruction: "Completely remove the old_benchmark package from the pipeline"
+        input: '{"pipeline_id": "ml_pipeline", "pkg_id": "old_benchmark"}'
+        output: '{"pipeline_id": "ml_pipeline", "removed": "old_benchmark"}'
 
-  # Jarvis Manager Configuration
+  # ═══ Jarvis Manager — Configuration ═════════════════════════════════
   - name: jm_create_config
-    description: Initialize manager directories and persist configuration
+    description: Initialize JarvisManager config directories and persist configuration
     parameters:
       - name: config_dir
         type: string
@@ -189,25 +202,25 @@ tools:
         description: Shared directory path
         required: false
     examples:
-      - instruction: "Initialize Jarvis with config, private and shared directories in ./jarvis_pipelines"
-        input: '{"config_dir": "./jarvis_pipelines/config", "private_dir": "./jarvis_pipelines/private", "shared_dir": "./jarvis_pipelines/shared"}'
-        output: '{"status": "success", "initialized": true}'
+      - instruction: "Initialize Jarvis with config and private directories"
+        input: '{"config_dir": "/home/user/jarvis/config", "private_dir": "/home/user/jarvis/private"}'
+        output: '"Jarvis configuration initialized."'
 
   - name: jm_load_config
-    description: Load manager configuration from saved state
+    description: Load existing JarvisManager configuration from saved state
     parameters: []
     examples:
       - instruction: "Load the existing Jarvis configuration"
         input: '{}'
-        output: '{"status": "success", "config_loaded": true}'
+        output: '"Configuration loaded."'
 
   - name: jm_save_config
-    description: Save current configuration state to disk
+    description: Save current JarvisManager configuration state to disk
     parameters: []
     examples:
       - instruction: "Save the current Jarvis configuration to disk"
         input: '{}'
-        output: '{"status": "success", "config_saved": true}'
+        output: '"Configuration saved."'
 
   - name: jm_set_hostfile
     description: Set and save the path to the hostfile for deployments
@@ -217,69 +230,70 @@ tools:
         description: Path to hostfile
         required: true
     examples:
-      - instruction: "Set the hostfile to /etc/hosts.cluster for distributed deployments"
-        input: '{"path": "/etc/hosts.cluster"}'
-        output: '{"status": "success", "hostfile_set": true}'
+      - instruction: "Set the hostfile to /home/user/hostfile.txt for distributed deployment"
+        input: '{"path": "/home/user/hostfile.txt"}'
+        output: '"Hostfile set to ''/home/user/hostfile.txt''"'
 
   - name: jm_bootstrap_from
-    description: Bootstrap configuration based on a predefined machine template
+    description: Bootstrap Jarvis config from a predefined machine template
     parameters:
       - name: machine
         type: string
-        description: Machine template name
+        description: Machine template name (e.g., ares, summit, polaris, delta)
         required: true
     examples:
-      - instruction: "Bootstrap Jarvis configuration from the cluster_template"
-        input: '{"machine": "cluster_template"}'
-        output: '{"status": "success", "bootstrapped": true}'
+      - instruction: "Bootstrap Jarvis configuration for the Ares cluster"
+        input: '{"machine": "ares"}'
+        output: '"Bootstrapped from ''ares''"'
 
   - name: jm_bootstrap_list
-    description: List all bootstrap templates available
+    description: List all available bootstrap machine templates
     parameters: []
     examples:
       - instruction: "Show me all available bootstrap templates for Jarvis setup"
         input: '{}'
-        output: '{"status": "success", "templates": ["cluster_template", "hpc_template", "local_template"]}'
+        output: '["ares", "summit", "polaris", "delta", "local"]'
 
   - name: jm_reset
-    description: Reset manager to a clean state by destroying all pipelines and config
+    description: Reset JarvisManager to a clean state by destroying all pipelines and data
     parameters: []
     examples:
-      - instruction: "Reset the entire Jarvis system to a clean state for testing"
+      - instruction: "Reset the entire Jarvis system to start fresh"
         input: '{}'
-        output: '{"status": "success", "reset_complete": true}'
+        output: '"All pipelines and data reset."'
 
+  # ═══ Jarvis Manager — Pipeline/Context ═══════════════════════════════
   - name: jm_list_pipelines
-    description: List all current pipelines under management
+    description: List all existing Jarvis pipelines under management
     parameters: []
     examples:
-      - instruction: "Show me all existing pipelines in the Jarvis system"
+      - instruction: "Show me all existing pipelines in the system"
         input: '{}'
-        output: '{"status": "success", "pipelines": ["performance_test", "ml_pipeline", "data_analysis"]}'
+        output: '["performance_test", "ml_pipeline", "data_analysis"]'
 
   - name: jm_cd
-    description: Set the working pipeline context
+    description: Set the working pipeline context (like cd for pipelines)
     parameters:
       - name: pipeline_id
         type: string
         description: Pipeline ID to set as current
         required: true
     examples:
-      - instruction: "Set hpc_workflow as the current working pipeline"
+      - instruction: "Switch to the hpc_workflow pipeline"
         input: '{"pipeline_id": "hpc_workflow"}'
-        output: '{"status": "success", "current_pipeline": "hpc_workflow"}'
+        output: '"Current pipeline set to ''hpc_workflow''"'
 
-  # Repository Management
+  # ═══ Jarvis Manager — Repository ════════════════════════════════════
   - name: jm_list_repos
-    description: List all registered repositories
+    description: List all registered Jarvis repositories
     parameters: []
     examples:
       - instruction: "Show all available repositories in the system"
         input: '{}'
-        output: '{"status": "success", "repos": ["default", "hpc_tools", "ml_packages"]}'
+        output: '["jarvis-cd", "iowarp-pkgs", "custom-pkgs"]'
 
   - name: jm_add_repo
-    description: Add a repository path to the manager
+    description: Add a repository path to JarvisManager
     parameters:
       - name: path
         type: string
@@ -287,15 +301,15 @@ tools:
         required: true
       - name: force
         type: boolean
-        description: Force add even if exists
+        description: Force add even if it already exists
         required: false
     examples:
-      - instruction: "Add a custom repository at /path/to/custom/repo"
-        input: '{"path": "/path/to/custom/repo", "force": false}'
-        output: '{"status": "success", "repo_added": true}'
+      - instruction: "Add a custom package repository at /opt/custom_pkgs"
+        input: '{"path": "/opt/custom_pkgs"}'
+        output: '"Repo added: /opt/custom_pkgs"'
 
   - name: jm_remove_repo
-    description: Remove a repository from configuration
+    description: Remove a repository from JarvisManager configuration
     parameters:
       - name: repo_name
         type: string
@@ -304,73 +318,74 @@ tools:
     examples:
       - instruction: "Remove the deprecated old_repo repository"
         input: '{"repo_name": "old_repo"}'
-        output: '{"status": "success", "repo_removed": true}'
+        output: '"Repo removed: old_repo"'
 
   - name: jm_promote_repo
-    description: Promote a repository to higher priority
+    description: Promote a repository to higher priority for package resolution
     parameters:
       - name: repo_name
         type: string
         description: Repository name to promote
         required: true
     examples:
-      - instruction: "Promote the custom repository to higher priority for package resolution"
-        input: '{"repo_name": "custom_repo"}'
-        output: '{"status": "success", "repo_promoted": true}'
+      - instruction: "Promote the custom_pkgs repository to higher priority"
+        input: '{"repo_name": "custom_pkgs"}'
+        output: '"Repo promoted: custom_pkgs"'
 
   - name: jm_get_repo
-    description: Get detailed information about a repository
+    description: Get detailed information about a registered repository
     parameters:
       - name: repo_name
         type: string
         description: Repository name
         required: true
     examples:
-      - instruction: "Get detailed information about the hpc_tools repository"
-        input: '{"repo_name": "hpc_tools"}'
-        output: '{"status": "success", "repo_info": {"name": "hpc_tools", "path": "/opt/hpc_tools", "priority": 2}}'
+      - instruction: "Get detailed information about the iowarp-pkgs repository"
+        input: '{"repo_name": "iowarp-pkgs"}'
+        output: '"/opt/iowarp-pkgs"'
 
+  # ═══ Jarvis Manager — Package Construction ══════════════════════════
   - name: jm_construct_pkg
-    description: Generate a new package skeleton by type
+    description: Generate a new package skeleton by type in JarvisManager
     parameters:
       - name: pkg_type
         type: string
-        description: Package type to construct
+        description: Package type to construct (e.g., ior, mdtest, orangefs)
         required: true
     examples:
-      - instruction: "Create a package skeleton for an mpi_application"
-        input: '{"pkg_type": "mpi_application"}'
-        output: '{"status": "success", "skeleton_created": true}'
+      - instruction: "Create a package skeleton for an IOR benchmark"
+        input: '{"pkg_type": "ior"}'
+        output: '"Constructed pkg: Ior"'
 
-  # Resource Graph Management
+  # ═══ Jarvis Manager — Resource Graph ════════════════════════════════
   - name: jm_graph_show
-    description: Print the resource graph to the console
+    description: Print the current resource graph frames to the console
     parameters: []
     examples:
-      - instruction: "Show me the current resource graph for monitoring"
+      - instruction: "Show me the current resource graph"
         input: '{}'
-        output: '{"status": "success", "graph": "Resource graph displayed"}'
+        output: '"Resource graph printed to console."'
 
   - name: jm_graph_build
-    description: Construct or rebuild the graph with a given sleep delay
+    description: Build or rebuild the resource graph with a net sleep interval between operations
     parameters:
       - name: net_sleep
         type: number
-        description: Sleep delay between operations
+        description: Sleep delay in seconds between operations
         required: true
     examples:
       - instruction: "Build a new resource graph with 2.0 second monitoring intervals"
         input: '{"net_sleep": 2.0}'
-        output: '{"status": "success", "graph_built": true}'
+        output: '"Resource graph built."'
 
   - name: jm_graph_modify
     description: Modify the current resource graph with a delay between operations
     parameters:
       - name: net_sleep
         type: number
-        description: Sleep delay between operations
+        description: Sleep delay in seconds between operations
         required: true
     examples:
-      - instruction: "Modify the resource graph with 1.5 second intervals for finer monitoring"
+      - instruction: "Modify the resource graph with 1.5 second intervals"
         input: '{"net_sleep": 1.5}'
-        output: '{"status": "success", "graph_modified": true}'
+        output: '"Resource graph modified."'

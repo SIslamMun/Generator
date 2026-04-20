@@ -1402,17 +1402,29 @@ def tool_generate_from_topic(topic, output, docs, n_tools, config, provider, mod
 @click.option("--ratio-chain", type=float, default=0.25, help="Fraction chain-first")
 @click.option("--ratio-error", type=float, default=0.15, help="Fraction error-recovery")
 @click.option("--max-steps", type=int, default=5, help="Max steps for multi/chain")
+@click.option("--tools-per-example", type=int, default=0,
+              help="Tools visible per example (0=all, v7 default: 10)")
+@click.option("--distractor-strategy", type=click.Choice(["semantic", "random", "mixed"]),
+              default="mixed", help="How to pick distractor tools (v7)")
+@click.option("--save-every", type=int, default=100,
+              help="Checkpoint every N examples (0=disable)")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
 def tool_generate_full(tools_path, output, config, target_pairs,
                        ratio_single, ratio_multi, ratio_chain, ratio_error,
-                       max_steps, provider, model):
+                       max_steps, tools_per_example, distractor_strategy,
+                       save_every, provider, model):
     """
     Generate a balanced tool-use corpus across categories in ONE run.
 
     Produces a mix of single-step, multi-step, chain-first, and
     error-recovery examples according to the provided ratios. Designed for
     a single long run (e.g. on Delta-AI with a local model).
+
+    v7 features:
+      --tools-per-example 10   show 10 tools per example (target + distractors)
+      --distractor-strategy    semantic (hard), random (easy), mixed (60/40)
+      --save-every 100         checkpoint every 100 examples (auto-resume)
 
     Default ratios sum to 1.00:
       --ratio-single 0.30   (single-tool baseline)
@@ -1426,7 +1438,8 @@ def tool_generate_full(tools_path, output, config, target_pairs,
     Examples:
       uv run generator tool-generate-full tools.json -o mix.json
       uv run generator tool-generate-full tools.json -o mix.json \\
-        --target-pairs 2000 --provider ollama --model gpt-oss:20b
+        --target-pairs 2000 --tools-per-example 10 \\
+        --provider ollama --model gpt-oss:120b
     """
     from pathlib import Path
     from .tool.tool_schemas import load_tools, save_examples
@@ -1448,9 +1461,20 @@ def tool_generate_full(tools_path, output, config, target_pairs,
     console.print(f"[cyan]Provider: {llm_config.get('provider', 'ollama')}[/cyan]")
     console.print(f"[cyan]Model: {llm_config.get('model', 'default')}[/cyan]")
     console.print(f"[cyan]Target: {target_pairs} | ratios s={ratio_single} m={ratio_multi} c={ratio_chain} e={ratio_error}[/cyan]")
+    if tools_per_example > 0:
+        console.print(f"[cyan]Subset: {tools_per_example} tools/example | strategy: {distractor_strategy}[/cyan]")
+    console.print(f"[cyan]Checkpoint: every {save_every} examples[/cyan]")
     console.print(f"[green]✓ Loaded {len(tools)} tools[/green]")
 
-    generator = ToolGenerator(llm_config.copy(), prompts)
+    # Ensure output directory exists
+    output_dir = Path(output).parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    generator = ToolGenerator(
+        llm_config.copy(), prompts,
+        tools_per_example=tools_per_example,
+        distractor_strategy=distractor_strategy,
+    )
     examples = generator.generate_full_mix(
         tools=tools,
         target_pairs=target_pairs,
@@ -1459,6 +1483,8 @@ def tool_generate_full(tools_path, output, config, target_pairs,
         ratio_chain=ratio_chain,
         ratio_error=ratio_error,
         max_steps=max_steps,
+        output_path=output,
+        save_every=save_every,
     )
 
     save_examples(examples, output)

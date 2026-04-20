@@ -98,7 +98,7 @@ class Tool:
     def from_dict(cls, d: Dict[str, Any]) -> "Tool":
         """Create from dictionary."""
         return cls(
-            tool_id=d["tool_id"],
+            tool_id=d.get("tool_id", d.get("name", "")),
             name=d["name"],
             description=d["description"],
             parameters=[Parameter.from_dict(p) for p in d.get("parameters", [])],
@@ -138,15 +138,28 @@ class Tool:
             f"{p.name}: {p.type}" + (f" = {p.default}" if p.default is not None else "")
             for p in self.parameters
         )
-        
+
         doc = f"{self.name}({params_str})\n\n{self.description}\n\nParameters:\n"
         for p in self.parameters:
             req = "required" if p.required else "optional"
             doc += f"  - {p.name} ({p.type}, {req}): {p.description}\n"
-        
+
         if self.returns:
             doc += f"\nReturns: {self.returns.get('type', 'any')} - {self.returns.get('description', '')}\n"
-        
+
+        # Include real example I/O so the LLM learns actual return shapes
+        if self.examples:
+            doc += "\nReal usage examples:\n"
+            for ex in self.examples[:2]:  # Max 2 to keep prompt compact
+                if isinstance(ex, dict):
+                    inp = ex.get("input", "")
+                    out = ex.get("output", "")
+                    if inp and out:
+                        doc += f"  Call: {self.name}({inp})\n"
+                        doc += f"  Returns: {out}\n"
+                elif isinstance(ex, str):
+                    doc += f"  {ex}\n"
+
         return doc
 
 
@@ -392,10 +405,15 @@ class ToolExample:
 
 # Utility functions
 def load_tools(path: str) -> List[Tool]:
-    """Load tools from JSON file."""
-    with open(path, "r") as f:
-        data = json.load(f)
-    
+    """Load tools from JSON or YAML file."""
+    p = path if isinstance(path, str) else str(path)
+    with open(p, "r") as f:
+        if p.endswith((".yaml", ".yml")):
+            import yaml  # type: ignore[import-untyped]
+            data = yaml.safe_load(f)
+        else:
+            data = json.load(f)
+
     if isinstance(data, list):
         return [Tool.from_dict(d) for d in data]
     elif "tools" in data:

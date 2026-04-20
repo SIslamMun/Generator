@@ -47,6 +47,10 @@ output/*.json
 output/*.jsonl
 !output/README.md
 
+# Intermediate checkpoints and slurm logs (keep only final outputs)
+outputs/**/*_intermediate.json
+slurm/logs/
+
 # Google Cloud SDK (not part of project)
 google/
 

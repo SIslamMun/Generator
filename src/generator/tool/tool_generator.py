@@ -15,38 +15,184 @@ Three modes for solution complexity:
 - single: Simple single-tool calls
 - multi: Multi-step reasoning with tool chains
 - auto (default): Generates balanced mix based on instruction complexity
+
+v7 additions:
+- Subset selection: Each example sees N tools (target + distractors) instead of full catalog
+- Checkpointing: Intermediate saves every N examples with resume support
 """
 
 import json
 import json5
 import logging
-from typing import List, Dict, Any, Optional
+import random
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 
-from .tool_schemas import Tool, Solution, ReasoningStep, ToolExample
+import numpy as np
+
+from .tool_schemas import Tool, Solution, ReasoningStep, ToolExample, save_examples, load_examples
 from ..clients import get_client, BaseLLMClient
 
 console = Console()
 logger = logging.getLogger(__name__)
 
 
+# =========================================================================
+# CHECKPOINT HELPERS
+# =========================================================================
+
+def _save_checkpoint(examples: List[ToolExample], path: str) -> None:
+    """Save intermediate checkpoint."""
+    save_examples(examples, path)
+    console.print(f"[dim]  💾 Checkpoint: {len(examples)} examples → {path}[/dim]")
+
+
+def _load_checkpoint(path: str) -> List[ToolExample]:
+    """Load intermediate checkpoint if it exists."""
+    p = Path(path)
+    if p.exists():
+        try:
+            examples = load_examples(str(p))
+            console.print(f"[yellow]⏩ Resuming from checkpoint: {len(examples)} examples in {p.name}[/yellow]")
+            return examples
+        except Exception as e:
+            logger.warning(f"Failed to load checkpoint {path}: {e}")
+    return []
+
+
+def _checkpoint_path(output_path: str) -> str:
+    """Derive checkpoint path from output path."""
+    p = Path(output_path)
+    return str(p.parent / f"{p.stem}_intermediate{p.suffix}")
+
+
+def _is_valid_example(example: ToolExample, valid_tools: set, min_instruction_len: int = 15) -> bool:
+    """
+    Validate a generated example before accepting it.
+
+    Rejects examples with:
+    - Too-short instructions
+    - Empty reasoning path
+    - Steps with missing/invalid tool names
+    """
+    if not example.instruction or len(example.instruction) < min_instruction_len:
+        return False
+    if not example.solution.reasoning_path:
+        return False
+    for step in example.solution.reasoning_path:
+        if not step.tool or step.tool not in valid_tools:
+            return False
+    return True
+
+
+# =========================================================================
+# SUBSET / DISTRACTOR SELECTION (v7)
+# =========================================================================
+
+def _compute_tool_embeddings(tools: List[Tool]) -> np.ndarray:
+    """Compute sentence embeddings for tool descriptions (lazy, cached)."""
+    try:
+        from sentence_transformers import SentenceTransformer
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+        docs = [f"{t.name}: {t.description}" for t in tools]
+        return model.encode(docs, show_progress_bar=False)
+    except ImportError:
+        logger.warning("sentence-transformers not installed; falling back to random distractors")
+        return None
+
+
+def pick_subset(
+    all_tools: List[Tool],
+    target_tools: List[Tool],
+    n: int = 10,
+    strategy: str = "mixed",
+    tool_embeddings: Optional[np.ndarray] = None,
+) -> List[Tool]:
+    """
+    Pick a subset of tools for a training example (v7 subset selection).
+
+    Args:
+        all_tools: Full tool catalog
+        target_tools: Tools that MUST be in the subset (used in the solution)
+        n: Total subset size (default 10)
+        strategy: "semantic" (hard distractors), "random", or "mixed" (60/40)
+        tool_embeddings: Pre-computed embeddings for semantic strategy
+
+    Returns:
+        Shuffled list of n tools including all targets
+    """
+    if n >= len(all_tools):
+        subset = list(all_tools)
+        random.shuffle(subset)
+        return subset
+
+    # Pin targets
+    subset = list(target_tools)
+    target_ids = {t.tool_id for t in target_tools}
+    remaining = [t for t in all_tools if t.tool_id not in target_ids]
+    need = n - len(subset)
+
+    if need <= 0:
+        random.shuffle(subset)
+        return subset[:n]
+
+    # Decide strategy for this call
+    if strategy == "mixed":
+        use_semantic = random.random() < 0.6
+    else:
+        use_semantic = strategy == "semantic"
+
+    if use_semantic and tool_embeddings is not None:
+        # Semantic: pick distractors most similar to target
+        tool_id_list = [t.tool_id for t in all_tools]
+        target_indices = [tool_id_list.index(t.tool_id) for t in target_tools if t.tool_id in tool_id_list]
+        remaining_indices = [tool_id_list.index(t.tool_id) for t in remaining]
+
+        if target_indices and remaining_indices:
+            # Average embedding of targets
+            target_emb = tool_embeddings[target_indices].mean(axis=0)
+            remaining_embs = tool_embeddings[remaining_indices]
+            sims = (remaining_embs @ target_emb) / (
+                np.linalg.norm(remaining_embs, axis=1) * np.linalg.norm(target_emb) + 1e-8
+            )
+            # Pick top-N most similar
+            top_idx = np.argsort(sims)[-need:][::-1]
+            distractors = [remaining[i] for i in top_idx]
+        else:
+            distractors = random.sample(remaining, min(need, len(remaining)))
+    else:
+        # Random
+        distractors = random.sample(remaining, min(need, len(remaining)))
+
+    subset.extend(distractors)
+    random.shuffle(subset)
+    return subset
+
+
 class ToolGenerator:
     """Generate tool-use training data with unified approach."""
-    
-    def __init__(self, llm_config: Dict[str, Any], prompts: Dict[str, str]):
+
+    def __init__(self, llm_config: Dict[str, Any], prompts: Dict[str, str],
+                 tools_per_example: int = 0, distractor_strategy: str = "mixed"):
         """
         Initialize generator.
-        
+
         Args:
             llm_config: LLM configuration with provider and settings
             prompts: Prompt templates dict (loaded from configs/prompts/tool_prompts.yaml)
+            tools_per_example: Number of tools visible per example (0 = all tools, v7 default: 10)
+            distractor_strategy: "semantic", "random", or "mixed" (60% semantic / 40% random)
         """
         self.prompts = prompts
         provider = llm_config.pop("provider", "ollama")
         self.llm = get_client(provider, llm_config)
         self.provider = provider
+        self.tools_per_example = tools_per_example
+        self.distractor_strategy = distractor_strategy
+        self._tool_embeddings: Optional[np.ndarray] = None
     
     def _get_prompt(self, key: str) -> str:
         """Get prompt template, raising error if not found."""
@@ -56,6 +202,23 @@ class ToolGenerator:
                 f"Add it to configs/prompts/tool_prompts.yaml"
             )
         return self.prompts[key]
+
+    def _ensure_tool_embeddings(self, tools: List[Tool]) -> None:
+        """Lazily compute and cache tool embeddings for subset selection."""
+        if self._tool_embeddings is None and self.tools_per_example > 0:
+            console.print("[dim]Computing tool embeddings for subset selection...[/dim]")
+            self._tool_embeddings = _compute_tool_embeddings(tools)
+
+    def _get_visible_tools(self, all_tools: List[Tool], target_tools: List[Tool]) -> List[Tool]:
+        """Get the tool subset visible for one training example."""
+        if self.tools_per_example <= 0 or self.tools_per_example >= len(all_tools):
+            return all_tools
+        return pick_subset(
+            all_tools, target_tools,
+            n=self.tools_per_example,
+            strategy=self.distractor_strategy,
+            tool_embeddings=self._tool_embeddings,
+        )
     
     def generate_instructions(
         self,
@@ -248,24 +411,33 @@ class ToolGenerator:
         tools: List[Tool],
         mode: str = "auto",
         max_steps: int = 5,
+        all_tools: Optional[List[Tool]] = None,
     ) -> Solution:
         """
         Generate a solution for an instruction.
-        
+
         Always includes API documentation for better grounding.
-        
+        When tools_per_example > 0, selects a subset of tools visible to the model.
+
         Args:
             instruction: User instruction to solve
-            tools: Available tools
+            tools: Target tools (used in the solution)
             mode: 'single' (one tool call), 'multi' (chain), or 'auto' (detect)
             max_steps: Maximum reasoning steps for multi mode
-            
+            all_tools: Full tool catalog (for subset selection; if None, uses tools)
+
         Returns:
             Solution object with reasoning path
         """
+        # Subset selection (v7): pick visible tools for this example
+        if all_tools and self.tools_per_example > 0:
+            visible = self._get_visible_tools(all_tools, tools)
+        else:
+            visible = tools
+
         # Always include documentation (Gorilla insight)
-        docs = "\n\n".join([t.to_documentation() for t in tools])
-        tools_json = json.dumps([t.to_schema() for t in tools], indent=2)
+        docs = "\n\n".join([t.to_documentation() for t in visible])
+        tools_json = json.dumps([t.to_schema() for t in visible], indent=2)
         
         # Auto-detect mode based on instruction complexity
         if mode == "auto":
@@ -389,26 +561,34 @@ class ToolGenerator:
         n_per_tool: int = 10,
         mode: str = "auto",
         max_steps: int = 5,
+        _accumulator: Optional[List[ToolExample]] = None,
+        _save_every: int = 0,
+        _checkpoint_file: str = "",
     ) -> List[ToolExample]:
         """
         Generate complete tool-use examples (instructions + solutions).
-        
+
         Args:
             tools: Tool definitions
             n_per_tool: Examples per tool
             mode: 'single', 'multi', or 'auto' (balanced mix)
             max_steps: Max reasoning steps for multi-step
-            
+            _accumulator: Shared list to append to (for checkpoint support)
+            _save_every: Save checkpoint every N examples (0 = disabled)
+            _checkpoint_file: Path for checkpoint file
+
         Returns:
             List of ToolExample objects
         """
+        self._ensure_tool_embeddings(tools)
+
         # First generate instructions
         instructions = self.generate_instructions(tools, n_per_tool)
-        
+
         # Then annotate solutions
         examples = []
         tool_map = {t.tool_id: t for t in tools}
-        
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -417,32 +597,32 @@ class ToolGenerator:
             console=console,
         ) as progress:
             task = progress.add_task(
-                "[cyan]Annotating solutions...", 
+                "[cyan]Annotating solutions...",
                 total=len(instructions)
             )
-            
+
             for inst_data in instructions:
                 instruction = inst_data.get("instruction", "")
                 required = inst_data.get("required_tools", [])
-                
+
                 # Determine mode for this instruction
                 if mode == "auto":
-                    # Use instruction's detected mode, or auto-detect
                     inst_mode = inst_data.get("mode", "auto")
                 else:
                     inst_mode = mode
-                
-                # Get relevant tools
+
+                # Get target tools
                 relevant_tools = [tool_map[tid] for tid in required if tid in tool_map]
                 if not relevant_tools:
                     relevant_tools = tools[:3]  # Fallback
-                
+
                 solution = self.annotate_solution(
-                    instruction, relevant_tools, inst_mode, max_steps
+                    instruction, relevant_tools, inst_mode, max_steps,
+                    all_tools=tools,
                 )
-                
+
                 if solution.reasoning_path:  # Only keep non-empty solutions
-                    examples.append(ToolExample(
+                    example = ToolExample(
                         instruction=instruction,
                         solution=solution,
                         metadata={
@@ -452,10 +632,17 @@ class ToolGenerator:
                             "multi_tool": inst_data.get("multi_tool", False),
                             "mode": solution.method,
                         }
-                    ))
-                
+                    )
+                    valid_tool_names = {t.name for t in tools}
+                    if _is_valid_example(example, valid_tool_names):
+                        examples.append(example)
+                        if _accumulator is not None:
+                            _accumulator.append(example)
+                            if _save_every > 0 and _checkpoint_file and len(_accumulator) % _save_every == 0:
+                                _save_checkpoint(_accumulator, _checkpoint_file)
+
                 progress.advance(task)
-        
+
         console.print(f"[green]✓ Generated {len(examples)} examples[/green]")
         return examples
     
@@ -471,34 +658,33 @@ class ToolGenerator:
         n_chains: int = 20,
         min_steps: int = 2,
         max_steps: int = 4,
+        _accumulator: Optional[List[ToolExample]] = None,
+        _save_every: int = 0,
+        _checkpoint_file: str = "",
     ) -> List[ToolExample]:
         """
         Chain-first generation: build valid tool chains, then synthesize queries.
-        
+
         Based on ToolGrad (Aug 2025): https://arxiv.org/abs/2508.04086
-        
-        Approach:
-        1. Generate valid tool chains (sequences of compatible calls)
-        2. For each chain, synthesize a natural user query that would require it
-        3. Validate chain coherence
-        
-        This reduces invalid samples by ~40% compared to query-first.
-        
+
         Args:
             tools: List of tool definitions
             n_chains: Number of chains to generate
             min_steps: Minimum tools per chain
             max_steps: Maximum tools per chain
-            
+            _accumulator: Shared list for checkpoint support
+            _save_every: Save checkpoint every N examples (0 = disabled)
+            _checkpoint_file: Path for checkpoint file
+
         Returns:
             List of ToolExample objects with valid chains
         """
+        self._ensure_tool_embeddings(tools)
         console.print(f"\n[bold cyan]Chain-First Generation (ToolGrad)[/bold cyan]")
         console.print(f"[dim]Building {n_chains} valid chains ({min_steps}-{max_steps} steps)...[/dim]\n")
-        
+
         examples = []
-        docs = "\n\n".join([t.to_documentation() for t in tools])
-        
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -507,24 +693,30 @@ class ToolGenerator:
             console=console,
         ) as progress:
             task = progress.add_task("[cyan]Generating chains...", total=n_chains)
-            
+
             generated = 0
             attempts = 0
-            max_attempts = n_chains * 3  # Allow some failures
-            
+            max_attempts = n_chains * 3
+
             while generated < n_chains and attempts < max_attempts:
                 attempts += 1
-                
+
                 # Step 1: Generate a valid tool chain
                 chain = self._generate_valid_chain(tools, min_steps, max_steps)
                 if not chain or not chain.get("steps"):
                     continue
-                
+
+                # Identify tools used in the chain for subset selection
+                chain_tool_names = {s.get("tool", "") for s in chain.get("steps", [])}
+                target_tools = [t for t in tools if t.name in chain_tool_names]
+                visible = self._get_visible_tools(tools, target_tools) if target_tools else tools
+                docs = "\n\n".join([t.to_documentation() for t in visible])
+
                 # Step 2: Synthesize a natural query for this chain
                 query = self._synthesize_query_for_chain(chain, docs)
                 if not query:
                     continue
-                
+
                 # Step 3: Build the ToolExample
                 steps = []
                 for i, step_data in enumerate(chain.get("steps", [])):
@@ -535,7 +727,7 @@ class ToolGenerator:
                         args=step_data.get("args", {}),
                         expected_result=step_data.get("expected_result"),
                     ))
-                
+
                 solution = Solution(
                     instruction=query,
                     reasoning_path=steps,
@@ -543,7 +735,7 @@ class ToolGenerator:
                     api_documentation=docs,
                     method="chain_first",
                 )
-                
+
                 example = ToolExample(
                     instruction=query,
                     solution=solution,
@@ -554,15 +746,23 @@ class ToolGenerator:
                         "difficulty": "complex" if len(steps) >= 3 else "medium",
                     }
                 )
-                
+
+                valid_tool_names = {t.name for t in tools}
+                if not _is_valid_example(example, valid_tool_names):
+                    continue
+
                 examples.append(example)
+                if _accumulator is not None:
+                    _accumulator.append(example)
+                    if _save_every > 0 and _checkpoint_file and len(_accumulator) % _save_every == 0:
+                        _save_checkpoint(_accumulator, _checkpoint_file)
                 generated += 1
                 progress.advance(task)
-        
+
         success_rate = generated / max(attempts, 1) * 100
         console.print(f"\n[green]✓ Generated {generated} chain-first examples[/green]")
         console.print(f"[dim]Success rate: {success_rate:.1f}% ({generated}/{attempts})[/dim]")
-        
+
         return examples
     
     def _generate_valid_chain(
@@ -573,18 +773,24 @@ class ToolGenerator:
     ) -> Optional[Dict[str, Any]]:
         """
         Generate a valid tool chain with proper data flow.
-        
+
         Creates chains where:
         - Each step's output can feed into subsequent steps
         - Tools are used in a logical sequence
         - Arguments reference previous results correctly
         """
+        # Subset selection: pick a random subset for chain generation
+        if self.tools_per_example > 0 and self.tools_per_example < len(tools):
+            visible = random.sample(tools, min(self.tools_per_example, len(tools)))
+        else:
+            visible = tools
+
         tools_json = json.dumps([{
             "name": t.name,
             "description": t.description,
             "parameters": [p.to_dict() for p in t.parameters],
             "returns": t.returns,
-        } for t in tools], indent=2)
+        } for t in visible], indent=2)
         
         prompt_template = self._get_prompt("chain_generation")
         prompt = prompt_template.format(
@@ -659,17 +865,18 @@ class ToolGenerator:
         self,
         tools: List[Tool],
         n: int = 10,
+        _accumulator: Optional[List[ToolExample]] = None,
+        _save_every: int = 0,
+        _checkpoint_file: str = "",
     ) -> List[ToolExample]:
         """
         Generate error-recovery examples where step 1 fails with a realistic
-        error and subsequent steps show recovery. The LLM picks the scenario
-        from the tool catalog — no external seed file needed.
+        error and subsequent steps show recovery.
         """
+        self._ensure_tool_embeddings(tools)
         console.print(f"\n[bold]Error-Recovery Generation[/bold]")
         console.print(f"[dim]Target: {n} examples[/dim]\n")
 
-        docs = "\n\n".join([t.to_documentation() for t in tools])
-        tools_json = json.dumps([t.to_schema() for t in tools], indent=2)
         prompt_template = self._get_prompt("tool_error_recovery_full")
 
         examples: List[ToolExample] = []
@@ -687,6 +894,16 @@ class ToolGenerator:
 
             while len(examples) < n and attempts < max_attempts:
                 attempts += 1
+
+                # Subset selection: pick a random subset for this error-recovery scenario
+                if self.tools_per_example > 0 and self.tools_per_example < len(tools):
+                    visible = random.sample(tools, min(self.tools_per_example, len(tools)))
+                else:
+                    visible = tools
+
+                docs = "\n\n".join([t.to_documentation() for t in visible])
+                tools_json = json.dumps([t.to_schema() for t in visible], indent=2)
+
                 prompt = prompt_template.format(
                     api_documentation=docs,
                     tools_json=tools_json,
@@ -720,8 +937,6 @@ class ToolGenerator:
                         error_message=sd.get("error_message"),
                     ))
 
-                # Require at least one failure step for this to count as
-                # an error-recovery example
                 if not any(s.status == "failure" for s in steps):
                     continue
 
@@ -734,7 +949,7 @@ class ToolGenerator:
                 )
 
                 md = result.get("metadata", {}) or {}
-                examples.append(ToolExample(
+                example = ToolExample(
                     instruction=instruction,
                     solution=solution,
                     metadata={
@@ -742,7 +957,15 @@ class ToolGenerator:
                         "error_category": md.get("error_category", "unknown"),
                         "difficulty": md.get("difficulty", "complex"),
                     },
-                ))
+                )
+                valid_tool_names = {t.name for t in tools}
+                if not _is_valid_example(example, valid_tool_names):
+                    continue
+                examples.append(example)
+                if _accumulator is not None:
+                    _accumulator.append(example)
+                    if _save_every > 0 and _checkpoint_file and len(_accumulator) % _save_every == 0:
+                        _save_checkpoint(_accumulator, _checkpoint_file)
                 progress.update(task, completed=len(examples))
 
         console.print(f"[green]✓ Generated {len(examples)} error-recovery examples[/green]")
@@ -763,13 +986,25 @@ class ToolGenerator:
         ratio_chain: float = 0.25,
         ratio_error: float = 0.15,
         max_steps: int = 5,
+        output_path: str = "",
+        save_every: int = 100,
     ) -> List[ToolExample]:
         """
         Generate a balanced mix of single, multi, chain-first, and
         error-recovery examples in one run.
 
-        Ratios should sum to ~1.0. The function normalizes and converts to
-        integer counts. Any remainder goes to single-step.
+        Supports checkpointing and resume:
+        - Saves intermediate results every `save_every` examples
+        - On resume, detects existing checkpoint and continues from there
+        - Each section's progress is tracked so partial sections resume correctly
+
+        Args:
+            tools: Tool definitions
+            target_pairs: Total examples to generate
+            ratio_*: Category ratios (auto-normalized)
+            max_steps: Max steps per multi/chain example
+            output_path: Final output file (checkpoint derives from this)
+            save_every: Save checkpoint every N examples (0 = disabled)
         """
         # Normalize ratios
         total_ratio = ratio_single + ratio_multi + ratio_chain + ratio_error
@@ -784,47 +1019,101 @@ class ToolGenerator:
         n_multi  = int(target_pairs * ratio_multi)
         n_chain  = int(target_pairs * ratio_chain)
         n_error  = int(target_pairs * ratio_error)
-        # Put any rounding remainder into single
         leftover = target_pairs - (n_single + n_multi + n_chain + n_error)
         n_single += max(0, leftover)
 
         console.print(f"\n[bold]🎯 Full-Mix Tool Generation[/bold]")
         console.print(f"[dim]Target: {target_pairs} examples[/dim]")
-        console.print(f"[dim]  single: {n_single}  multi: {n_multi}  chain: {n_chain}  error: {n_error}[/dim]\n")
+        console.print(f"[dim]  single: {n_single}  multi: {n_multi}  chain: {n_chain}  error: {n_error}[/dim]")
+        if self.tools_per_example > 0:
+            console.print(f"[dim]  tools_per_example: {self.tools_per_example}  distractor_strategy: {self.distractor_strategy}[/dim]")
+        console.print()
 
+        # ── Checkpoint / resume logic ───────────────────────────────
+        ckpt_file = _checkpoint_path(output_path) if output_path else ""
         all_examples: List[ToolExample] = []
 
+        # Count how many of each category we already have from checkpoint
+        done_single = done_multi = done_chain = done_error = 0
+        if ckpt_file:
+            resumed = _load_checkpoint(ckpt_file)
+            if resumed:
+                all_examples = resumed
+                for ex in resumed:
+                    method = ex.solution.method
+                    if method == "single":
+                        done_single += 1
+                    elif method == "multi":
+                        done_multi += 1
+                    elif method == "chain_first":
+                        done_chain += 1
+                    elif method == "error_recovery":
+                        done_error += 1
+                console.print(
+                    f"[yellow]  Resumed: single={done_single} multi={done_multi} "
+                    f"chain={done_chain} error={done_error} (total={len(all_examples)})[/yellow]\n"
+                )
+
+        # Pre-compute tool embeddings once
+        self._ensure_tool_embeddings(tools)
+
         # ── Single-step ─────────────────────────────────────────────
-        if n_single > 0:
-            console.print("[cyan]━━ Section 1/4: SINGLE-STEP ━━[/cyan]")
-            n_per_tool = max(1, n_single // len(tools))
+        need_single = n_single - done_single
+        if need_single > 0:
+            console.print(f"[cyan]━━ Section 1/4: SINGLE-STEP ({need_single} needed, {done_single} done) ━━[/cyan]")
+            n_per_tool = max(1, need_single // len(tools))
             single_ex = self.generate_examples(
                 tools, n_per_tool=n_per_tool, mode="single", max_steps=max_steps,
+                _accumulator=all_examples, _save_every=save_every, _checkpoint_file=ckpt_file,
             )
-            all_examples.extend(single_ex[:n_single])
+            # Trim to target (generate_examples may produce more)
+            if len(single_ex) > need_single:
+                # Remove extras from accumulator too
+                excess = len(single_ex) - need_single
+                del all_examples[-excess:]
+        elif n_single > 0:
+            console.print(f"[green]━━ Section 1/4: SINGLE-STEP ━━ DONE ({done_single} already)[/green]")
 
-        # ── Multi-step (forced multi mode) ──────────────────────────
-        if n_multi > 0:
-            console.print("\n[cyan]━━ Section 2/4: MULTI-STEP ━━[/cyan]")
-            n_per_tool = max(1, n_multi // len(tools))
+        # ── Multi-step ──────────────────────────────────────────────
+        need_multi = n_multi - done_multi
+        if need_multi > 0:
+            console.print(f"\n[cyan]━━ Section 2/4: MULTI-STEP ({need_multi} needed, {done_multi} done) ━━[/cyan]")
+            n_per_tool = max(1, need_multi // len(tools))
             multi_ex = self.generate_examples(
                 tools, n_per_tool=n_per_tool, mode="multi", max_steps=max_steps,
+                _accumulator=all_examples, _save_every=save_every, _checkpoint_file=ckpt_file,
             )
-            all_examples.extend(multi_ex[:n_multi])
+            if len(multi_ex) > need_multi:
+                excess = len(multi_ex) - need_multi
+                del all_examples[-excess:]
+        elif n_multi > 0:
+            console.print(f"\n[green]━━ Section 2/4: MULTI-STEP ━━ DONE ({done_multi} already)[/green]")
 
         # ── Chain-first ─────────────────────────────────────────────
-        if n_chain > 0:
-            console.print("\n[cyan]━━ Section 3/4: CHAIN-FIRST ━━[/cyan]")
+        need_chain = n_chain - done_chain
+        if need_chain > 0:
+            console.print(f"\n[cyan]━━ Section 3/4: CHAIN-FIRST ({need_chain} needed, {done_chain} done) ━━[/cyan]")
             chain_ex = self.generate_chain_first(
-                tools, n_chains=n_chain, min_steps=2, max_steps=max_steps,
+                tools, n_chains=need_chain, min_steps=2, max_steps=max_steps,
+                _accumulator=all_examples, _save_every=save_every, _checkpoint_file=ckpt_file,
             )
-            all_examples.extend(chain_ex)
+        elif n_chain > 0:
+            console.print(f"\n[green]━━ Section 3/4: CHAIN-FIRST ━━ DONE ({done_chain} already)[/green]")
 
         # ── Error-recovery ──────────────────────────────────────────
-        if n_error > 0:
-            console.print("\n[cyan]━━ Section 4/4: ERROR-RECOVERY ━━[/cyan]")
-            err_ex = self.generate_error_recovery_examples(tools, n=n_error)
-            all_examples.extend(err_ex)
+        need_error = n_error - done_error
+        if need_error > 0:
+            console.print(f"\n[cyan]━━ Section 4/4: ERROR-RECOVERY ({need_error} needed, {done_error} done) ━━[/cyan]")
+            err_ex = self.generate_error_recovery_examples(
+                tools, n=need_error,
+                _accumulator=all_examples, _save_every=save_every, _checkpoint_file=ckpt_file,
+            )
+        elif n_error > 0:
+            console.print(f"\n[green]━━ Section 4/4: ERROR-RECOVERY ━━ DONE ({done_error} already)[/green]")
+
+        # Final checkpoint save
+        if ckpt_file and all_examples:
+            _save_checkpoint(all_examples, ckpt_file)
 
         console.print(f"\n[bold green]✓ Full-mix complete: {len(all_examples)} examples[/bold green]")
         return all_examples
