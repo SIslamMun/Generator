@@ -1,1 +1,19 @@
-*.json filter=lfs diff=lfs merge=lfs -text
+# Large model / training artifacts tracked via Git LFS.
+# Targeted paths so small config JSONs are NOT pushed through LFS.
+
+# Model weights + GGUFs wherever they live
+*.gguf filter=lfs diff=lfs merge=lfs -text
+*.safetensors filter=lfs diff=lfs merge=lfs -text
+*.bin filter=lfs diff=lfs merge=lfs -text
+*.pt filter=lfs diff=lfs merge=lfs -text
+*.pth filter=lfs diff=lfs merge=lfs -text
+
+# Tokenizer blobs (often tens of MB) — only inside artifacts/
+finetuned_unsloth/artifacts/**/tokenizer.json filter=lfs diff=lfs merge=lfs -text
+finetuned_unsloth/artifacts/**/tokenizer.model filter=lfs diff=lfs merge=lfs -text
+
+# Training corpora
+finetuned_unsloth/data/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
+
+# Raw generator outputs (tens of MB each)
+outputs/**/*.json filter=lfs diff=lfs merge=lfs -text
