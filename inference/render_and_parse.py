@@ -19,38 +19,156 @@ import re
 from typing import Any
 
 
-# same regex FunctionGemma's multi-turn inference notebook uses
-_CALL_RE = re.compile(
-    r"<start_function_call>call:(\w+)\{(.*?)\}<end_function_call>", re.DOTALL
-)
-_ARG_RE = re.compile(r"(\w+):(?:<escape>(.*?)<escape>|([^,}]*))")
+# FunctionGemma tool-call grammar (recursive — supports nested dict/list args):
+#   call        := `<start_function_call>call:` NAME `{` pairs `}` `<end_function_call>`
+#   pairs       := (KEY `:` value (`,` KEY `:` value)*)?
+#   value       := escape_string | object | array | number | bool | null | bareword
+#   escape_str  := `<escape>` ... `<escape>`
+#   object      := `{` pairs `}`
+#   array       := `[` value (`,` value)* `]`
+_CALL_BOUNDARY = re.compile(r"<start_function_call>call:(\w+)(\{)")
 
 
-def _cast(value: str) -> Any:
+def _skip_ws(s: str, i: int) -> int:
+    while i < len(s) and s[i].isspace():
+        i += 1
+    return i
+
+
+def _parse_escape_string(s: str, i: int) -> tuple[str, int]:
+    """i points at first char after opening <escape>. Returns (text, next_i)."""
+    end = s.find("<escape>", i)
+    if end < 0:
+        return s[i:], len(s)
+    return s[i:end], end + len("<escape>")
+
+
+def _parse_value(s: str, i: int) -> tuple[Any, int]:
+    i = _skip_ws(s, i)
+    if s.startswith("<escape>", i):
+        return _parse_escape_string(s, i + len("<escape>"))
+    c = s[i]
+    if c == "{":
+        return _parse_object(s, i)
+    if c == "[":
+        return _parse_array(s, i)
+    # bareword: up to ,  }  ] (respecting nested escape-strings isn't needed here)
+    j = i
+    while j < len(s) and s[j] not in ",}]":
+        j += 1
+    raw = s[i:j].strip()
+    if raw == "":
+        return "", j
+    if raw.lower() == "true":
+        return True, j
+    if raw.lower() == "false":
+        return False, j
+    if raw.lower() in ("null", "none"):
+        return None, j
     try:
-        return int(value)
+        return int(raw), j
     except ValueError:
         pass
     try:
-        return float(value)
+        return float(raw), j
     except ValueError:
         pass
-    low = value.lower()
-    if low == "true":
-        return True
-    if low == "false":
-        return False
-    return value.strip("'\"")
+    return raw.strip("'\""), j
+
+
+def _parse_key(s: str, i: int) -> tuple[str, int]:
+    i = _skip_ws(s, i)
+    j = i
+    while j < len(s) and (s[j].isalnum() or s[j] == "_"):
+        j += 1
+    return s[i:j], j
+
+
+def _parse_object(s: str, i: int) -> tuple[dict, int]:
+    # s[i] == '{'
+    i += 1
+    out: dict[str, Any] = {}
+    while True:
+        i = _skip_ws(s, i)
+        if i >= len(s):
+            return out, len(s)
+        if s[i] == "}":
+            return out, i + 1
+        key, i = _parse_key(s, i)
+        i = _skip_ws(s, i)
+        if i >= len(s) or s[i] != ":":
+            # malformed; bail
+            return out, i
+        i += 1
+        value, i = _parse_value(s, i)
+        out[key] = value
+        i = _skip_ws(s, i)
+        if i < len(s) and s[i] == ",":
+            i += 1
+            continue
+        if i < len(s) and s[i] == "}":
+            return out, i + 1
+        return out, i
+
+
+def _parse_array(s: str, i: int) -> tuple[list, int]:
+    # s[i] == '['
+    i += 1
+    out: list[Any] = []
+    while True:
+        i = _skip_ws(s, i)
+        if i >= len(s):
+            return out, len(s)
+        if s[i] == "]":
+            return out, i + 1
+        value, i = _parse_value(s, i)
+        out.append(value)
+        i = _skip_ws(s, i)
+        if i < len(s) and s[i] == ",":
+            i += 1
+            continue
+        if i < len(s) and s[i] == "]":
+            return out, i + 1
+        return out, i
 
 
 def extract_tool_calls(text: str) -> list[dict]:
-    calls = []
-    for name, args_blob in _CALL_RE.findall(text):
-        arguments: dict[str, Any] = {}
-        for key, v_esc, v_plain in _ARG_RE.findall(args_blob):
-            raw = v_esc if v_esc or v_esc == "" else v_plain
-            arguments[key] = _cast(raw.strip())
-        calls.append({"name": name, "arguments": arguments})
+    """Parse every `<start_function_call>…<end_function_call>` block.
+
+    Handles nested dicts (e.g. `extra_args:{nprocs:64}`), lists, numbers,
+    bools, and `<escape>`-wrapped strings. Stops each call at the matching
+    `}<end_function_call>` by tracking brace depth so nested `}` don't
+    prematurely terminate the call.
+    """
+    calls: list[dict] = []
+    for m in _CALL_BOUNDARY.finditer(text):
+        name = m.group(1)
+        start = m.end() - 1  # position of the opening `{`
+        # Skip escape-wrapped strings so their `{` / `}` don't count toward depth.
+        depth = 0
+        i = start
+        end = None
+        while i < len(text):
+            if text.startswith("<escape>", i):
+                nxt = text.find("<escape>", i + len("<escape>"))
+                if nxt < 0:
+                    i = len(text)
+                    break
+                i = nxt + len("<escape>")
+                continue
+            ch = text[i]
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    end = i + 1
+                    break
+            i += 1
+        if end is None:
+            continue
+        obj, _ = _parse_object(text, start)
+        calls.append({"name": name, "arguments": obj})
     return calls
 
 

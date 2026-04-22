@@ -32,9 +32,9 @@ class JarvisMCP:
         startup_timeout: float = 15.0,
     ):
         self.server_cmd = server_cmd or [
-            "/home/shazzadul/Illinois_Tech/Spring26/RA/clio-kit/clio-kit-mcp-servers/jarvis/.venv/bin/jarvis-mcp",
+            "/u/sislam3/clio-kit/clio-kit-mcp-servers/jarvis/.venv/bin/jarvis-mcp",
         ]
-        self.cwd = cwd or "/home/shazzadul/Illinois_Tech/Spring26/RA/clio-kit/clio-kit-mcp-servers/jarvis"
+        self.cwd = cwd or "/u/sislam3/clio-kit/clio-kit-mcp-servers/jarvis"
         self.env = {**os.environ, **(env or {})}
         self.startup_timeout = startup_timeout
         self._proc: subprocess.Popen | None = None
@@ -104,6 +104,8 @@ class JarvisMCP:
             try:
                 msg = self._responses.get(timeout=max(0.1, deadline - _t.time()))
             except Empty:
+                continue
+            if not isinstance(msg, dict):
                 continue
             if msg.get("id") != rid:
                 continue

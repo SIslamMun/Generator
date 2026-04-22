@@ -44,8 +44,9 @@ def validate_row(messages: list[dict]) -> tuple[bool, list[str]]:
         else:
             declared_tool_names.add(name)
 
-    if len(declared_tool_names) > 5:
-        errors.append(f"declared {len(declared_tool_names)} tools (ceiling is 5)")
+    # v7 uses 10 tools per example (target + distractors) — documented design choice
+    if len(declared_tool_names) > 12:
+        errors.append(f"declared {len(declared_tool_names)} tools (ceiling is 12)")
 
     # build map of tool_call_id -> function name as helper does
     id_to_name: dict[str, str] = {}

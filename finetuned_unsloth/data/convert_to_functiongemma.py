@@ -1,8 +1,5 @@
 """Convert v7 reasoning_path dataset to FunctionGemma chat-template format.
 
-Source: outputs/v7_2k/jarvis_v7_2000.json
-Output: finetuned_unsloth/v7_2k/jarvis_v7_functiongemma.jsonl
-
 Each output row: {"messages": "<JSON STRING>"} where the decoded list matches what
 `prepare_messages_and_tools()` in FunctionGemma_(270M).ipynb expects:
   - First message carries a `tools` list (stripped by the notebook helper).
@@ -10,18 +7,19 @@ Each output row: {"messages": "<JSON STRING>"} where the decoded list matches wh
     filtered as "poison" by the helper).
   - `tool_calls` follow HF-style: {id, type:"function", function:{name, arguments}}.
   - Tool responses carry `name` and `tool_call_id`.
+
+Usage:
+  python convert_to_functiongemma.py --input <raw.json> --output <out.jsonl>
 """
 
+import argparse
 import json
 import random
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent  # Generator/
-SRC = ROOT / "outputs" / "v7_2k" / "jarvis_v7_2000.json"
-CATALOG = ROOT / "configs" / "tools" / "jarvis_tools.json"
-OUT_DIR = HERE / "v7_2k"
-OUT = OUT_DIR / "jarvis_v7_functiongemma.jsonl"
+ROOT = HERE.parent.parent  # data/ → finetuned_unsloth/ → Generator/
+DEFAULT_CATALOG = ROOT / "configs" / "tools" / "jarvis_tools.yaml"
 
 SYSTEM_PROMPT = (
     "You are a Jarvis-CD HPC workflow assistant. Use the provided tools to "
@@ -30,15 +28,21 @@ SYSTEM_PROMPT = (
     "at a time unless the user asks for multiple actions."
 )
 
-TOOLS_PER_EXAMPLE = 5  # training ceiling documented in CLAUDE.md
+TOOLS_PER_EXAMPLE = 10  # v7 uses 10 tools per example (matches --tools-per-example in generator)
 FINAL_THINK = (
     "The requested operations are complete; I'll summarize the outcome for the user."
 )
 
 
 def load_catalog(path: Path) -> dict[str, dict]:
-    raw = json.loads(path.read_text())
-    return {t["name"]: t for t in raw["tools"]}
+    """Load tool catalog from JSON or YAML."""
+    if path.suffix in (".yaml", ".yml"):
+        import yaml
+        raw = yaml.safe_load(path.read_text())
+    else:
+        raw = json.loads(path.read_text())
+    tools_list = raw if isinstance(raw, list) else raw.get("tools", [])
+    return {t["name"]: t for t in tools_list}
 
 
 def catalog_to_function_schema(tool: dict) -> dict:
@@ -67,8 +71,11 @@ def catalog_to_function_schema(tool: dict) -> dict:
 
 
 def pick_tools(required_names: list[str], catalog_names: list[str], seed: int) -> list[str]:
-    """Return a deterministic list of tool names including the required ones first,
-    padded with random other catalog tools up to TOOLS_PER_EXAMPLE.
+    """Return a list of tool names including required ones + distractors,
+    then SHUFFLED so targets are at random positions (not always first).
+
+    CRITICAL: without the final shuffle, the model learns a positional bias
+    (always picks first tool in the list) instead of semantic matching.
     """
     rng = random.Random(seed)
     selected = list(dict.fromkeys(required_names))  # dedupe, preserve order
@@ -76,7 +83,10 @@ def pick_tools(required_names: list[str], catalog_names: list[str], seed: int) -
     rng.shuffle(pool)
     while len(selected) < TOOLS_PER_EXAMPLE and pool:
         selected.append(pool.pop())
-    return selected[:TOOLS_PER_EXAMPLE]
+    selected = selected[:TOOLS_PER_EXAMPLE]
+    # Shuffle so the target tool is not always at position 0
+    rng.shuffle(selected)
+    return selected
 
 
 def format_tool_response(step: dict) -> str:
@@ -157,13 +167,26 @@ def convert_example(ex: dict, catalog: dict[str, dict], idx: int) -> dict | None
 
 
 def main():
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    catalog = load_catalog(CATALOG)
-    data = json.loads(SRC.read_text())
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--input", "-i", required=True, help="Input v7 raw JSON (with reasoning_path)")
+    ap.add_argument("--output", "-o", required=True, help="Output JSONL file")
+    ap.add_argument("--catalog", default=str(DEFAULT_CATALOG), help="Tool catalog (yaml or json)")
+    args = ap.parse_args()
+
+    src = Path(args.input).resolve()
+    out = Path(args.output).resolve()
+    catalog_path = Path(args.catalog).resolve()
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    catalog = load_catalog(catalog_path)
+    print(f"Loaded catalog with {len(catalog)} tools from {catalog_path}")
+
+    data = json.loads(src.read_text())
+    print(f"Loaded {len(data)} raw examples from {src}")
     kept = 0
     dropped = 0
     method_counts: dict[str, int] = {}
-    with OUT.open("w") as f:
+    with out.open("w") as f:
         for idx, ex in enumerate(data):
             row = convert_example(ex, catalog, idx)
             if row is None:
@@ -173,7 +196,7 @@ def main():
             kept += 1
             m = ex["solution"].get("method", "?")
             method_counts[m] = method_counts.get(m, 0) + 1
-    print(f"Wrote {OUT}")
+    print(f"\nWrote {out}")
     print(f"  kept   = {kept}")
     print(f"  dropped= {dropped}")
     print(f"  by method: {method_counts}")

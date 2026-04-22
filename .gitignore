@@ -22,9 +22,13 @@ wheels/
 
 # Virtual environments
 .venv/
+.venv-delta/
 venv/
 ENV/
 env/
+
+# Claude agent / local tool state
+.claude/
 
 # IDEs
 .vscode/
@@ -46,6 +50,15 @@ htmlcov/
 output/*.json
 output/*.jsonl
 !output/README.md
+
+# Large training artifacts (regeneratable; kept in $SCRATCH / $WORK instead)
+finetuned_unsloth/artifacts/
+finetuned_unsloth/logs/
+finetuned_unsloth/unsloth_compiled_cache/
+finetuned_unsloth/data/v7_10k_clean/
+finetuned_unsloth/data/v7_delta/
+finetuned_unsloth/data/v7_merged/
+outputs/
 
 # Google Cloud SDK (not part of project)
 google/
