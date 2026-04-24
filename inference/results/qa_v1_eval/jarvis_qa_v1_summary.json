@@ -1,0 +1,14 @@
+{
+  "tag": "jarvis_qa_v1",
+  "model": "/work/hdd/bekn/sislam3/jarvis_qa_v1_lora/merged_16bit",
+  "n": 365,
+  "parse_success": 1.0,
+  "has_reasoning_steps": 1.0,
+  "answer_keyword_recall": 0.2452,
+  "finished": 1.0,
+  "reasoning_len_mean": 601.5,
+  "answer_len_mean": 321.4,
+  "total_len_mean": 951.9,
+  "gen_latency_s_mean": 5.453,
+  "elapsed_s": 1990.4
+}

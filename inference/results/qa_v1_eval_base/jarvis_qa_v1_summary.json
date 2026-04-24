@@ -1,0 +1,14 @@
+{
+  "tag": "jarvis_qa_v1",
+  "model": "unsloth/gemma-3-270m-it",
+  "n": 365,
+  "parse_success": 0.0986,
+  "has_reasoning_steps": 0.0164,
+  "answer_keyword_recall": 0.0166,
+  "finished": 0.989,
+  "reasoning_len_mean": 334.7,
+  "answer_len_mean": 31.0,
+  "total_len_mean": 386.5,
+  "gen_latency_s_mean": 2.072,
+  "elapsed_s": 756.5
+}
