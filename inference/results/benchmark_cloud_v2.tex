@@ -1,0 +1,21 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Real-MCP task success across providers and temperatures. Numbers are mean \% over 12 cases; 95\% CI in brackets.}
+\label{tab:mcp_bench}
+\begin{tabular}{llcccccc}
+\toprule
+Model & T & Task Success & Tool Acc. & Arg Acc. & Ans. Corr. & Halluc. & Lat.\,(s) \\
+\midrule
+\textbf{claude-haiku-4-5} & 0.0 & 58 [33, 83] & 75 & 75 & 83 & 0.0 & 8.44 \\
+\textbf{claude-opus-4-7} & 0.0 & 58 [33, 83] & 83 & 83 & 92 & 0.1 & 14.40 \\
+\textbf{claude-sonnet-4-6} & 0.0 & 42 [17, 75] & 67 & 67 & 83 & 0.0 & 15.79 \\
+gemini-2.5-flash & 0.0 & 75 [50, 100] & 83 & 83 & 83 & 0.1 & 5.01 \\
+\textbf{gemini-2.5-flash} & 0.3 & 75 [61, 89] & 83 & 83 & 81 & 0.1 & 4.73 \\
+gemini-2.5-flash & 0.7 & 72 [58, 86] & 92 & 92 & 78 & 0.1 & 5.42 \\
+\textbf{gemini-2.5-pro} & 0.0 & 67 [42, 92] & 75 & 75 & 75 & 0.0 & 6.62 \\
+gemini-2.5-pro & 0.3 & 67 [50, 81] & 78 & 78 & 72 & 0.0 & 7.43 \\
+gemini-2.5-pro & 0.7 & 17 [6, 31] & 19 & 19 & 31 & 0.0 & 11.04 \\
+\bottomrule
+\end{tabular}
+\end{table*}

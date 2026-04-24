@@ -1,0 +1,15 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Real-MCP task success across providers and temperatures. Numbers are mean \% over 12 cases; 95\% CI in brackets.}
+\label{tab:mcp_bench}
+\begin{tabular}{llcccccc}
+\toprule
+Model & T & Task Success & Tool Acc. & Arg Acc. & Ans. Corr. & Halluc. & Lat.\,(s) \\
+\midrule
+jarvis-v10 & 0.0 & 67 [42, 92] & 92 & 92 & 75 & 0.1 & 1.55 \\
+\textbf{jarvis-v10} & 0.3 & 67 [50, 81] & 94 & 92 & 81 & 0.1 & 1.27 \\
+jarvis-v10 & 0.7 & 67 [50, 81] & 94 & 92 & 78 & 0.1 & 1.66 \\
+\bottomrule
+\end{tabular}
+\end{table*}

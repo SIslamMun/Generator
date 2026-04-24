@@ -1,0 +1,6 @@
+FROM ./model_merged_16bit
+
+PARAMETER temperature 1.0
+PARAMETER top_p 0.95
+PARAMETER top_k 64
+PARAMETER num_ctx 4096

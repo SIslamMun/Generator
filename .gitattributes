@@ -17,3 +17,7 @@ finetuned_unsloth/data/**/*.jsonl filter=lfs diff=lfs merge=lfs -text
 
 # Raw generator outputs (tens of MB each)
 outputs/**/*.json filter=lfs diff=lfs merge=lfs -text
+
+# v10 delta raw / clean JSONs (~18 MB each)
+finetuned_unsloth/data/v10/*.json filter=lfs diff=lfs merge=lfs -text
+finetuned_unsloth/data/v10_delta/*.json filter=lfs diff=lfs merge=lfs -text

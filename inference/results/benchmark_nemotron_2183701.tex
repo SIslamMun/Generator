@@ -1,0 +1,18 @@
+\begin{table*}[t]
+\centering
+\small
+\caption{Real-MCP task success across providers and temperatures. Numbers are mean \% over 12 cases; 95\% CI in brackets.}
+\label{tab:mcp_bench}
+\begin{tabular}{llcccccc}
+\toprule
+Model & T & Task Success & Tool Acc. & Arg Acc. & Ans. Corr. & Halluc. & Lat.\,(s) \\
+\midrule
+nemotron-nano-30b & 0.0 & 67 [42, 92] & 83 & 83 & 67 & 0.0 & 14.39 \\
+\textbf{nemotron-nano-30b} & 0.3 & 69 [56, 83] & 86 & 86 & 72 & 0.0 & 9.68 \\
+nemotron-nano-30b & 0.7 & 69 [56, 83] & 81 & 81 & 72 & 0.0 & 11.49 \\
+\textbf{nemotron-super-120b} & 0.0 & 67 [42, 92] & 92 & 83 & 75 & 0.0 & 9.26 \\
+nemotron-super-120b & 0.3 & 61 [44, 75] & 89 & 83 & 64 & 0.0 & 7.95 \\
+nemotron-super-120b & 0.7 & 64 [47, 78] & 89 & 83 & 69 & 0.0 & 7.84 \\
+\bottomrule
+\end{tabular}
+\end{table*}

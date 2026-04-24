@@ -90,9 +90,23 @@ class JarvisMCP:
             self._responses.put(msg)
 
     def _send(self, payload: dict):
+        """Write one JSON-RPC frame; auto-restart the subprocess if the pipe died."""
+        if not self._proc or self._proc.poll() is not None:
+            self.start()
         assert self._proc and self._proc.stdin
-        self._proc.stdin.write(json.dumps(payload) + "\n")
-        self._proc.stdin.flush()
+        try:
+            self._proc.stdin.write(json.dumps(payload) + "\n")
+            self._proc.stdin.flush()
+        except (BrokenPipeError, OSError):
+            # subprocess is gone — restart and retry once
+            try:
+                self._proc.wait(timeout=1)
+            except Exception:
+                pass
+            self.start()
+            assert self._proc and self._proc.stdin
+            self._proc.stdin.write(json.dumps(payload) + "\n")
+            self._proc.stdin.flush()
 
     def _request(self, method: str, params: dict | None = None, timeout: float = 60.0) -> Any:
         rid = self._next_id
