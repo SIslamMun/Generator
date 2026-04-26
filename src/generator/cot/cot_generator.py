@@ -57,8 +57,9 @@ def generate_cot_pairs(
     if n_pairs is None and target_pairs is None:
         n_pairs = llm_config.get("generation", {}).get("n_pairs_per_chunk", 3)
 
-    # Load prompt template
-    config_dir = Path(__file__).parent.parent.parent / "configs"
+    # Load prompt template — repo_root/configs/prompts/.
+    # __file__ = src/generator/cot/cot_generator.py → 4 parents = repo root.
+    config_dir = Path(__file__).resolve().parent.parent.parent.parent / "configs"
     prompts = load_prompts(config_dir)
     cot_prompt = prompts.get("cot_generation")
     if not cot_prompt:

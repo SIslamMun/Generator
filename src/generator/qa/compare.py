@@ -21,7 +21,7 @@ class DatasetComparator:
         provider = llm_config.pop("provider")
         self.client = get_client(provider, llm_config)
         # Load prompts
-        config_dir = Path(__file__).parent.parent.parent / "configs"
+        config_dir = Path(__file__).resolve().parent.parent.parent.parent / "configs"
         self.prompts = load_prompts(config_dir)
     
     def load_datasets(self, paths: List[Path]) -> Dict[str, List[Dict]]:

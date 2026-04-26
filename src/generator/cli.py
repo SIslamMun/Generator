@@ -568,7 +568,8 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
     # Apply topic filtering if requested
     if topic:
         console.print(f"\n[bold cyan]🔍 Filtering CoT pairs by topic: {topic}[/bold cyan]\n")
-        from .curate import _rate_batch, load_prompts
+        from .qa.curate import _rate_batch
+        from .prompt_loader import load_prompts
         import json
         
         # Load prompts
@@ -1879,6 +1880,92 @@ def tool_pipeline(tools_path, output, config, mode, target_pairs, threshold, exe
             f.write(json.dumps(training_data, ensure_ascii=False) + "\n")
     
     console.print(f"\n[bold green]✨ Pipeline complete! {len(examples)} examples → {output}[/bold green]\n")
+
+
+# ─────────────────── universal training pipelines ───────────────────
+# Wired from generator.training package — see src/generator/training/
+
+@main.command(name="train-init")
+@click.option("--type", "kind", type=click.Choice(["chat", "tool", "both"]),
+              default="both", help="Which pipeline to set up")
+@click.option("-o", "--output", default="./pipeline.yaml",
+              help="Where to write the config")
+def train_init(kind, output):
+    """Interactive wizard — write a pipeline.yaml the train commands can read."""
+    from .training.config import wizard, save_config
+    cfg = wizard(kind)
+    p = save_config(cfg, output)
+    console.print(f"\n[bold green]✓ Saved {p}[/bold green]")
+    console.print("[dim]Run [bold]generator train-chat[/bold] or [bold]generator train-tool[/bold] (or [bold]generator train[/bold] for both).[/dim]")
+
+
+@main.command(name="train-chat")
+@click.option("-c", "--config", "config_path", default="./pipeline.yaml", show_default=True,
+              help="Pipeline config (from train-init)")
+@click.option("--lancedb", default=None, help="Override chat.data.lancedb_path")
+@click.option("--target", "target_pairs", type=int, default=None,
+              help="Override chat.data.target_pairs (e.g. 100 for smoke test)")
+@click.option("--force", is_flag=True, help="Re-run all stages, ignore cache")
+@click.option("--from", "start_from", default=None, help="Resume from a specific stage")
+@click.option("--only", default=None, help="Run only one stage")
+def train_chat(config_path, lancedb, target_pairs, force, start_from, only):
+    """Run the full chat (QA+CoT) pipeline: gen → curate → train → eval."""
+    from .training.config import load_config
+    from .training.pipelines import run_chat
+    from .training.hardware import detect, summarize
+    cfg = load_config(config_path)
+    cfg["chat"]["enabled"] = True
+    if lancedb:        cfg["chat"]["data"]["lancedb_path"] = lancedb
+    if target_pairs:   cfg["chat"]["data"]["target_pairs"] = target_pairs
+    console.print(f"[dim]hw: {summarize(detect())}[/dim]")
+    run_chat(cfg, force=force, start_from=start_from, only=only)
+
+
+@main.command(name="train-tool")
+@click.option("-c", "--config", "config_path", default="./pipeline.yaml", show_default=True)
+@click.option("--tools",  default=None, help="Override tool.data.tools_path")
+@click.option("--target", "target_pairs", type=int, default=None,
+              help="Override tool.data.target_pairs")
+@click.option("--force", is_flag=True)
+@click.option("--from", "start_from", default=None)
+@click.option("--only", default=None)
+def train_tool(config_path, tools, target_pairs, force, start_from, only):
+    """Run the full tool-use pipeline: gen → schema-filter → train → eval."""
+    from .training.config import load_config
+    from .training.pipelines import run_tool
+    from .training.hardware import detect, summarize
+    cfg = load_config(config_path)
+    cfg["tool"]["enabled"] = True
+    if tools:          cfg["tool"]["data"]["tools_path"]  = tools
+    if target_pairs:   cfg["tool"]["data"]["target_pairs"] = target_pairs
+    console.print(f"[dim]hw: {summarize(detect())}[/dim]")
+    run_tool(cfg, force=force, start_from=start_from, only=only)
+
+
+@main.command(name="train")
+@click.option("-c", "--config", "config_path", default="./pipeline.yaml", show_default=True)
+@click.option("--force", is_flag=True)
+def train_both(config_path, force):
+    """Run both chat and tool pipelines per pipeline.yaml."""
+    from .training.config import load_config
+    from .training.pipelines import run_both
+    from .training.hardware import detect, summarize
+    cfg = load_config(config_path)
+    console.print(f"[dim]hw: {summarize(detect())}[/dim]")
+    run_both(cfg, force=force)
+
+
+@main.command(name="ingest")
+@click.argument("source_dir", type=click.Path(exists=True, file_okay=False))
+@click.option("-o", "--output", required=True, help="LanceDB directory (will be created)")
+@click.option("--table",     default="code_chunks", show_default=True)
+@click.option("--max-chars", default=1500, show_default=True, type=int)
+@click.option("--max-files", default=None, type=int, help="Cap total files (smoke test)")
+def ingest_cmd(source_dir, output, table, max_chars, max_files):
+    """Build a LanceDB index from a directory of text/code files."""
+    from .training.ingest import ingest as do_ingest
+    res = do_ingest(source_dir, output, table=table, max_chars=max_chars, max_files=max_files)
+    console.print(f"[bold green]✓ Ingest complete[/bold green]: {res}")
 
 
 if __name__ == "__main__":

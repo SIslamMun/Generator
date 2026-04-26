@@ -65,6 +65,13 @@ finetuned_unsloth/data/v7_delta/
 finetuned_unsloth/data/v7_merged/
 outputs/
 
+# Universal training-pipeline runtime — code is committed, run outputs are not
+runs/
+lancedb_smoke/
+lancedb*/
+unsloth_compiled_cache/
+jarvis_config/
+
 # Google Cloud SDK (not part of project)
 google/
 

@@ -1,0 +1,55 @@
+# Smoke-test config — 100 examples each side, ~30 min end to end on a GH200.
+# After verifying everything works, bump target_pairs to 3000 for real training.
+
+output_dir: ./runs/smoke_v1
+topic: "Jarvis-CD HPC workflows"
+
+llm:
+  provider: ollama
+  model: gpt-oss:20b           # 120b for higher quality (slower)
+  workers: 4
+
+chat:
+  enabled: true
+  data:
+    lancedb_path: ./lancedb
+    table: code_chunks
+    target_pairs: 100
+    max_chunks: 100              # cap chunks processed (keeps smoke test ~100 pairs)
+  curate:
+    threshold: 5.0          # smoke-test: lenient so the pipeline flows through; use 7.0+ for real runs
+  train:
+    base_model: unsloth/gemma-3-270m-it
+    lora_r: 64
+    lora_alpha: 128
+    epochs: 2
+    batch_size: 8
+    lr: 2e-4
+    bf16: true
+    save_merged: true
+  eval:
+    enabled: true
+    val_split: 0.10                       # ~10 val rows from 100 generated
+    baseline: unsloth/gemma-3-270m-it
+    max_examples: 0
+
+tool:
+  enabled: true
+  data:
+    tools_path: configs/tools/jarvis_tools.json
+    target_pairs: 100
+    ratios: { single: 0.10, multi: 0.15, chain: 0.45, error: 0.30 }
+    tools_per_example: 10
+    distractor_strategy: mixed
+  train:
+    base_model: unsloth/functiongemma-270m-it
+    lora_r: 64
+    lora_alpha: 128
+    epochs: 2
+    batch_size: 8
+    lr: 2e-4
+    bf16: true
+    save_merged: true
+  eval:
+    enabled: true
+    max_examples: 50
