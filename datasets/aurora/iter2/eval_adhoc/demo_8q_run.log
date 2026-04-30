@@ -1,0 +1,7 @@
+[init] loading llama_A GGUF (15GB, ~30-60s on CPU)...
+llama_context: n_ctx_seq (4096) < n_ctx_train (131072) -- the full capacity of the model will not be utilized
+[init] loaded in 12.1s
+
+========================================================================================
+[1/8] [EASY] What is the single module load command on Aurora that brings in IPEX-enabled PyTorch and TensorFlow?
+========================================================================================

@@ -1,0 +1,736 @@
+[
+  {
+    "qid": "c1-sycl-compile",
+    "answer": "**Reasoning:**\n1. The text shows a command for building a SYCL program.\n2. The command includes `icpx` as the compiler.\n3. It uses the flag `-fsycl` to enable SYCL support.\n4. The `-g` flag is added for debugging.\n5. The `-fopenmp-targets=spir64_gen` flag is used to target the SPIR‑64 generation for the Aurora PVC GPUs.\n6. The source file `aurora_kernel.cpp` is listed as the only input.\n7. No additional flags are mentioned, so these three flags suffice.\n\n**Answer:**\nCompile with `icpx -fsycl -g -fopenmp-targets=spir64_gen aurora_kernel.cpp`.",
+    "routing": [
+      "C1"
+    ],
+    "router_reply": "C1",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text shows a command for building a SYCL program.\n2. The command includes `icpx` as the compiler.\n3. It uses the flag `-fsycl` to enable SYCL support.\n4. The `-g` flag is added for debugging.\n5. The `-fopenmp-targets=spir64_gen` flag is used to target the SPIR‑64 generation for the Aurora PVC GPUs.\n6. The source file `aurora_kernel.cpp` is listed as the only input.\n7. No additional flags are mentioned, so these three flags suffice.\n\n**Answer:**\nCompile with `icpx -fsycl -g -fopenmp-targets=spir64_gen aurora_kernel.cpp`."
+    },
+    "synth_elapsed_s": 0.0
+  },
+  {
+    "qid": "c1-sycl-aot",
+    "answer": "**Reasoning:**\nExpert C3 provides a specific compiler command that targets the PVC GPUs, which is a crucial piece of information for AOT SYCL compilation. This command is likely the most direct and accurate way to compile a SYCL program for the PVC GPUs on Aurora. Expert C1 suggests consulting the guide's AOT SYCL section, but since the guide is not shown, we cannot rely on this information. The command provided by Expert C3 is a concrete step that can be taken to achieve AOT SYCL compilation for the PVC GPUs.\n\n**Answer:**\nRun `icpx -fsycl -Xarch_device -fsanitize=address -g demo.cpp` to compile the SYCL program for the PVC GPUs.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text mentions AOT SYCL compilation but does not provide a detailed step‑by‑step.\n2. However, it does state that the guide covers AOT SYCL.\n3. Since the guide is not shown, we infer that the process involves using the guide’s AOT SYCL section.\n4. The guide likely provides compiler flags and build commands for PVC.\n5. Therefore, the user should consult the guide’s AOT SYCL section for the exact steps.\n\n**Answer:**\nConsult the guide’s AOT SYCL section for the specific compiler flags and build commands needed to compile for PVC GPUs on Aurora.",
+      "C3": "**Reasoning:**\n1. The text mentions that the PVC GPUs can be targeted with a specific compiler command.\n2. The command shown is `icpx -fsycl -Xarch_device -fsanitize=address -g demo.cpp`.\n3. The `-Xarch_device` flag tells the compiler to generate device code for the PVC GPUs.\n4. Running this command compiles the SYCL program for the PVC GPUs before execution.\n\n**Answer:**\nRun `icpx -fsycl -Xarch_device -fsanitize=address -g demo.cpp` to compile the SYCL program for the PVC GPUs."
+    },
+    "synth_elapsed_s": 4.349570035934448
+  },
+  {
+    "qid": "c1-openmp-target",
+    "answer": "**Reasoning:**\nExpert C1 provides a detailed breakdown of the flags required to enable OpenMP target offload to the Aurora PVC GPUs with `icpx`. The flags `-fiopenmp`, `-fopenmp-targets=spir64_gen`, and `-Xs \"-device pvc\"` are specifically mentioned as necessary for this purpose. Expert C3 states that OpenMP target offload is enabled by default, but this is not sufficient for the specific case of using `icpx` and targeting the PVC GPUs. Therefore, the most accurate and comprehensive answer is to use the flags provided by Expert C1.\n\n**Answer:**\nAdd `-fiopenmp -fopenmp-targets=spir64_gen -Xs \"-device pvc\"` to the `icpx` command.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text shows a command line that uses `icpx` to compile a program.\n2. The flag `-fiopenmp` enables OpenMP support.\n3. The flag `-fopenmp-targets=spir64_gen` specifies the offload target architecture.\n4. The flag `-Xs \"-device pvc\"` selects the PVC GPU as the offload device.\n5. Combining these flags enables both OpenMP and PVC offload with `icpx`.\n\n**Answer:**\nAdd `-fiopenmp -fopenmp-targets=spir64_gen -Xs \"-device pvc\"` to the `icpx` command.",
+      "C3": "**Reasoning:**\n1. The text states that OpenMP target offload is enabled by default.\n2. It also mentions that the default can be changed with the `-fiopenmp` flag.\n3. To explicitly enable it, you would compile with `-fiopenmp`.\n4. No additional flags are required beyond this.\n\n**Answer:**\nCompile with `-fiopenmp`; OpenMP target offload is already enabled by default."
+    },
+    "synth_elapsed_s": 4.579755067825317
+  },
+  {
+    "qid": "c1-kokkos-backend",
+    "answer": "**Reasoning:**\n1. Both experts agree that the Intel PVC GPU backend is a specific target for Kokkos on Aurora.\n2. Expert C3 provides more detailed information about the Kokkos backend for PVC GPUs, stating that it is provided by the Kokkos-Kernels package.\n3. Expert C3's answer is more specific and detailed about the enabling flag, mentioning `-DKokkos_Kernels_PVSGPU=ON`.\n4. Since both experts agree on the backend, but Expert C3 provides more specific information about the enabling flag, we can rely on their answer for the enabling flag.\n\n**Answer:**\nThe Kokkos-Kernels backend targets the Intel PVC GPUs, and it is enabled with `-DKokkos_Kernels_PVSGPU=ON`.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text lists the backends that can be used with Kokkos on Aurora.\n2. It explicitly mentions the \"Intel PVC GPU\" backend.\n3. The CMake flag that activates this backend is `KOKKOS_ROOT=... -DKokkos_ARCH_INTEL_PVC=ON`.\n4. This flag tells CMake to include the Intel PVC GPU support when configuring Kokkos.\n\n**Answer:**\nThe Intel PVC GPU backend is enabled by adding `-DKokkos_ARCH_INTEL_PVC=ON` to the CMake configuration.",
+      "C3": "**Reasoning:**\n1. The text lists the Kokkos backends available in the Kokkos build.\n2. It specifically mentions that the \"Kokkos backend for PVC GPUs\" is provided by the Kokkos‑Kernels package.\n3. The CMake flag `-DKokkos_Kernels_PVSGPU=ON` is used to enable this backend.\n4. Therefore, the backend that targets Intel PVC GPUs is Kokkos‑Kernels, and the enabling flag is `-DKokkos_Kernels_PVSGPU=ON`.\n\n**Answer:**\nThe Kokkos‑Kernels backend targets the Intel PVC GPUs, and it is enabled with `-DKokkos_Kernels_PVSGPU=ON`."
+    },
+    "synth_elapsed_s": 4.465965986251831
+  },
+  {
+    "qid": "c1-dpcpp-deprecation",
+    "answer": "**Reasoning:**\nBoth experts agree that `dpcpp` is not the recommended compiler to use on Aurora. Expert C1 suggests replacing it with `mpicxx` to correctly link MPI libraries, but this is not relevant to the question as there is no mention of MPI in the problem. Expert C3 recommends using `icx` instead of `dpcpp` for compiling SYCL or OpenMP code on Aurora, which is the most relevant information. Since the question does not specify the type of code being compiled, it is reasonable to assume it is SYCL or OpenMP code, making Expert C3's answer more relevant.\n\n**Answer:**\nReplace `dpcpp` with `icx` in the Makefile, as `icx` is the recommended compiler for SYCL or OpenMP on Aurora.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text notes that Makefiles should invoke `mpicxx` instead of `dpcpp`.\n2. `dpcpp` is a compiler wrapper that may not be compatible with the MPI environment.\n3. Using `mpicxx` ensures the MPI libraries are linked correctly.\n4. Replacing `dpcpp` with `mpicxx` fixes the incompatibility.\n\n**Answer:**\nReplace `dpcpp` with `mpicxx` to correctly link MPI libraries in the Makefile.",
+      "C3": "**Reasoning:**\n1. The text states that `dpcpp` is not available on Aurora.\n2. It recommends using `icx` instead for compiling SYCL or OpenMP code.\n3. Therefore, the Makefile should invoke `icx` instead of `dpcpp`.\n4. No other changes are mentioned, so the replacement is straightforward.\n\n**Answer:**\nReplace `dpcpp` with `icx` in the Makefile, as `icx` is the recommended compiler for SYCL or OpenMP on Aurora."
+    },
+    "synth_elapsed_s": 4.827304363250732
+  },
+  {
+    "qid": "c1-julia-aurora",
+    "answer": "**Reasoning:**\nExpert C1 provides a clear and concise answer that aligns with the information provided. The text explicitly states that a working Julia environment is pre-configured to target the PVC GPUs, which implies that no additional setup is required. Expert C2's answer is also correct, but it focuses on the specific module that needs to be loaded, which is a necessary step to obtain a GPU-enabled environment. However, this step is not sufficient on its own, as the environment is already pre-configured to target the PVC GPUs. Therefore, the most accurate answer is a combination of both: loading the pre-configured environment and loading the `frameworks` module, which is a necessary step to access the pre-configured environment.\n\n**Answer:**\nLoad the pre-configured Julia environment on Aurora by loading the `frameworks` module, which will automatically provide access to the PVC GPUs.",
+    "routing": [
+      "C1",
+      "C2"
+    ],
+    "router_reply": "C1,C2",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text states that a working Julia environment is available on Aurora.\n2. It also mentions that the environment is pre‑configured to target the PVC GPUs.\n3. Therefore, the environment is ready to use without additional setup.\n4. The user can simply load the environment and start using Julia with PVC GPU support.\n\n**Answer:**\nLoad the pre‑configured Julia environment on Aurora, and it will automatically support the PVC GPUs.",
+      "C2": "**Reasoning:**\n1. The text states that a working Julia environment on Aurora requires the `frameworks` module.\n2. It also mentions that the default module does not include GPU support.\n3. Therefore, loading the `frameworks` module provides the necessary dependencies for GPU‑enabled Julia.\n4. No additional steps are mentioned, so this is the sole requirement.\n\n**Answer:**\nLoad the `frameworks` module in your Julia session to obtain a GPU‑enabled environment."
+    },
+    "synth_elapsed_s": 5.1495420932769775
+  },
+  {
+    "qid": "c1-level0-devices",
+    "answer": "**Reasoning:**\n1. Both experts agree that the oneAPI Level Zero provides a command-line tool to list devices and tile structure.\n2. Expert C1 directly states that the tool is named `ze_aot`, which is a specific and clear answer.\n3. Expert C3 infers that the tool is likely named `xpu-smi` or similar, but does not provide a specific name.\n4. Since Expert C1 provides a specific and direct answer, it is more reliable than Expert C3's inference.\n5. However, Expert C1's answer is not explicitly mentioned by Expert C3, but it is consistent with the information provided.\n\n**Answer:**\nThe `ze_aot` command lists the devices and tile structure.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text mentions that the oneAPI Level‑Zero loader provides a command‑line tool.\n2. It specifies that this tool is used to list devices and tile structure.\n3. The tool is invoked directly from the command line.\n4. No alternative tool is mentioned for this purpose.\n\n**Answer:**\nThe `ze_aot` command lists the devices and tile structure.",
+      "C3": "**Reasoning:**\n1. The text mentions that oneAPI Level Zero provides a command‑line tool.\n2. It specifies that this tool can list devices and tile structure.\n3. The exact name of the tool is not given, but the context implies it is part of the oneAPI installation.\n4. Since the tool is part of the Level Zero package, it is reasonable to infer its name from common Level Zero utilities.\n5. The most likely tool is `xpu-smi` or a similar name, but the text does not explicitly state it; however, the implication is that such a tool exists.\n\n**Answer:**\nA command‑line tool (presumably named `xpu-smi` or similar) is included to list devices and tile structure."
+    },
+    "synth_elapsed_s": 4.334474802017212
+  },
+  {
+    "qid": "c1-opencl-platform",
+    "answer": "**Reasoning:**\nExpert C3 provides a more comprehensive and accurate answer regarding the OpenCL platform name and the command to list devices. Expert C1's answer is partially correct but incomplete, as it does not provide a correct command to list devices. Expert C3's answer is more reliable, as it directly states the platform name and provides a command to list devices. Therefore, the most accurate answer is from Expert C3.\n\n**Answer:**\nThe OpenCL platform is named \"Intel(R) OpenCL(TM) SDK\", and you can list the devices with `xpu-smi --opencl-list`.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text shows a command `module load kokkos` followed by `export OCL_PLATFORM=Intel(R) UHD Graphics` and `export OCL_DEVICE=Intel(R) UHD Graphics`.\n2. This sets the environment variables for the OpenCL platform and device.\n3. The next command is `echo $OCL_PLATFORM` which prints the platform name.\n4. The following command is `glxinfo | grep \"OpenGL renderer\"` which is unrelated to OpenCL.\n5. To list OpenCL devices, the text uses `echo $OCL_DEVICE` but also mentions `glxinfo` which is incorrect for OpenCL.\n6. The correct command to list devices is not shown, but it would typically be `clinfo` or `opencl.isDevice()` in a programming context.\n7. Therefore, the platform name is \"Intel(R) UHD Graphics\" and the device name is also \"Intel(R) UHD Graphics\", but the text does not demonstrate how to list devices.\n\n**Answer:**\nThe OpenCL platform is named \"Intel(R) UHD Graphics\", and you can verify this with `echo $OCL_PLATFORM`; however, the text does not provide a correct command to list the OpenCL devices.",
+      "C3": "**Reasoning:**\n1. The text states that the OpenCL platform name is \"Intel(R) OpenCL(TM) SDK\".\n2. It also provides a command to list OpenCL devices: `xpu-smi --opencl-list`.\n3. Running this command on a compute node will display the OpenCL devices that are currently available.\n4. Therefore, the platform name and the command to view devices are both provided in the text.\n\n**Answer:**\nThe OpenCL platform is named \"Intel(R) OpenCL(TM) SDK\", and you can list the devices with `xpu-smi --opencl-list`."
+    },
+    "synth_elapsed_s": 6.109457969665527
+  },
+  {
+    "qid": "c1-cmake-aurora",
+    "answer": "**Reasoning:**\nBoth experts agree that a recent CMake is available on Aurora and can be loaded using the `module load cmake` command. Expert C1 provides a concise answer that directly addresses the question, while Expert C3 provides additional information about the location of the CMake executable. However, the location is not necessary to answer the question. The most relevant information is that the `cmake` module must be loaded before invoking `cmake` from a build script.\n\n**Answer:**\nYou can load a recent CMake by running `module load cmake` in your session.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text mentions that CMake is available on Aurora.\n2. It provides a specific command to load the CMake module: `module load cmake`.\n3. Loading this module makes the `cmake` executable accessible in the PATH.\n4. Therefore, the build script should include `module load cmake` before invoking `cmake`.\n\n**Answer:**\nYou can load a recent CMake by running `module load cmake` in your session.",
+      "C3": "**Reasoning:**\n1. The text states that a recent CMake is available in the default environment.\n2. It also mentions that the default CMake is in `/opt/aurora/.../cmake-3.27.7`.\n3. To use this CMake, the user must load the `cmake` module first.\n4. The required module command is `module load cmake`.\n5. After loading, the user can run `cmake` without installing it locally.\n\n**Answer:**\nA recent CMake resides at `/opt/aurora/.../cmake-3.27.7`; load the `cmake` module with `module load cmake` before invoking `cmake`."
+    },
+    "synth_elapsed_s": 3.4669649600982666
+  },
+  {
+    "qid": "c1-icpx-vs-icx",
+    "answer": "**Reasoning:**\n1. Both experts agree that `icx` and `icpx` are compiler wrappers for SYCL on Aurora.\n2. Expert C1 correctly identifies that `icpx` is the C++ compiler wrapper for SYCL, which is consistent with the fact that the code is written in C++.\n3. Expert C3 suggests that `icx` is specifically the Intel C++ Compiler for SYCL, but this is not the primary reason to choose it over `icpx`.\n4. However, Expert C3's statement that `icx` is specifically described as the SYCL compiler is consistent with the fact that `icx` is the C compiler wrapper for SYCL, as mentioned in the initial text.\n5. Given that `icx` is specifically designed for SYCL and `icpx` is the C++ compiler wrapper, the most accurate and consistent answer is that `icx` is the recommended compiler for SYCL code, as it is specifically designed for SYCL.\n\n**Answer:**\n`icx` is the recommended compiler for SYCL code on Aurora, as it is specifically designed for SYCL.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text states that `icx` is the C compiler wrapper for SYCL.\n2. It also mentions `icpx` as the C++ compiler wrapper for SYCL.\n3. Since the code is C++, the appropriate wrapper is `icpx`.\n4. Using `icpx` ensures the C++ language features are correctly handled.\n5. Therefore, `icpx` is the correct choice for building C++ SYCL code.\n\n**Answer:**\n`icpx` is the C++ compiler wrapper for SYCL; use it to compile C++ SYCL code.",
+      "C3": "**Reasoning:**\n1. The text states that `icx` is Intel C++ Compiler for SYCL, OpenMP, and C++ applications.\n2. It also mentions that `icpx` is Intel C++ Compiler for OpenMP, C++ applications, and SYCL applications, but it is not the recommended compiler for SYCL.\n3. Therefore, while both can compile SYCL code, `icx` is specifically described as the SYCL compiler.\n4. The recommendation is to use `icx` for SYCL builds.\n\n**Answer:**\n`icx` is the Intel C++ Compiler specifically for SYCL, OpenMP, and C++ on Aurora, and it is the recommended compiler for SYCL code."
+    },
+    "synth_elapsed_s": 6.756940841674805
+  },
+  {
+    "qid": "c1-sycl-device-filter",
+    "answer": "**Reasoning:**\nBoth experts agree that setting an environment variable is necessary to restrict the visible devices to the Level Zero PVC GPU backend. Expert C1 suggests setting `SYCL_AOT_TARGET_BACKENDS=LevelZero`, while Expert C3 recommends setting `ZE_AFFINITY_MASK=level_zero:gpu`. However, the text from Expert C3 provides more context about the device selector and affinity mask, which is specific to the Level Zero PVC GPU backend. This suggests that `ZE_AFFINITY_MASK` is the more relevant variable for this use case.\n\n**Answer:**\nSet the `ZE_AFFINITY_MASK` environment variable to \"level_zero:gpu\" to restrict the visible devices to the Level Zero PVC GPU backend.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text shows a command `export SYCL_AOT_TARGET_BACKENDS=LevelZero` before running the program.\n2. This variable tells the SYCL runtime which backends to prioritize.\n3. By setting it to `LevelZero`, the runtime will only discover Level Zero devices.\n4. No other backends are listed in the environment, so they will be ignored.\n\n**Answer:**\nSet `SYCL_AOT_TARGET_BACKENDS=LevelZero` to restrict the visible devices to Level Zero.",
+      "C3": "**Reasoning:**\n1. The text states that the SYCL device selector can be set to \"level_zero:gpu\" to target the PVC GPU.\n2. It also mentions that this can be achieved via the environment variable ZE_AFFINITY_MASK.\n3. Setting ZE_AFFINITY_MASK to \"level_zero:gpu\" restricts the visible devices to the Level Zero PVC GPU backend.\n4. No other variable is mentioned for this purpose.\n\n**Answer:**\nSet the ZE_AFFINITY_MASK environment variable to \"level_zero:gpu\"."
+    },
+    "synth_elapsed_s": 4.3712732791900635
+  },
+  {
+    "qid": "c1-omp-num-threads",
+    "answer": "**Reasoning:**\nBoth experts agree that the number of threads should match the number of physical cores, and that a single socket of Aurora's CPUs contains 52 physical cores. However, Expert C3 provides additional context by considering the hardware configuration, specifically that each core has 2 hardware threads. This suggests that using 2 threads per core is a more nuanced and efficient approach, aligning with the hardware capabilities. This approach also ensures that the job can take full advantage of the CPU's capabilities.\n\n**Answer:**\nA default of 104 threads (2 threads per core) is sensible for a CPU-only OpenMP job on one Aurora socket.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text notes that the number of threads should match the number of physical cores.\n2. A single socket of Aurora’s CPUs contains 52 physical cores.\n3. Using all cores is typical for CPU‑only workloads.\n4. Therefore, the default should be 52 threads.\n\n**Answer:**\nSet OMP_NUM_THREADS=52 to use all 52 physical cores of a single socket.",
+      "C3": "**Reasoning:**\n1. The text recommends setting OMP_NUM_THREADS to the number of hardware threads per core.\n2. Aurora’s CPUs have 2 hardware threads per core.\n3. Using one socket means the job runs on 52 physical cores (104 threads).\n4. A default of 2 threads per core aligns with the hardware configuration and allows efficient use of the CPU.\n5. Therefore, a default of 104 threads (2 × 52 cores) is reasonable.\n\n**Answer:**\nA default of 104 threads (2 threads per core) is sensible for a CPU‑only OpenMP job on one Aurora socket."
+    },
+    "synth_elapsed_s": 3.7920823097229004
+  },
+  {
+    "qid": "c1-hip-aurora",
+    "answer": "**Reasoning:**\n1. Both experts agree that HIP code can be run on Aurora, but they differ in the compilation process.\n2. Expert C1 suggests using the HIP compiler within the Aurora PE, which is a straightforward approach.\n3. Expert C3 suggests using a SYCL compiler to translate HIP code, which is a more general approach that leverages the SYCL support on Aurora.\n4. Given that SYCL is explicitly mentioned as a supported API on Aurora, and it can be used to run code originally written in HIP, it's reasonable to assume that a SYCL compiler can be used to translate HIP code.\n5. This approach is more flexible and future-proof, as it allows for the use of a standard SYCL compiler, rather than relying on the HIP compiler within the Aurora PE.\n\n**Answer:**\nCompile the HIP code with a SYCL compiler, which translates it for execution on Aurora’s Intel GPUs.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text states that HIP code can be compiled on Aurora.\n2. It also mentions that the HIP compiler is part of the Aurora PE.\n3. Therefore, the workflow involves using the HIP compiler within the Aurora PE to compile the HIP source files.\n4. The compiled executable can then be run on the Aurora hardware.\n\n**Answer:**\nCompile HIP code with the HIP compiler provided in the Aurora PE, then execute the resulting binary on Aurora.",
+      "C3": "**Reasoning:**\n1. The text states that Aurora is an Intel GPU system.\n2. It also mentions that Aurora supports both SYCL and OpenMP.\n3. It further notes that SYCL can be used to run code originally written in HIP.\n4. Therefore, to run HIP code, you should compile it for SYCL.\n5. The compilation command would use a SYCL compiler that can translate HIP code.\n\n**Answer:**\nCompile the HIP code with a SYCL compiler, which translates it for execution on Aurora’s Intel GPUs."
+    },
+    "synth_elapsed_s": 5.387904167175293
+  },
+  {
+    "qid": "c1-link-vs-compile",
+    "answer": "**Reasoning:**\nBoth experts agree that `-fsycl` is a compiler flag that enables SYCL language extensions, and it is specified in the compilation command, not the linking command. Expert C1 explicitly states that the linking command only uses `-lOpenCL` to link the OpenCL library, which does not require any additional SYCL flag. Expert C2 also concludes that only the compile-time flag is required, as there is no mention of an additional flag needed at link time. Both experts are consistent in their reasoning, and there is no disagreement between them.\n\n**Answer:**\n`-fsycl` is required only at compile time; it is not needed in the linking command.",
+    "routing": [
+      "C1",
+      "C2"
+    ],
+    "router_reply": "C1,C2",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. `-fsycl` is a compiler flag that enables SYCL language extensions.\n2. It is specified in the compilation command, not the linking command.\n3. The linking command only uses `-lOpenCL` to link the OpenCL library.\n4. No additional SYCL flag is required for linking.\n5. Therefore, `-fsycl` is needed only at compile time.\n\n**Answer:**\n`-fsycl` is required only at compile time; it is not needed in the linking command.",
+      "C2": "**Reasoning:**\n1. The text says the compiler flag `-fsycl` is required at compile time.\n2. It does not mention any additional flag needed at link time.\n3. Therefore, only the compile‑time flag is required.\n\n**Answer:**\nOnly the `-fsycl` flag is needed at compile time; no extra flag is required at link time."
+    },
+    "synth_elapsed_s": 4.0303144454956055
+  },
+  {
+    "qid": "c2-pytorch-load",
+    "answer": "**Reasoning:**\nBoth experts agree that the module load command is necessary to load the necessary framework modules for the GPU. However, they disagree on the exact module load command. Expert C2 suggests `module load frameworks`, while Expert C3 suggests `module load pti-gpu`. Since the Aurora supercomputer uses Intel GPUs, which are part of the Ponte Vecchio architecture, I will rely on Expert C3's answer, as it is more specific to the architecture. Both experts also agree on the Python code to move a tensor to the GPU, which is `t = t.to('xpu')` or `x = x.to(\"xpu\")`. However, Expert C2's code snippet is more concise and directly answers the question. Therefore, I will use Expert C2's code snippet.\n\n**Answer:**\nLoad the module with `module load pti-gpu` and run the Python code: `import torch; t = torch.rand(1, 3, 224, 224); t = t.to('xpu')`.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text provides the module load command: `module load frameworks`.\n2. It then shows the Python code:\n   - Import torch: `import torch`.\n   - Create a tensor: `t = torch.rand(1, 3, 224, 224)`.\n   - Move it to the GPU: `t = t.to('xpu')`.\n3. No other commands are needed for this example.\n\n**Answer:**\nUse `module load frameworks` and run `import torch; t = torch.rand(1, 3, 224, 224); t = t.to('xpu')`.",
+      "C3": "**Reasoning:**\n1. The text provides the module load command: `module load pti-gpu`.\n2. It then shows the Python code block that imports torch and moves a tensor to the GPU.\n3. The code is:\n   ```python\n   import torch\n   x = torch.randn(1, 1000, 1000)\n   x = x.to(\"xpu\")\n   print(x.device)\n   ```\n4. This code creates a random tensor, moves it to the \"xpu\" device, and prints the device it is now on.\n\n**Answer:**\nLoad the module with `module load pti-gpu` and run the Python code:\n```python\nimport torch\nx = torch.randn(1, 1000, 1000)\nx = x.to(\"xpu\")\nprint(x.device)\n```"
+    },
+    "synth_elapsed_s": 6.146388292312622
+  },
+  {
+    "qid": "c2-pytorch-xpu-check",
+    "answer": "**Reasoning:**\nBoth experts agree that the command to verify the presence of the Intel XPU backend in PyTorch is a one-liner. Expert C1 provides the correct command, which is `python -c \"import torch; print(torch.backends.xpu.is_available())\"`, and Expert C2 confirms that this command returns `True` if the XPU backend is present. This command is the recommended method for checking availability, as stated by Expert C2.\n\n**Answer:**\nRun `python -c \"import torch; print(torch.backends.xpu.is_available())\"` and verify the output is `True`.",
+    "routing": [
+      "C2",
+      "C1"
+    ],
+    "router_reply": "C2,C1",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text provides a single Python command for verification.\n2. The command is `torch.xpu.is_available()`.\n3. Executing this returns `True` if the XPU backend is present, `False` otherwise.\n4. This is the recommended method for checking availability.\n\n**Answer:**\nRun `torch.xpu.is_available()`; it returns `True` if the Intel XPU backend is present.",
+      "C1": "**Reasoning:**\n1. The text provides a command to verify the backend.\n2. The command is shown as `python -c \"import torch; print(torch.backends.cudnn.is_available())\"` but this checks CUDA.\n3. For the Intel XPU, the correct command is `python -c \"import torch; print(torch.backends.xpu.is_available())\"`.\n4. Running this prints `True` if the backend is present.\n\n**Answer:**\nRun `python -c \"import torch; print(torch.backends.xpu.is_available())\"` and verify the output is `True`."
+    },
+    "synth_elapsed_s": 3.60772442817688
+  },
+  {
+    "qid": "c2-vllm-tp",
+    "answer": "**Reasoning:**\nBoth experts agree that the `--shard 12` argument is the one that shards the model across all 12 tiles. Expert C2 provides a single-node launch command, but it does not include the `--shard 12` argument. Expert C3 provides a command that includes the `--shard 12` argument, but it is part of a more complex command that includes `mpirun` and a script. However, the `--shard 12` argument is the key to sharding the model across all 12 tiles. Therefore, the most relevant information is the argument that shards the model, which is consistent across both experts.\n\n**Answer:**\nUse `mpirun -n 1 gpu_tile_compact.sh vllm_train --shard 12`; the `--shard 12` flag distributes the model across all 12 PVC tiles.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text provides a single‑node launch command.\n2. The command includes the argument `--tensor-parallel-size 12`.\n3. This argument tells vLLM to split the model across 12 tiles.\n4. No other arguments are required for single‑node execution.\n\n**Answer:**\nUse `vllm serve --tensor-parallel-size 12` to launch vLLM on a single node with the model split across all 12 tiles.",
+      "C3": "**Reasoning:**\n1. The command for a single node is `mpirun -n 1 gpu_tile_compact.sh vllm_train --shard 12`.\n2. The `--shard 12` flag tells vLLM to split the model across 12 tiles.\n3. The `-n 1` flag requests one MPI rank, matching the single‑node configuration.\n4. The `gpu_tile_compact.sh` script likely sets up the GPU environment.\n5. Therefore, the argument `--shard 12` is the one that shards the model across all 12 tiles.\n\n**Answer:**\nUse `mpirun -n 1 gpu_tile_compact.sh vllm_train --shard 12`; the `--shard 12` flag distributes the model across all 12 PVC tiles."
+    },
+    "synth_elapsed_s": 5.296092748641968
+  },
+  {
+    "qid": "c2-deepspeed-aurora",
+    "answer": "**Reasoning:**\nBoth experts agree that DeepSpeed needs to use a specific backend for collective communications across PVC tiles on Aurora. Expert C2 explicitly states that the `xccl` backend is required, while Expert C3 recommends the `CCL` backend. However, upon closer inspection, it appears that `xccl` is actually a variant of the CCL library, optimized for use on Intel architectures like Aurora. Therefore, the experts are essentially saying the same thing, with Expert C2 providing more specific information about the implementation.\n\n**Answer:**\nDeepSpeed should use the `xccl` backend for collective communications across PVC tiles on Aurora.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text specifies that DeepSpeed must use the `xccl` backend for collective communications.\n2. It also notes that the default `ccl` backend is not supported on Aurora.\n3. Therefore, any DeepSpeed job on Aurora must be configured to use `xccl` for collectives.\n\n**Answer:**\nDeepSpeed must use the `xccl` backend for collective communications on Aurora.",
+      "C3": "**Reasoning:**\n1. The text states that collective communications across PVC tiles are handled by the CCL backend.\n2. It explicitly says: \"CCL is the recommended backend for collective communications across PVC tiles.\"\n3. No other backend is mentioned for this purpose.\n4. Therefore, CCL is the required backend.\n\n**Answer:**\nDeepSpeed should use the CCL backend for collective communications across PVC tiles on Aurora."
+    },
+    "synth_elapsed_s": 3.7281224727630615
+  },
+  {
+    "qid": "c2-megatron-launch",
+    "answer": "**Reasoning:**\n1. Both experts agree that the launcher pattern is used to bind one rank per PVC tile for Megatron-DeepSpeed on Aurora.\n2. Expert C2 provides a specific launcher pattern `--launcher pattern=pmix:rank:tile` that achieves this binding, and Expert C3 mentions that the `mpi` launcher pattern also binds one rank per PVC tile.\n3. However, Expert C2's pattern is more specific and detailed, indicating a more precise control over the binding process.\n4. Given the importance of accurate binding in high-performance computing, it's reasonable to prioritize the more specific and detailed information provided by Expert C2.\n\n**Answer:**\nThe launcher pattern `--launcher pattern=pmix:rank:tile` binds one rank per PVC tile for Megatron-DeepSpeed on Aurora.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text specifies that the launcher pattern for Megatron-DeepSpeed on Aurora is `--launcher pattern=pmix:rank:tile`.\n2. This pattern tells the launcher to bind each rank to a specific tile using the PMIX scheduling system.\n3. The use of `tile` as the binding dimension ensures one rank per tile.\n4. No other launcher pattern is mentioned for this workload.\n\n**Answer:**\nThe launcher pattern `--launcher pattern=pmix:rank:tile` binds one rank per tile for Megatron-DeepSpeed on Aurora.",
+      "C3": "**Reasoning:**\n1. The text states that the launcher pattern for Megatron-DeepSpeed on Aurora is `mpi`.\n2. It also specifies that the `mpi` launcher binds one rank per PVC tile.\n3. Therefore, the pattern `mpi` is the one that achieves the desired rank‑to‑tile binding.\n\n**Answer:**\nThe `mpi` launcher pattern binds one rank per PVC tile for Megatron-DeepSpeed on Aurora."
+    },
+    "synth_elapsed_s": 4.769994497299194
+  },
+  {
+    "qid": "c2-jupyter-port",
+    "answer": "**Reasoning:**\nBoth experts agree that Jupyter notebooks can be run on Aurora compute nodes and accessed from a laptop. Expert C2 emphasizes the need for SSH tunneling to access the notebook from outside the Aurora network, while Expert C3 focuses on starting the Jupyter service on the compute node and connecting to it via a URL. However, both approaches ultimately aim to enable remote access to the notebook. To reconcile the differences, we can combine the steps: start the Jupyter service on the compute node, which will provide a URL to access the notebook, and then use SSH tunneling to securely connect to that URL from the laptop.\n\n**Answer:**\nStart the Jupyter service on the Aurora compute node, then use SSH tunneling to securely connect to the URL provided by the service from your laptop.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2, C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text says Jupyter notebooks can be run on compute nodes.\n2. It also mentions that SSH tunneling is required to access them from outside the Aurora network.\n3. Therefore, the recommended approach is to SSH into the compute node, start the Jupyter server, and then tunnel the notebook port back to the local machine.\n4. This allows the user to open the notebook in a browser on their laptop while the computation runs on the node.\n\n**Answer:**\nSSH into the compute node, start Jupyter, and set up an SSH tunnel to forward the notebook port to your laptop so you can access it remotely.",
+      "C3": "**Reasoning:**\n1. The text says Jupyter notebooks can be run on compute nodes.\n2. It also mentions that users can connect from their laptops.\n3. The recommended pattern is to first start the Jupyter service on the compute node.\n4. Then, from the laptop, use the browser to connect to the URL provided by the service.\n5. This two‑step process satisfies both requirements.\n\n**Answer:**\nStart the Jupyter service on the Aurora compute node, then use your laptop’s browser to connect to the URL shown."
+    },
+    "synth_elapsed_s": 4.613909721374512
+  },
+  {
+    "qid": "c2-frameworks-module",
+    "answer": "**Reasoning:**\n1. The `module load frameworks` command is used to load the Aurora PE (Platform Environment).\n2. The Aurora PE includes a set of frameworks that provide access to various tools and libraries, including Julia, oneAPI, and MPICH.\n3. Loading the frameworks module also makes the DDT and gdb-oneapi debuggers available for use.\n4. The module is available in the default Aurora environment, making it easily accessible to users.\n\n**Answer:**\nLoading the `frameworks` module provides access to Julia, oneAPI, MPICH, DDT, and gdb-oneapi, and is available in the default Aurora environment.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text states that `module load frameworks` loads the Aurora PE.\n2. The Aurora PE includes Julia, oneAPI, and MPICH.\n3. Therefore, loading the frameworks module provides access to these three components.\n4. No additional action is required beyond loading the module.\n\n**Answer:**\nIt loads the Aurora PE, giving you access to Julia, oneAPI, and MPICH.",
+      "C3": "**Reasoning:**\n1. The text states that loading the frameworks module provides the DDT and gdb-oneapi debuggers.\n2. It also mentions that the module is available in the default Aurora environment.\n3. Therefore, after loading, the debuggers become available for use.\n\n**Answer:**\nIt loads the DDT and gdb-oneapi debuggers, making them available for debugging on Aurora."
+    },
+    "synth_elapsed_s": 3.8129289150238037
+  },
+  {
+    "qid": "c2-tf-xpu",
+    "answer": "**Reasoning:**\nBoth experts agree that TensorFlow is available on Aurora with Intel GPU support. They also agree that no additional installation steps are required beyond loading the module, as it is pre-configured. The experts' answers are consistent in stating that loading the `tensorflow` module will provide access to the Intel-optimized version of TensorFlow. Therefore, the most accurate and concise answer is to load the `tensorflow` module.\n\n**Answer:**\nLoad the `tensorflow` module, which provides the Intel-optimized version of TensorFlow on Aurora.",
+    "routing": [
+      "C2",
+      "C1"
+    ],
+    "router_reply": "C2,C1",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text states that TensorFlow is available on Aurora.\n2. It also mentions that TensorFlow with Intel GPU support is available.\n3. No additional installation steps are described, implying that the module provides the required version.\n4. Therefore, loading the appropriate TensorFlow module will give you the Intel‑enabled version.\n\n**Answer:**\nLoad the TensorFlow module on Aurora, which includes an Intel GPU‑enabled version.",
+      "C1": "**Reasoning:**\n1. The text states that Aurora provides pre‑configured environments for popular scientific packages.\n2. It specifically mentions that TensorFlow is one of the pre‑configured packages.\n3. Since the environment is pre‑configured, no additional installation steps are required beyond loading the module.\n4. Loading the `tensorflow` module will give access to the Intel‑optimized version.\n\n**Answer:**\nLoad the `tensorflow` module, which provides the Intel‑optimized version of TensorFlow on Aurora."
+    },
+    "synth_elapsed_s": 3.085031747817993
+  },
+  {
+    "qid": "c2-sklearn-intelex",
+    "answer": "**Reasoning:**\nBoth experts agree that scikit-learn computations on Aurora are accelerated by Intel-optimized kernels. They also concur that these kernels are enabled by default, requiring no additional configuration steps. The experts' responses are consistent in their conclusion that the acceleration is automatic when using scikit-learn on Aurora.\n\n**Answer:**\nScikit-learn computations on Aurora automatically use Intel-optimized kernels, which are enabled by default, requiring no extra steps.",
+    "routing": [
+      "C1",
+      "C2"
+    ],
+    "router_reply": "C1, C2",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text mentions that scikit-learn can be accelerated on Aurora.\n2. It specifies that the acceleration is provided by Intel-optimized kernels.\n3. No additional configuration steps are described.\n4. Therefore, the acceleration is enabled by default when using scikit-learn on Aurora.\n\n**Answer:**\nScikit-learn computations on Aurora are accelerated by default with Intel‑optimized kernels.",
+      "C2": "**Reasoning:**\n1. The text mentions that scikit-learn on Aurora uses Intel-optimized kernels.\n2. It also states that these kernels are enabled by default.\n3. No additional configuration is required according to the passage.\n4. Therefore, simply using scikit-learn on Aurora automatically leverages the acceleration.\n\n**Answer:**\nScikit-learn on Aurora automatically uses Intel‑optimized kernels, which are enabled by default, so no extra steps are needed."
+    },
+    "synth_elapsed_s": 2.6804418563842773
+  },
+  {
+    "qid": "c2-dask-jobqueue",
+    "answer": "**Reasoning:**\n1. Both experts agree that the question is about submitting Dask workers as PBS jobs on Aurora.\n2. Expert C3 provides a clear statement that the MPI backend is used for this purpose, which is consistent with the environment.\n3. Expert C2's reasoning about the `PBS` backend is not directly relevant to submitting Dask workers as PBS jobs, but rather to the local scheduler.\n4. Since Expert C3's reasoning is more specific to the task at hand, it is the most relevant and accurate.\n\n**Answer:**\nUse the MPI backend to submit Dask workers as PBS jobs on Aurora.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2, C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text specifies that the Aurora example uses the `local` scheduler with a `PBS` backend.\n2. The `PBS` backend is the mechanism that integrates Dask with the PBS scheduler.\n3. Therefore, the recommended backend for this environment is `PBS`.\n\n**Answer:**\nUse the `PBS` backend.",
+      "C3": "**Reasoning:**\n1. The text states that Dask can be used to submit Dask workers as PBS jobs on Aurora.\n2. It specifies that the **MPI** backend is used for this purpose.\n3. No other backends are mentioned for PBS job submission.\n4. Therefore, the MPI backend is the appropriate choice.\n\n**Answer:**\nUse the MPI backend to submit Dask workers as PBS jobs on Aurora."
+    },
+    "synth_elapsed_s": 3.626185417175293
+  },
+  {
+    "qid": "c2-pyg-xpu",
+    "answer": "**Reasoning:**\nBoth experts agree that PyTorch Geometric (PyG) is compatible with the Aurora XPU backend. Expert C1 provides a more detailed explanation of the compatibility, stating that it is achieved through the library's data structures and computation being executable on Aurora's hardware. This is consistent with Expert C2's mention of the `torch_geometric` module facilitating compatibility. Therefore, we can conclude that PyG tensors and models can be used with the Aurora XPU backend.\n\n**Answer:**\nYes, PyTorch Geometric tensors and models are compatible with the Aurora XPU backend.",
+    "routing": [
+      "C2",
+      "C1"
+    ],
+    "router_reply": "C2,C1",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text explicitly says PyG is compatible with the Aurora XPU backend.\n2. It also mentions that the compatibility is achieved through the `torch_geometric` module.\n3. Therefore, PyG can utilize the Aurora XPU for computation.\n\n**Answer:**\nYes, PyG can run on the Aurora XPU backend via the `torch_geometric` module.",
+      "C1": "**Reasoning:**\n1. The text states that PyTorch Geometric is a set of tools for geometric deep learning.\n2. It also mentions that the library is compatible with the Aurora XPU backend.\n3. Compatibility means the library’s data structures and computation can be executed on Aurora’s hardware.\n4. Therefore, PyG tensors and models can be used with the Aurora XPU backend.\n\n**Answer:**\nYes, PyTorch Geometric tensors and models are compatible with the Aurora XPU backend."
+    },
+    "synth_elapsed_s": 3.5009686946868896
+  },
+  {
+    "qid": "c2-oneccl-backend",
+    "answer": "**Reasoning:**\n1. Both experts agree that the `backend` argument is necessary for multi-node training on Aurora.\n2. Expert C2 states that the default backend is `xccl` and it's used for multi-node training, while Expert C3 lists `ccl` as the recommended backend for multi-node training.\n3. However, upon closer inspection, Expert C2's response is more specific about the default backend being `xccl` for multi-node training, which implies that it's the default and recommended choice.\n4. Since Expert C2's response is more specific and detailed about the default backend for multi-node training, it's more authoritative.\n\n**Answer:**\nUse `backend='xccl'` for multi-node training.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text specifies that the default backend is `xccl`.\n2. It also states that this backend is used for multi‑node training.\n3. No other backend is mentioned for multi‑node.\n4. Therefore, the appropriate argument for multi‑node is `backend='xccl'`.\n\n**Answer:**\nUse `backend='xccl'` for multi‑node training.",
+      "C3": "**Reasoning:**\n1. The text lists the available backends as `ccl` and `mpi`.\n2. It explicitly states that `ccl` is the recommended backend for multi-node training.\n3. Therefore, to enable multi-node training, the `backend` argument must be set to `ccl`.\n\n**Answer:**\nUse the `ccl` backend."
+    },
+    "synth_elapsed_s": 4.309260606765747
+  },
+  {
+    "qid": "c2-libtorch-cpp",
+    "answer": "**Reasoning:**\nBoth experts agree that the model is loaded using `torch::jit::load`, and the `forward` method is called on the loaded model with a tensor. However, there is a discrepancy regarding the device. Expert C2 explicitly mentions that the example runs on a PVC GPU, indicated by the device string `torch::kXPU`, while Expert C1 incorrectly states that the code runs on the CPU of the PVC GPU. Given the context of the question, which specifically asks about running on a PVC GPU, I will prioritize Expert C2's answer.\n\n**Answer:**\nUse `torch::jit::load` to load the TorchScript model, create a tensor matching the model’s input shape, and call `forward` on that tensor with the device set to `torch::kXPU`.",
+    "routing": [
+      "C2",
+      "C1"
+    ],
+    "router_reply": "C2, C1",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text provides a C++ example that loads a TorchScript model.\n2. It uses `torch::jit::load` to load the model from a file.\n3. After loading, it creates a tensor with the same shape as the model’s input.\n4. The model is then executed with `forward` on that tensor.\n5. The example runs on a PVC GPU, as shown by the device string `torch::kXPU`.\n\n**Answer:**\nUse `torch::jit::load` to load the TorchScript model, create a tensor matching the model’s input shape, and call `forward` on that tensor with the device set to `torch::kXPU`.",
+      "C1": "**Reasoning:**\n1. The text shows a C++ code snippet that loads a model.\n2. The model is loaded with `torch::jit::load(\"model.pt\")`.\n3. The code then calls `forward` on the loaded model, passing in a tensor.\n4. The example runs on a PVC GPU because the code uses `torch::Device(torch::kCPU, 0)` to select the device.\n5. Therefore, the steps are to load the model with `torch::jit::load` and then call `forward` on the model with a tensor, all on the CPU of the PVC GPU.\n\n**Answer:**\nLoad the model with `torch::jit::load(\"model.pt\")` and then call `forward` on the model with a tensor, running on the CPU of the PVC GPU."
+    },
+    "synth_elapsed_s": 4.698757648468018
+  },
+  {
+    "qid": "c2-vllm-which-image",
+    "answer": "**Reasoning:**\nExpert C2 provides a clear and concise answer that is consistent with the format of the question, specifying the recommended vLLM build and the module to load it from. Expert C3 provides a detailed install path, but it is unclear why this path is necessary, and the build version mentioned is not consistent with the recommended version from Expert C2. Given the format of the question, it seems to be asking for a simple answer, and Expert C2's answer is more suitable for this format.\n\n**Answer:**\nUse vLLM version `v0.20.0`, which is available via the `frameworks` module.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text specifies that the recommended vLLM build for Aurora is `v0.20.0`.\n2. It also states that this build is available via the `frameworks` module.\n3. No other build versions are mentioned for Aurora.\n4. Therefore, the correct build is `v0.20.0` and it can be loaded through the `frameworks` module.\n\n**Answer:**\nUse vLLM version `v0.20.0`, which is available via the `frameworks` module.",
+      "C3": "**Reasoning:**\n1. The text states that the vLLM build used on Aurora is \"vLLM 0.0.0-23-g9f2ed86\".\n2. It also provides the install path: \"/soft/aurora/24.180.3/24.182.0/24.183.0/24.184.0/24.185.0/24.186.0/24.187.0/24.188.0/24.189.0/24.190.0/24.191.0/24.192.0/24.193.0/24.194.0/24.195.0/24.196.0/24.197.0/24.198.0/24.199.0/24.200.0/24.201.0/24.202.0/24.203.0/24.204.0/24.205.0/24.206.0/24.207.0/24.208.0/24.209.0/24.210.0/24.211.0/24.212.0/24.213.0/24.214.0/24.215.0/24.216.0/24.217.0/24.218.0/24.219.0/24.220.0/24.221.0/24.222.0/24.223.0/24.224.0/24.225.0/24.226.0/24.227.0/24.228.0/24.229.0/24.230.0/24.231.0/24.232.0/24.233.0/24.234.0/24.235.0/24.236.0/24.237.0/24.238.0/24.239.0/24.240.0/24.241.0/24.242.0/24.243.0/24.244.0/24.245.0/24.246.0/24.247.0/24.248.0/24.249.0/24.250.0/24.251.0/24.252.0/24.253.0/24.254.0/24.255.0/24.256.0/24.257.0/24.258.0/24.259.0/24.260.0/24.261.0/24.262.0/24.263.0/24.264.0/24.265.0/24.266.0/24.267.0/24.268.0/24.269.0/24.270.0/24.271.0/"
+    },
+    "synth_elapsed_s": 3.9486196041107178
+  },
+  {
+    "qid": "c2-openvino",
+    "answer": "**Reasoning:**\nBoth experts agree that the inference runtime is a key component for deploying optimized models on the PVC GPUs. Expert C3 provides a more direct answer, mentioning Intel's inference runtime as part of the oneAPI, which is specifically designed to run on the PVC GPUs. This aligns with the information provided by Expert C2, who mentions that the Intel Extension for PyTorch, TensorFlow, and Scikit-learn is built on the Intel Data Center GPU Max 1550, which is the same hardware as the PVC GPUs. However, Expert C3's answer is more concise and directly addresses the question. Therefore, I will synthesize the answer from Expert C3.\n\n**Answer:**\nIntel's inference runtime is the provided oneAPI component for PVC GPU deployment.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text mentions that the \"Intel Extension for Scikit-learn\" is built on top of the \"Intel Extension for PyTorch\" and the \"Intel Extension for TensorFlow\".\n2. It also states that these extensions are built on the \"Intel(R) Extension for Scikit-learn, TensorFlow, and PyTorch\" which is further based on the \"Intel(R) Data Center GPU Max 1550\" (PVC) hardware.\n3. Therefore, the underlying runtime is the Intel Extension for PyTorch, TensorFlow, and Scikit-learn, which is optimized for the Intel Data Center GPU Max 1550.\n4. This runtime is the one that provides the optimized inference on the PVC GPUs.\n\n**Answer:**\nThe Intel Extension for PyTorch, TensorFlow, and Scikit-learn (built on the Intel Data Center GPU Max 1550) is the provided runtime.",
+      "C3": "**Reasoning:**\n1. The text lists Intel's oneAPI as a key component.\n2. It specifically mentions Intel's inference runtime as part of that oneAPI.\n3. This inference runtime is designed to run on the PVC GPUs.\n4. No other inference runtimes are mentioned.\n\n**Answer:**\nIntel's inference runtime is the provided oneAPI component for PVC GPU deployment."
+    },
+    "synth_elapsed_s": 4.517361879348755
+  },
+  {
+    "qid": "c3-pbs-script",
+    "answer": "**Reasoning:**\nBoth experts agree on the basic structure of the PBS script, including the PBS directives and the `mpiexec` command. However, there are some discrepancies in the syntax and options used. Expert C1 provides a more detailed and accurate explanation of the `mpiexec` command, using `--ppn` to specify the number of ranks per node and per socket. Expert C3 uses the `-np` option, which is a valid alternative, but less specific. The `qsub` command is not necessary in a batch script, as the script will be submitted directly to the scheduler. The `filesystems` option is correctly specified as `filesystems=home:flare` in both experts' answers. The `walltime` option is correctly specified as `walltime=0:60:00` in Expert C1's answer, which is more concise and accurate.\n\n**Answer:**\n```bash\n#!/bin/bash\n#PBS -l select=4\n#PBS -l walltime=0:60:00\n#PBS -q debug\n#PBS -A gpu_hack\n#PBS -l filesystems=home:flare\nmpiexec -n 96 --ppn 24./your_program\n```",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The script starts with `#PBS -l select=4` to request four nodes.\n2. `#PBS -l walltime=0:60:00` sets the job to run for 60 minutes.\n3. `#PBS -q debug` submits the job to the debug queue.\n4. `#PBS -A gpu_hack` allocates the `gpu_hack` project for charging.\n5. `#PBS -l filesystems=home:flare` provides access to the home and flare filesystems.\n6. The `mpiexec` command is placed after the PBS directives, using `--ppn 24` to start 24 MPI ranks per node, and `--ppn 4` to start 4 MPI ranks per socket, resulting in 96 ranks total.\n7. The script ends with `mpiexec -n 96./your_program` (replace with the actual executable).\n8. The final script combines all these directives in the correct order.\n\n**Answer:**\n```bash\n#!/bin/bash\n#PBS -l select=4\n#PBS -l walltime=0:60:00\n#PBS -q debug\n#PBS -A gpu_hack\n#PBS -l filesystems=home:flare\nmpiexec -n 96 --ppn 24./your_program\n```",
+      "C3": "**Reasoning:**\n1. The script must start with `#!/bin/bash`.\n2. The `qsub` command uses `-lselect=4` to request 4 nodes.\n3. The walltime is set with `-lwalltime=01:00:00` (60 minutes).\n4. The queue is specified as `-q debug`.\n5. The project is set with `-A gpu_hack`.\n6. Filesystems are listed as `-lfilesystems=home:flare`.\n7. The `mpiexec` command uses `-np 96` to launch 96 ranks.\n8. All these options are placed in the correct order after `qsub`.\n\n**Answer:**\n```bash\n#!/bin/bash\n#PBS -lselect=4\n#PBS -lwalltime=01:00:00\n#PBS -q debug\n#PBS -A gpu_hack\n#PBS -lfilesystems=home:flare\nmpiexec -np 96 <application>\n```"
+    },
+    "synth_elapsed_s": 7.332709550857544
+  },
+  {
+    "qid": "c3-mpiexec-oneppn",
+    "answer": "**Reasoning:**\nBoth experts agree that to launch exactly one MPI rank per node, we need to specify the total number of ranks and the number of ranks per node. Expert C1 calculates the total number of ranks by multiplying the number of nodes by the number of ranks per node, while Expert C3 uses the `--ppn` option to specify one rank per node. However, Expert C3's answer is more concise and directly addresses the question. We can use the `--ppn` option to specify the number of ranks per node, which is a more straightforward approach.\n\n**Answer:**\nRun `mpiexec -n 8 --ppn 1./a.out` to start one MPI rank per node on eight Aurora nodes.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The script sets `num_nodes=8` and `num_ranks_per_node=1`.\n2. The `mpiexec` command uses the `-n` option to specify the total number of ranks.\n3. The calculation `num_ranks=$((num_nodes*num_ranks_per_node))` computes the total ranks needed.\n4. The script passes this value to `mpiexec` as `-n $num_ranks`.\n5. With `num_ranks_per_node=1`, each node will run exactly one rank.\n\n**Answer:**\nSet `num_ranks=$((8*1))` and pass `-n $num_ranks` to `mpiexec`; this will launch one rank per node across eight nodes.",
+      "C3": "**Reasoning:**\n1. The text provides a command for one rank per node.\n2. The command is `mpiexec -n 8 --ppn 1./a.out`.\n3. `-n 8` requests a total of 8 ranks.\n4. `--ppn 1` tells mpiexec to place one rank on each node.\n5. The application binary is `./a.out`.\n\n**Answer:**\nRun `mpiexec -n 8 --ppn 1./a.out` to start one MPI rank per node on eight Aurora nodes."
+    },
+    "synth_elapsed_s": 4.306703567504883
+  },
+  {
+    "qid": "c3-ze-affinity",
+    "answer": "**Reasoning:**\nBoth experts agree that ZE_AFFINITY_MASK restricts the visible GPU resources. Expert C1 explains that it's a colon-delimited list of GPU IDs and tile IDs, while Expert C3 provides a specific example of how to set it to limit a process to a single tile. Expert C3's example is more concise and directly addresses the question, making it the most relevant answer.\n\n**Answer:**\nZE_AFFINITY_MASK restricts visible GPUs; setting it to \"0.0\" makes the process see only tile 0 of GPU 1.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text explains that ZE_AFFINITY_MASK restricts the visible GPU resources.\n2. It is a colon‑delimited list of GPU IDs and tile IDs, e.g., \"GPU=1.TILE=0\".\n3. By setting it to \"GPU=1.TILE=0\", the process is told to consider only tile 0 of GPU 1.\n4. No other GPUs or tiles are listed, so the mask effectively hides them.\n\n**Answer:**\nZE_AFFINITY_MASK restricts visible GPUs to the specified IDs; setting it to \"GPU=1.TILE=0\" limits the process to tile 0 of GPU 1.",
+      "C3": "**Reasoning:**\n1. The text explains that ZE_AFFINITY_MASK restricts the visible GPUs to those listed.\n2. To see only a single tile, the mask must contain exactly that tile.\n3. The example for GPU 1 tile 0 is \"ZE_AFFINITY_MASK=0.0\".\n4. Setting this variable to \"0.0\" therefore limits the process to tile 0 of GPU 1.\n\n**Answer:**\nZE_AFFINITY_MASK restricts visible GPUs; setting it to \"0.0\" makes the process see only tile 0 of GPU 1."
+    },
+    "synth_elapsed_s": 3.436094284057617
+  },
+  {
+    "qid": "c3-tile-compact",
+    "answer": "**Reasoning:**\n1. gpu_tile_compact.sh is a script provided in the Aurora PE (as per Expert C1).\n2. It sets environment variables that help MPI locate GPU tiles (Expert C1).\n3. These environment variables are essential for MPI to bind ranks to specific GPU tiles (Expert C1).\n4. The script serves as an entry point for MPI jobs that require GPU resources (Expert C3).\n5. Therefore, gpu_tile_compact.sh is a wrapper script that sets environment variables necessary for MPI to utilize GPU resources on Aurora.\n\n**Answer:**\ngpu_tile_compact.sh is a wrapper script that sets environment variables necessary for MPI to utilize GPU resources on Aurora.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. gpu_tile_compact.sh is a script provided in the Aurora PE.\n2. It sets environment variables that help MPI locate GPU tiles.\n3. MPI uses these variables to bind ranks to specific GPU tiles.\n4. By running gpu_tile_compact.sh before mpiexec, MPI can correctly distribute work across the GPU.\n5. Therefore, the script is essential for proper GPU resource utilization.\n\n**Answer:**\ngpu_tile_compact.sh sets environment variables that allow MPI to bind ranks to GPU tiles, making it a required step for MPI launches on Aurora.",
+      "C3": "**Reasoning:**\n1. The text defines gpu_tile_compact.sh as a wrapper script.\n2. It explains that this script is used to launch MPI applications on Aurora.\n3. The script is described as a way to launch applications that use the GPU.\n4. Therefore, gpu_tile_compact.sh serves as an entry point for MPI jobs that require GPU resources.\n\n**Answer:**\ngpu_tile_compact.sh is a wrapper script that launches MPI applications on Aurora, enabling GPU usage."
+    },
+    "synth_elapsed_s": 3.967620372772217
+  },
+  {
+    "qid": "c3-flare-path",
+    "answer": "**Reasoning:**\n1. The export command provided by Expert C2 gives the path to the project directory: `export MY_PROJECT_PATH=/flare/project/aurora/your-username/your-project-name`. However, this path is specific to the user's environment and may not be directly applicable to the question.\n2. Expert C3 provides a more general path to the project directory: `/lus/flare/projects/Aurora/...`, which is consistent with the typical Lustre filesystem structure.\n3. For large files, both experts agree on the importance of setting the stripe count, but Expert C3 provides a more concise and consistent recommendation: `lfs setstripe -c 64 /lus/flare/projects/Aurora/...`.\n\n**Answer:**\nThe path to your Aurora project directory is `/lus/flare/projects/Aurora/...` and for very large files, you should run `lfs setstripe -c 64 /lus/flare/projects/Aurora/...`.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text provides the export command: `export MY_PROJECT_PATH=/flare/project/aurora/your-username/your-project-name`.\n2. It also gives a specific `lfs setstripe` recommendation: `lfs setstripe -c 1048 -I 512 -l 512m -L 512m -m 512m -o 1048 -p 1048 -s 1048 -t 1048 -u 1048 -v 1048 -V 1048 -z 1048 -C 1048 -D 1048 -E 1048 -F 1048 -G 1048 -H 1048 -I 1048 -J 1048 -K 1048 -L 1048 -M 1048 -N 1048 -O 1048 -P 1048 -Q 1048 -R 1048 -S 1048 -T 1048 -U 1048 -W 1048 -X 1048 -Y 1048 -Z 1048 -c 1048 -d 1048 -e 1048 -f 1048 -g 1048 -h 1048 -i 1048 -k 1048 -l 1048 -m 1048 -n 1048 -o 1048 -p 1048 -q 1048 -r 1048 -s 1048 -t 1048 -u 1048 -v 1048 -w 1048 -x 1048 -y 1048 -z 1048 -C 1048 -D 1048 -E 1048 -F 1048 -G 1048 -H 1048 -I 1048 -J 1048 -K 1048 -L 1048 -M 1048 -N 1048 -O 1048 -P 1048 -Q 1048 -R 1048 -S 1048 -T 1048 -U 1048 -W 1048 -X 1048 -Y 1048 -Z 1048 -c 1048 -d 1048 -e 1048 -f 1048 -g 1048 -h 1048 -i 1048 -k 1048 -l 1048 -m 1048 -n 1048 -o 1048 -p 1048 -q 1048 -r 1048 -s 1048 -t 1048 -u 1048 -v 1048 -w 1048 -x 1048 -y 1048 -z 1048 -C 1048 -D 1048 -E 1048 -F 1048 -G",
+      "C3": "**Reasoning:**\n1. The text states that the project directory is located at `/lus/flare/projects/Aurora/...`.\n2. It also provides a recommendation for large files: `lfs setstripe -c 64 /lus/flare/projects/Aurora/...`.\n3. Combining these two pieces of information gives the full path and the suggested stripe count.\n\n**Answer:**\nThe project directory is at `/lus/flare/projects/Aurora/...` and for large files you should run `lfs setstripe -c 64 /lus/flare/projects/Aurora/...`."
+    },
+    "synth_elapsed_s": 5.851975917816162
+  },
+  {
+    "qid": "c3-lfs-getstripe",
+    "answer": "**Reasoning:**\n1. The text provides a command for inspecting the Lustre stripe layout.\n2. The command is `daos container get-prop ${DAOS_POOL} ${DAOS_CONT}`.\n3. This command retrieves properties of the specified container, which includes the stripe layout.\n4. Running it will display the current layout, allowing verification.\n\n**Answer:**\nRun `daos container get-prop ${DAOS_POOL} ${DAOS_CONT}` to view the current Lustre stripe layout.",
+    "routing": [
+      "C3"
+    ],
+    "router_reply": "C3",
+    "expert_answers": {
+      "C3": "**Reasoning:**\n1. The text provides a command for inspecting the Lustre stripe layout.\n2. The command is `daos container get-prop ${DAOS_POOL} ${DAOS_CONT}`.\n3. This command retrieves properties of the specified container, which includes the stripe layout.\n4. Running it will display the current layout, allowing verification.\n\n**Answer:**\nRun `daos container get-prop ${DAOS_POOL} ${DAOS_CONT}` to view the current Lustre stripe layout."
+    },
+    "synth_elapsed_s": 0.0
+  },
+  {
+    "qid": "c3-daos-pool",
+    "answer": "**Reasoning:**\nExpert C1 provides a clear and concise step-by-step guide to creating a POSIX container and mounting it via dfuse. However, Expert C3 provides additional context on creating the DAOS pool and obtaining the mount point path, which is essential for a complete workflow. To synthesize the experts' responses, we can combine the steps from both experts. First, we need to ensure the DAOS pool exists, which can be done by creating it if it doesn't exist. Then, we can create a POSIX container within the pool. To mount the container, we need to obtain the mount point path using `mount | grep dfuse` and execute the mount command using `launch-dfuse.sh`. This approach ensures a complete and accurate workflow.\n\n**Answer:**\nCreate the DAOS pool (if needed) with `daos pool create <pool_name> <pool_size>`, then create a POSIX container within the pool with `daos container create --type=POSIX <pool_name> <cont_name>`. Obtain the mount point path with `mount | grep dfuse` and finally execute `launch-dfuse.sh <mount_point>` to mount the container.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text shows a command `daos create -t posix -s 1G -n my_container` to create a POSIX container named `my_container` with a size of 1 GB.\n2. It then uses `dfuse mount` to mount the container on a compute node.\n3. The exact compute node is not specified, but the command format is provided as `dfuse mount -o rw,uid=1000,gid=1000 <container> /mnt`.\n4. Combining these steps gives the full workflow.\n\n**Answer:**\nCreate the container with `daos create -t posix -s 1G -n my_container` and then mount it on a compute node with `dfuse mount -o rw,uid=1000,gid=1000 my_container /mnt`.",
+      "C3": "**Reasoning:**\n1. First, ensure the DAOS pool exists; if not, create it with `daos pool create <pool_name> <pool_size>`.\n2. Create a POSIX container within the pool using `daos container create --type=POSIX <pool_name> <cont_name>`.\n3. Obtain the mount point path with `mount | grep dfuse`.\n4. Execute the mount command using the path from step 3: `launch-dfuse.sh <mount_point>`.\n5. Verify the mount succeeded by checking `mount | grep dfuse` again.\n\n**Answer:**\nCreate the pool (if needed), then run `daos container create --type=POSIX <pool_name> <cont_name>`; get the mount point with `mount | grep dfuse`; and finally execute `launch-dfuse.sh <mount_point>` to mount the container."
+    },
+    "synth_elapsed_s": 6.765665292739868
+  },
+  {
+    "qid": "c3-dfuse-options",
+    "answer": "**Reasoning:**\n1. The experts agree that dfuse options can improve performance for a metadata-heavy workload reading many small files from a DAOS POSIX container on Aurora.\n2. Expert C1 emphasizes the importance of metadata handling for small-file workloads, suggesting that options should focus on metadata caching, prefetching, or parallel I/O.\n3. Expert C3 provides specific options that address both cache locality and read ordering, which are relevant to metadata-heavy workloads.\n4. The options listed by Expert C3 (`cache_dir=/tmp`, `use_in_order=1`, and `max_read_ahead=131072`) are consistent with the goal of reducing metadata overhead and improving performance.\n\n**Answer:**\nUse `cache_dir=/tmp`, `use_in_order=1`, and `max_read_ahead=131072` together to optimize performance for a metadata-heavy workload.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text notes that DAOS is optimized for large‑scale metadata‑intensive workloads.\n2. It also mentions that the DAOS POSIX interface is designed for compatibility rather than performance.\n3. For small‑file workloads, the text recommends using the dfuse options to improve performance.\n4. The options are not specified, but the context implies they should enhance metadata handling.\n5. Therefore, the options should focus on metadata caching, prefetching, or parallel I/O to reduce overhead.\n\n**Answer:**\nUse dfuse options that enhance metadata caching, prefetching, or parallel I/O to improve performance for small‑file workloads on DAOS POSIX.",
+      "C3": "**Reasoning:**\n1. The text lists three options for improving performance.\n2. The first option is `cache_dir=/tmp`, which moves the cache to a faster temporary directory.\n3. The second option is `use_in_order=1`, which forces reads to occur in the order written, reducing metadata storms.\n4. The third option is `max_read_ahead=131072`, which increases the amount of data read ahead, further reducing metadata overhead.\n5. Combining these three options addresses both cache locality and read ordering.\n\n**Answer:**\nUse `cache_dir=/tmp`, `use_in_order=1`, and `max_read_ahead=131072` together to optimize performance for a metadata‑heavy workload."
+    },
+    "synth_elapsed_s": 5.026951789855957
+  },
+  {
+    "qid": "c3-globus-endpoint",
+    "answer": "**Reasoning:**\nExpert C2 provides information about the endpoint name, which is consistent with the general knowledge about Globus endpoints. Expert C3 provides information about the writable location, but the endpoint name is not consistent with the general knowledge. However, the location `/lus/flare/projects/...` is not mentioned in Expert C2, so it's possible that this is a specific project or directory within the home directory. Given the domain relevance, I will prioritize Expert C2's information about the endpoint name, but consider Expert C3's information about the writable location as a possible subdirectory within the home directory.\n\n**Answer:**\nThe endpoint name is \"aurora.alcf.anl.gov\", and you can write to your home directory, specifically to a subdirectory such as `/lus/flare/projects/...`.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text states that the login node provides access to the Aurora Globus endpoint.\n2. It gives the endpoint name as \"aurora.alcf.anl.gov\".\n3. It also specifies that the home directory is available for writing.\n4. Combining these points gives the endpoint name and the writable location.\n\n**Answer:**\nThe endpoint name is \"aurora.alcf.anl.gov\", and you can write to your home directory.",
+      "C3": "**Reasoning:**\n1. The text states that the endpoint for Aurora is `aurora-uan-0013`.\n2. It also specifies that the destination path for writing data is `/lus/flare/projects/...`.\n3. Combining these two pieces of information gives the full endpoint and write location.\n\n**Answer:**\nUse the endpoint `aurora-uan-0013` and write data to `/lus/flare/projects/...`."
+    },
+    "synth_elapsed_s": 4.703298330307007
+  },
+  {
+    "qid": "c3-datamover",
+    "answer": "**Reasoning:**\n1. Both experts agree that the ALCF Datamover service is a dedicated service for file transfers.\n2. Expert C3 specifically notes that the service is for moving data between Lustre and non-Lustre filesystems, which is a key aspect of its functionality.\n3. Both experts recommend using the Datamover service instead of running Globus from a login node, particularly for large-scale data movements.\n4. Expert C1 emphasizes the preference for the Datamover service for large-scale file transfers, which aligns with the general recommendation to use the Datamover for cross-filesystem transfers.\n\n**Answer:**\nThe ALCF Datamover service is a dedicated service for moving data between Lustre and non-Lustre filesystems; you should use it instead of running Globus from a login node, especially for large-scale data movements.",
+    "routing": [
+      "C3",
+      "C1"
+    ],
+    "router_reply": "C3,C1",
+    "expert_answers": {
+      "C3": "**Reasoning:**\n1. The text defines the Datamover as a service that can move data between Lustre and non‑Lustre filesystems.\n2. It notes that the service is not running on the login nodes.\n3. It advises using the service when moving data between Lustre and non‑Lustre locations.\n4. Therefore, the Datamover is a dedicated service for cross‑filesystem transfers, and you should use it instead of Globus on the login nodes for those specific scenarios.\n\n**Answer:**\nThe ALCF Datamover is a dedicated service for moving data between Lustre and non‑Lustre filesystems; you should use it for those transfers rather than running Globus from a login node.",
+      "C1": "**Reasoning:**\n1. The text mentions the ALCF Datamover service as a way to transfer files.\n2. It is described as a dedicated service for file transfers.\n3. Using the Datamover service is recommended for large‑scale data movements.\n4. Running Globus from a login node is discouraged for such transfers.\n5. Therefore, the Datamover service is the preferred method for large‑scale file transfers.\n\n**Answer:**\nThe ALCF Datamover service is a dedicated service for large‑scale file transfers; you should use it instead of running Globus from a login node for such operations."
+    },
+    "synth_elapsed_s": 5.026820421218872
+  },
+  {
+    "qid": "c3-copper",
+    "answer": "**Reasoning:**\n1. Both experts agree that Copper solves a problem related to performance on Aurora.\n2. Expert C2 mentions that Copper provides predictable and high performance for specific frameworks (scikit-learn and TensorFlow), while Expert C3 highlights Copper's ability to reduce repeated reads of shared libraries and Python modules, leading to faster startup and lower filesystem load.\n3. These two points are related, as repeated reads of shared libraries and Python modules can lead to inconsistent performance.\n4. Therefore, Copper's primary purpose is to provide a solution to inconsistent performance on Aurora by reducing repeated reads of shared libraries and Python modules, which is particularly beneficial for scikit-learn and TensorFlow workloads.\n\n**Answer:**\nCopper solves the problem of inconsistent performance on Aurora by reducing repeated reads of shared libraries and Python modules, and you should use it for scikit-learn and TensorFlow workloads that require predictable, high performance.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text describes Copper as a library that solves the problem of inconsistent performance across different hardware types on Aurora.\n2. It is designed to provide predictable and high performance for scikit-learn and TensorFlow workloads.\n3. Therefore, you should use Copper when you need reliable, hardware‑agnostic performance on Aurora for those frameworks.\n\n**Answer:**\nCopper fixes inconsistent performance on Aurora and should be used for scikit-learn and TensorFlow workloads that require predictable, high performance.",
+      "C3": "**Reasoning:**\n1. The text states that Copper is a read‑only, distributed cache for shared libraries and Python modules.\n2. It mentions that many applications on Aurora read the same files repeatedly.\n3. By caching these files, Copper reduces the number of times the filesystem is accessed.\n4. This leads to faster startup and lower filesystem load.\n5. Therefore, Copper is appropriate whenever an application repeatedly reads the same shared libraries or Python modules.\n\n**Answer:**\nCopper solves the repeated reads of shared libraries and Python modules on Aurora, and you should use it whenever your application loads the same files many times."
+    },
+    "synth_elapsed_s": 5.199842929840088
+  },
+  {
+    "qid": "c3-gdb-oneapi",
+    "answer": "**Reasoning:**\nBoth experts agree that the debugger should be able to handle SYCL kernels and PVC GPU code. Expert C1 mentions that the oneAPI tools include a debugger, which is designed for this purpose. Expert C3 specifically states that Linaro DDT can step through SYCL kernels and debug PVC GPU kernels. However, Expert C1's reasoning is more general and consistent with the oneAPI framework, which is the primary framework for programming the Aurora supercomputer. Therefore, the most domain-relevant expert is Expert C1.\n\n**Answer:**\nYou should use the oneAPI debugger to step through SYCL kernels on a PVC GPU.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text mentions that SYCL programs can be debugged using the oneAPI tools.\n2. It specifically states that the oneAPI tools include a debugger.\n3. Since the program is running on a PVC GPU, the debugger must be able to handle GPU code.\n4. The oneAPI debugger is designed for this purpose.\n5. Therefore, the oneAPI debugger is the tool to use for kernel debugging.\n\n**Answer:**\nYou should use the oneAPI debugger to step through SYCL kernels on a PVC GPU.",
+      "C3": "**Reasoning:**\n1. The text states that the Linaro DDT debugger can step through SYCL kernels.\n2. It also mentions that DDT can debug PVC GPU kernels.\n3. Therefore, DDT is the appropriate debugger for both kernel types.\n4. No other debugger is mentioned for this purpose.\n\n**Answer:**\nUse Linaro DDT to step through SYCL kernels on the PVC GPU."
+    },
+    "synth_elapsed_s": 3.729445219039917
+  },
+  {
+    "qid": "c3-ddt-debug",
+    "answer": "**Reasoning:**\n1. The text lists \"Parallel debugger: DDT (GUI) - MPI ranks across nodes\".\n2. DDT is described as having a graphical user interface.\n3. It is also stated to debug MPI ranks across nodes.\n4. No other debugger is mentioned with these characteristics.\n\n**Answer:**\nAurora provides DDT, a GUI parallel debugger that can debug MPI ranks across nodes.",
+    "routing": [
+      "C3"
+    ],
+    "router_reply": "C3",
+    "expert_answers": {
+      "C3": "**Reasoning:**\n1. The text lists \"Parallel debugger: DDT (GUI) - MPI ranks across nodes\".\n2. DDT is described as having a graphical user interface.\n3. It is also stated to debug MPI ranks across nodes.\n4. No other debugger is mentioned with these characteristics.\n\n**Answer:**\nAurora provides DDT, a GUI parallel debugger that can debug MPI ranks across nodes."
+    },
+    "synth_elapsed_s": 0.0
+  },
+  {
+    "qid": "c3-vtune-gpu",
+    "answer": "**Reasoning:**\n1. The experts agree that the command starts with either `./a.out` or `vtune`, but the latter is more specific to VTune, which is the tool used for profiling.\n2. Both experts agree that the `--collect=gpu-hotspots` option is necessary to collect a GPU hotspots profile.\n3. The target application is not specified in the question, so we should assume it is the current working directory, which is `./a.out`.\n4. The `-r` flag followed by a directory is not necessary for a one-line invocation, as the default output directory is usually the current working directory.\n\n**Answer:**\n`vtune --collect=gpu-hotspots./a.out`",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text shows a command line that runs `./a.out` under VTune.\n2. The command includes the option `-Kn` to select the GPU hotspots analysis.\n3. No other options are shown, so the minimal invocation is the line provided.\n4. The output will be a report showing the hottest GPU regions.\n\n**Answer:**\nRun `./a.out -Kn` to collect a GPU hotspots profile.",
+      "C3": "**Reasoning:**\n1. The text provides a single command line for GPU hotspots collection.\n2. The command begins with `vtune`.\n3. It includes the option `--collect=gpu-hotspots`.\n4. The target application is specified as `./Comp_GeoSeries_omp_mpicxx_DP`.\n5. The `-r` flag followed by `aps` designates the result directory.\n6. Combining these elements yields the full command.\n\n**Answer:**\n`vtune --collect=gpu-hotspots -r aps./Comp_GeoSeries_omp_mpicxx_DP`"
+    },
+    "synth_elapsed_s": 4.228095531463623
+  },
+  {
+    "qid": "c3-iprof",
+    "answer": "**Reasoning:**\nExpert C1 provides a good starting point by introducing `iprof` as a profiling tool on Aurora and its ability to view a kernel timeline. However, Expert C3 provides more specific information on how to use `iprof`, including the command to run it and the flags to use for a quick kernel timeline. Combining the information, it's clear that `iprof` is indeed Intel VTune Profiler, and Expert C3's command is the correct way to use it for a quick kernel timeline.\n\n**Answer:**\n`iprof` is Intel VTune Profiler; use `iprof -l -r <result_dir> <application> <args>` to collect a quick kernel timeline.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text introduces `iprof` as a profiling tool on Aurora.\n2. It mentions that `iprof` can be used to quickly view a kernel timeline.\n3. No additional configuration steps are provided, implying the tool is ready to use.\n4. Therefore, the user can simply run `iprof` after a job to view the timeline.\n\n**Answer:**\n`iprof` is a profiling tool on Aurora that lets you quickly view a kernel’s execution timeline.",
+      "C3": "**Reasoning:**\n1. The text defines `iprof` as Intel® VTune™ Profiler.\n2. It provides a command to run it: `iprof -l -r <result_dir> <application> <args>`.\n3. The `-l` flag requests a quick kernel timeline.\n4. The `-r` flag specifies the result directory.\n5. The rest of the command runs the application with its arguments.\n\n**Answer:**\n`iprof` is Intel VTune Profiler; use `iprof -l -r <result_dir> <application> <args>` to collect a quick kernel timeline."
+    },
+    "synth_elapsed_s": 4.214587450027466
+  },
+  {
+    "qid": "c3-xpu-smi",
+    "answer": "**Reasoning:**\n1. The text lists a command for GPU monitoring.\n2. The command begins with `xpu-smi`.\n3. It includes the `--version` flag to query the tool’s version.\n4. Therefore, `xpu-smi` is the tool used for state monitoring.\n\n**Answer:**\n`xpu-smi` is the tool used to monitor PVC GPU state.",
+    "routing": [
+      "C3"
+    ],
+    "router_reply": "C3",
+    "expert_answers": {
+      "C3": "**Reasoning:**\n1. The text lists a command for GPU monitoring.\n2. The command begins with `xpu-smi`.\n3. It includes the `--version` flag to query the tool’s version.\n4. Therefore, `xpu-smi` is the tool used for state monitoring.\n\n**Answer:**\n`xpu-smi` is the tool used to monitor PVC GPU state."
+    },
+    "synth_elapsed_s": 0.0
+  },
+  {
+    "qid": "c3-advisor",
+    "answer": "**Reasoning:**\n1. Both experts agree that the tool in question is a part of the Intel suite available on Aurora.\n2. Expert C3 provides a more comprehensive answer, mentioning that Intel Advisor can analyze code for both offload opportunities and vectorization advice.\n3. Expert C1's answer is specific to the Intel SYCL Programming Environment, but it does not mention vectorization advice.\n4. Given the information, Intel Advisor is the more comprehensive tool that provides both offload opportunities and vectorization advice.\n\n**Answer:**\nIntel Advisor analyzes code for offload opportunities and vectorization advice on the PVC GPUs.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text lists Intel tools available on Aurora.\n2. It specifically mentions the Intel SYCL Programming Environment.\n3. The description for this environment includes code analysis for offload and vectorization.\n4. Therefore, this environment is the tool that provides the analysis for PVC GPUs.\n\n**Answer:**\nThe Intel SYCL Programming Environment analyzes code for offload and vectorization on the PVC GPUs.",
+      "C3": "**Reasoning:**\n1. The text lists Intel Advisor as a tool for GPU offload and vectorization.\n2. It also mentions Intel Advisor can analyze code for offload opportunities.\n3. Therefore, Intel Advisor is the tool that provides both offload and vectorization advice on the PVC GPUs.\n\n**Answer:**\nIntel Advisor analyzes code for offload opportunities and vectorization advice on the PVC GPUs."
+    },
+    "synth_elapsed_s": 3.5631861686706543
+  },
+  {
+    "qid": "c3-aps",
+    "answer": "**Reasoning:**\n1. Both experts agree that APS is a tool related to assessing application performance on the Aurora system.\n2. Expert C1 defines APS as the Aurora Performance System, which implies a focus on overall performance assessment.\n3. Expert C3 defines APS as the Application Performance Survey, which suggests a more detailed examination of performance characteristics.\n4. Considering the context of the question, it's likely that APS is a tool that provides a comprehensive assessment of application performance on Aurora, including both overall performance and specific characteristics.\n5. The high-level question that APS answers is likely a combination of both experts' answers, focusing on the overall performance and specific characteristics of the application on the system.\n\n**Answer:**\nAPS is the Aurora Performance System, which assesses the overall performance and specific characteristics of an application on Aurora.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text defines APS as the Aurora Performance System.\n2. It describes APS as a tool that answers the question: \"How well does my application run on Aurora?\"\n3. Therefore, APS provides a performance assessment of applications on the system.\n\n**Answer:**\nAPS is the Aurora Performance System, which assesses how well an application runs on Aurora.",
+      "C3": "**Reasoning:**\n1. The text defines APS as \"Application Performance Survey\".\n2. It describes APS as a tool that surveys the application's performance characteristics.\n3. The high‑level question it answers is: \"What are the performance characteristics of my application on Aurora?\"\n\n**Answer:**\nAPS is the Application Performance Survey, which answers the question: \"What are the performance characteristics of my application on Aurora?\""
+    },
+    "synth_elapsed_s": 4.702359437942505
+  },
+  {
+    "qid": "c3-paraview-client",
+    "answer": "**Reasoning:**\nBoth experts agree that the recommended approach for visualizing large datasets on Aurora's flare filesystem with ParaView involves using a specific method to avoid transferring the entire dataset off the system. Expert C3 suggests using ParaView's client/server mode, where the server runs on Aurora and the client on the local machine. Expert C2 provides a more detailed command to load the `flare` module and run a Python script using `mpiexec` to display the PVD file. However, both experts emphasize the importance of using a method that doesn't require transferring the entire dataset. The `flare` module and `mpiexec` command provided by Expert C2 seem to be a more specific and detailed approach to achieve this, while Expert C3's client/server mode is a more general recommendation.\n\n**Answer:**\nUse the `module load flare` command followed by the provided `mpiexec` command with the Python script that imports PyVista and displays the PVD file to visualize large flare datasets without moving the data.",
+    "routing": [
+      "C3",
+      "C2"
+    ],
+    "router_reply": "C3,C2",
+    "expert_answers": {
+      "C3": "**Reasoning:**\n1. The text mentions that large datasets on flare can be visualized.\n2. It specifies that the recommended way is to use the client/server mode.\n3. This mode runs the ParaView server on Aurora and the client on the local machine.\n4. The user can then load the dataset on Aurora and view it locally.\n5. This approach avoids transferring the entire dataset off the system.\n\n**Answer:**\nUse ParaView's client/server mode, running the server on Aurora and the client locally, to visualize large flare datasets without moving the data.",
+      "C2": "**Reasoning:**\n1. The text states that for large datasets, the recommended approach is to use the `flare` module.\n2. It provides a specific command: `module load flare` followed by `mpiexec -n 4 -ppn 4 --ppd 12 --cpu-bind verbose python -c 'import pyvista as pv; pv.set_plot_theme(\"dark\"); pv.show(\"path/to/data.pvd\")'`.\n3. This command loads the `flare` module, launches an MPI job with 4 ranks per node, binds each rank to 12 CPU cores, and runs a Python script that imports PyVista, sets a dark theme, and displays the PVD file.\n4. The script is executed with the `mpiexec` command, which coordinates the distributed PyVista process.\n\n**Answer:**\nUse `module load flare` and then run the provided `mpiexec` command with the Python script that imports PyVista and displays the PVD file."
+    },
+    "synth_elapsed_s": 5.801887512207031
+  },
+  {
+    "qid": "c3-adios2",
+    "answer": "**Reasoning:**\nExpert C3's reasoning is more comprehensive and directly addresses the specific use case of high-throughput parallel I/O on Aurora's Lustre /flare filesystem. While Expert C2 mentions `dpnp`, it does not provide context about its use with Lustre /flare. Expert C3, on the other hand, explicitly mentions HDF5 with MPI-IO, which is a well-known and widely used combination for high-throughput parallel I/O on Lustre filesystems. Therefore, the most accurate and relevant answer is provided by Expert C3.\n\n**Answer:**\nALCF recommends HDF5 with MPI-IO for high-throughput parallel I/O on Aurora’s Lustre /flare filesystem.",
+    "routing": [
+      "C2",
+      "C3"
+    ],
+    "router_reply": "C2,C3",
+    "expert_answers": {
+      "C2": "**Reasoning:**\n1. The text provides a specific recommendation for high‑throughput I/O.\n2. It states that the recommended library is `dpnp` (Data‑Parallel NumPy).\n3. No other I/O library is mentioned for this purpose.\n\n**Answer:**\nALCF recommends using `dpnp` for high‑throughput parallel I/O on Aurora.",
+      "C3": "**Reasoning:**\n1. The text states that for high‑throughput parallel I/O, the recommended library is HDF5.\n2. It also mentions that HDF5 is used with the MPI‑IO engine.\n3. No other libraries are suggested for this use case.\n4. Therefore, HDF5 with MPI‑IO is the recommended choice.\n\n**Answer:**\nALCF recommends HDF5 with MPI‑IO for high‑throughput parallel I/O on Aurora’s Lustre /flare filesystem."
+    },
+    "synth_elapsed_s": 4.053210496902466
+  },
+  {
+    "qid": "c3-parsl-aurora",
+    "answer": "**Reasoning:**\nBoth experts agree that Parsl can be used to orchestrate many independent PBS jobs on Aurora. Expert C1 suggests submitting multiple PBS job scripts and letting Parsl manage their submission and tracking, while Expert C3 recommends defining tasks that request PBS jobs and letting Parsl's executor schedule each task on an allocated node. However, Expert C3's approach is more specific to the Parsl framework and aligns with the concept of task-based orchestration, which is a key feature of Parsl. This approach also leverages the PBSpro interface, which is relevant to the Aurora environment.\n\n**Answer:**\nDefine tasks that request PBS jobs, letting Parsl’s executor schedule each task on an allocated node.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text mentions that Parsl can be used to orchestrate many independent jobs.\n2. It does not specify a particular mechanism, but orchestration typically involves submitting multiple job descriptions.\n3. Since the environment already supports PBS, the jobs can be submitted as separate PBS scripts.\n4. Parsl can manage the submission and tracking of these scripts.\n5. Therefore, the orchestration is done by submitting multiple PBS job scripts and letting Parsl handle the submission and monitoring.\n\n**Answer:**\nSubmit multiple independent PBS job scripts and let Parsl manage their submission and tracking.",
+      "C3": "**Reasoning:**\n1. The text mentions that Parsl can be used to orchestrate many independent PBS jobs.\n2. It also notes that Parsl can submit jobs to PBSpro.\n3. By defining tasks that each request a PBS job, Parsl can manage the workflow.\n4. The executor will schedule each task on a compute node allocated by PBS.\n5. This approach scales to many jobs because Parsl handles the resource management.\n\n**Answer:**\nDefine tasks that request PBS jobs, letting Parsl’s executor schedule each task on an allocated node."
+    },
+    "synth_elapsed_s": 4.140178203582764
+  },
+  {
+    "qid": "c3-balsam",
+    "answer": "**Reasoning:**\nBoth experts agree that Balsam is a tool for managing jobs on the Aurora supercomputer. Expert C3 emphasizes its role as a workflow management system, highlighting its ability to handle dependencies, parallel execution, status tracking, and automatic retries. Expert C2 describes it as a Python package that provides a higher-level interface for managing and monitoring jobs, including automated submission, real-time tracking, and result collection. While there is some overlap in their descriptions, both emphasize that Balsam offers more than just plain PBS submission, focusing on workflow management and automation. The Python package aspect is a key point made by Expert C2, which is consistent with the idea of a higher-level interface.\n\n**Answer:**\nBalsam is a Python package that offers a higher-level interface for managing and monitoring jobs on the Aurora supercomputer, providing automated submission, real-time tracking, and result collection, and handling workflow logic and resilience beyond what plain PBS submission offers.",
+    "routing": [
+      "C3",
+      "C2"
+    ],
+    "router_reply": "C3,C2",
+    "expert_answers": {
+      "C3": "**Reasoning:**\n1. The text defines Balsam as a workflow management system.\n2. It mentions that Balsam can submit jobs to PBSpro on Aurora.\n3. It also lists several additional features: job dependencies, parallel execution of jobs, tracking of job status, and automatic retries on failure.\n4. These features go beyond simple PBS submission by managing the workflow logic and resilience.\n\n**Answer:**\nBalsam is a workflow management system that not only submits jobs to PBSpro on Aurora but also handles dependencies, parallel execution, status tracking, and automatic retries.",
+      "C2": "**Reasoning:**\n1. Balsam is described as a \"Python package for managing and monitoring large-scale jobs on Aurora.\"\n2. It provides a higher‑level interface than standard PBS commands.\n3. The text mentions that it can be used to submit jobs, monitor their status, and retrieve results.\n4. This implies that Balsam offers automated job management, real‑time tracking, and result collection, which PBS alone does not provide.\n\n**Answer:**\nBalsam is a Python package that simplifies job management on Aurora by offering automated submission, real‑time monitoring, and result retrieval beyond what plain PBS provides."
+    },
+    "synth_elapsed_s": 5.494995594024658
+  },
+  {
+    "qid": "c3-containers",
+    "answer": "**Reasoning:**\nUpon reviewing the responses from Expert C1 and Expert C3, I notice that they both provide information about the container runtime supported on Aurora compute nodes. However, they differ in their answers. Expert C1 states that Singularity is the supported runtime, while Expert C3 claims that Apptainer is the supported runtime. To resolve this discrepancy, I will examine the text again. Upon re-examination, I realize that Expert C1's response is actually incorrect, as the text does not mention Singularity. In contrast, Expert C3's response is consistent with the text, which mentions Apptainer as the container runtime. Therefore, I will rely on Expert C3's response to synthesize the answer.\n\n**Answer:**\nApptainer is the supported runtime; run a container with `apptainer exec --pwd / \"$IMAGE\" /bin/sh -lc \"ls -a\"`.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1, C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text states that the Aurora PE includes support for the Singularity container runtime.\n2. It also mentions that you can run a container image using the `singularity` command.\n3. Therefore, the supported runtime is Singularity, and the action is invoking `singularity` to execute the image.\n\n**Answer:**\nAurora supports the Singularity container runtime; you run a container image with the `singularity` command.",
+      "C3": "**Reasoning:**\n1. The text states that the container runtime is Apptainer.\n2. It provides a command to run a container image: `apptainer exec --pwd / \"$IMAGE\" /bin/sh -lc \"ls -a\"`.\n3. The command uses `apptainer exec` with the `--pwd /` flag to execute a shell inside the container.\n4. The image path `$IMAGE` should be replaced with the actual Apptainer image file.\n5. The inner command `ls -a` lists the container’s root directory.\n\n**Answer:**\nApptainer is the supported runtime; run a container with `apptainer exec --pwd / \"$IMAGE\" /bin/sh -lc \"ls -a\"`."
+    },
+    "synth_elapsed_s": 5.212350845336914
+  },
+  {
+    "qid": "c3-aprun-trick",
+    "answer": "**Reasoning:**\n1. The Cray ALPS launcher is not available on Aurora, as stated by Expert C1.\n2. Both experts agree that `mpiexec` is the recommended launcher on Aurora.\n3. Expert C1 provides a direct mapping from `aprun -n 96` to `mpiexec -n 96`, which is consistent with Expert C3's recommendation.\n4. Therefore, the equivalent command on Aurora is achieved by replacing `aprun` with `mpiexec` while keeping the `-n 96` flag.\n\n**Answer:**\nReplace `aprun -n 96` with `mpiexec -n 96`, resulting in `mpiexec -n 96./my_app`.",
+    "routing": [
+      "C1",
+      "C3"
+    ],
+    "router_reply": "C1,C3",
+    "expert_answers": {
+      "C1": "**Reasoning:**\n1. The text states that the Cray ALPS launcher is not available on Aurora.\n2. It provides an alternative command that achieves the same number of MPI ranks.\n3. The alternative command is `mpiexec -n 96./my_app`.\n4. This command uses the MPI wrapper `mpiexec` with the same number of ranks as the original.\n5. Therefore, the equivalent command on Aurora is the provided `mpiexec` invocation.\n\n**Answer:**\nUse `mpiexec -n 96./my_app` to launch the same number of MPI ranks on Aurora.",
+      "C3": "**Reasoning:**\n1. The text states that `mpiexec` is the recommended launcher on Aurora.\n2. It also provides a direct mapping: `aprun -n 96` → `mpiexec -n 96`.\n3. Therefore, replacing `aprun` with `mpiexec` while keeping the `-n 96` flag yields the Aurora equivalent.\n4. The final command becomes `mpiexec -n 96./my_app`.\n\n**Answer:**\nReplace `aprun -n 96` with `mpiexec -n 96`, resulting in `mpiexec -n 96./my_app`."
+    },
+    "synth_elapsed_s": 4.144421815872192
+  }
+]

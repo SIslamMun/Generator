@@ -1,0 +1,10 @@
+{
+  "name": "B",
+  "train_count": 3903,
+  "val_count": 433,
+  "first_chunk_ids": [
+    "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "docs_alcf_anl_gov_aurora_data-science_jupyter.md:0:3f500674",
+    "docs_alcf_anl_gov_aurora_compiling-and-linking.md:0:cb7503fb"
+  ]
+}

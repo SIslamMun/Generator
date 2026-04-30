@@ -1,0 +1,1444 @@
+[
+  {
+    "question": "Why is LAMMPS described as suitable for massively parallel computers?",
+    "reasoning": "1. The text explicitly calls LAMMPS a \"general\u2011purpose molecular dynamics software package for massively parallel computers\".\n2. A package designed for massive parallelism must have algorithms that can be divided among many processors.\n3. The mention of \"dozens of user\u2011developed extensions\" implies a modular architecture, which facilitates scaling by allowing independent components to run concurrently.\n4. Therefore, its purpose\u2011built design and modularity together make it appropriate for large\u2011scale parallel execution.",
+    "answer": "LAMMPS is purpose\u2011built for massive parallelism, with a modular architecture that lets many processors work on separate components efficiently.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the \"exceptionally clean style\" of LAMMPS contribute to its popularity among users who want to extend it?",
+    "reasoning": "1. Clean code is easier to read and understand.\n2. When code is readable, developers can locate relevant sections quickly.\n3. This reduces the effort required to add new functionality or modify existing behavior.\n4. The text notes that LAMMPS is \"one of the more popular codes for users to extend\" and links this popularity to its clean style.\n5. Consequently, the clean style directly lowers the barrier for creating extensions, fostering popularity.",
+    "answer": "The clean coding style makes LAMMPS easy to understand, lowering the effort needed to add extensions and thus boosting its popularity.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "What can be inferred about the LAMMPS community from the statement that it has \"dozens of user\u2011developed extensions\"?",
+    "reasoning": "1. \"Dozens\" indicates a substantial number of contributions.\n2. User\u2011developed extensions mean that many external developers are actively building on the core code.\n3. Active contributions suggest an engaged and collaborative community.\n4. A vibrant community often provides support, documentation, and shared solutions.\n5. Therefore, the presence of many extensions implies a strong, collaborative user base.",
+    "answer": "The many user\u2011developed extensions indicate a large, active community that collaborates to enhance LAMMPS.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "If a researcher wants to run LAMMPS on Aurora at the ALCF, what resources should they consult according to the text?",
+    "reasoning": "1. The overview states that the page provides \"information specific to running on Aurora at the ALCF\".\n2. It also references the general LAMMPS home page for broader code details.\n3. Therefore, the researcher should first review the Aurora\u2011specific page for configuration and usage instructions.\n4. For deeper understanding of LAMMPS itself, they should also consult the main LAMMPS home page.",
+    "answer": "They should consult the Aurora\u2011specific page for ALCF usage details and the main LAMMPS home page for general information.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "Why might the ALCF maintain a dedicated page for LAMMPS on Aurora rather than relying only on the generic LAMMPS documentation?",
+    "reasoning": "1. Aurora is a specific supercomputer with its own architecture and job\u2011submission environment.\n2. General LAMMPS documentation covers typical usage but may not address Aurora\u2011specific optimizations or compiler settings.\n3. Providing a dedicated page ensures users receive guidance tailored to Aurora's hardware and software stack.\n4. This helps users achieve optimal performance and avoid configuration pitfalls.\n5. Hence, a dedicated page adds value beyond the generic documentation.",
+    "answer": "Because Aurora\u2019s unique hardware and software require tailored guidance to ensure optimal LAMMPS performance, which generic documentation doesn\u2019t provide.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the modular nature implied by \"user\u2011developed extensions\" affect the ability to adapt LAMMPS to new scientific problems?",
+    "reasoning": "1. Extensions are separate code modules that add or modify functionality.\n2. A modular system allows scientists to plug in new physics models, force fields, or analysis tools without altering the core.\n3. This flexibility accelerates adaptation to novel research questions.\n4. The text\u2019s mention of many extensions demonstrates that this modularity is already being exploited.\n5. Therefore, the modular design directly facilitates rapid adaptation to new problems.",
+    "answer": "The modular extension system lets researchers add new models or tools without changing the core, enabling quick adaptation to emerging scientific challenges.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "What advantages does LAMMPS\u2019s \"exceptionally clean style\" provide for long\u2011term maintenance of large simulation projects?",
+    "reasoning": "1. Clean code reduces complexity and hidden bugs.\n2. Easier readability allows new developers to understand existing implementations quickly.\n3. This accelerates debugging and feature updates.\n4. Over time, a project with many contributors benefits from consistent code quality.\n5. Consequently, clean style supports sustainable, long\u2011term maintenance.",
+    "answer": "It simplifies debugging and updates, enabling new contributors to maintain and evolve large simulation projects efficiently.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "Considering LAMMPS is a \"general\u2011purpose\" MD package, what implications does this have for its applicability across different research domains?",
+    "reasoning": "1. \"General\u2011purpose\" means it is not limited to a single type of molecular system or interaction.\n2. Researchers can simulate a wide range of materials, biomolecules, and fluids.\n3. The availability of many extensions further broadens its functional scope.\n4. Hence, LAMMPS can be applied to diverse domains such as materials science, chemistry, and biophysics.",
+    "answer": "Its general\u2011purpose nature, combined with numerous extensions, makes LAMMPS suitable for a broad spectrum of research fields.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "Why might a developer choose LAMMPS over a proprietary MD code when planning to run simulations on Aurora?",
+    "reasoning": "1. LAMMPS is open and extensible, allowing custom modifications.\n2. Its clean codebase eases the integration of Aurora\u2011specific optimizations.\n3. Dozens of existing extensions may already provide needed functionality, reducing development effort.\n4. Proprietary codes often restrict source access and customization.\n5. Therefore, LAMMPS offers greater flexibility and adaptability for Aurora users.",
+    "answer": "Because LAMMPS\u2019s open, extensible, and clean architecture lets developers tailor it to Aurora\u2019s environment, unlike restrictive proprietary codes.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "What reasoning supports the claim that LAMMPS\u2019s design encourages community contributions?",
+    "reasoning": "1. The text highlights an \"exceptionally clean style,\" which lowers the barrier to understanding the code.\n2. It also notes that the code is \"one of the more popular codes for users to extend.\"\n3. A low barrier combined with popularity motivates users to create and share extensions.\n4. The existence of \"dozens of user\u2011developed extensions\" confirms that contributions are indeed occurring.\n5. Thus, the design elements directly foster community involvement.",
+    "answer": "The clean, readable code and established popularity make it easy for users to create extensions, which is evidenced by the many community\u2011contributed modules.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_applications-and-libraries_applications_lammps.md:0:97f2d3d7",
+    "source": "unknown"
+  },
+  {
+    "question": "What command must you execute to make the CMake tool available in your Aurora session?",
+    "reasoning": "1. The text provides a specific instruction for using CMake on Aurora.\n2. The instruction is presented as a code block containing the exact command.\n3. The command shown is `module load cmake`.\n4. Executing this command loads the CMake module into the environment, making the tool accessible.",
+    "answer": "Run `module load cmake` to load the CMake tool.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "Why is it necessary to run `module load cmake` before invoking the `cmake` command on Aurora?",
+    "reasoning": "1. The text states that loading CMake is done via `module load cmake`.\n2. Loading a module typically updates environment variables such as PATH.\n3. Without these updates, the system would not know where the CMake executable resides.\n4. Therefore, invoking `cmake` without loading the module would likely result in a command-not-found error.\n5. Loading the module first ensures the executable is reachable.",
+    "answer": "Because loading the module updates the environment so that the `cmake` executable can be found and run.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "If you open a new terminal on Aurora and immediately type `cmake --version`, what outcome should you expect based on the documentation?",
+    "reasoning": "1. The documentation only mentions making CMake available by executing `module load cmake`.\n2. It does not state that CMake is loaded by default in a new session.\n3. Therefore, before any module is loaded, the environment lacks CMake.\n4. Attempting to run `cmake --version` without loading the module will likely produce a \u201ccommand not found\u201d error.\n5. The expected outcome is failure to locate the command.",
+    "answer": "The command will fail, typically reporting that `cmake` is not found.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe the sequence of actions you must follow to compile a project with CMake on Aurora, starting from a fresh login.",
+    "reasoning": "1. After logging in, the environment does not yet have CMake loaded.\n2. The first required step is to load the CMake module using the provided command.\n3. The text specifies this command as `module load cmake`.\n4. Once the module is loaded, the `cmake` executable becomes available in the PATH.\n5. With CMake accessible, you can then run standard CMake commands to configure and build the project.",
+    "answer": "First run `module load cmake` to load the tool, then execute the usual CMake commands to configure and build your project.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the exact syntax, including spacing and case, for the command that loads CMake on Aurora?",
+    "reasoning": "1. The documentation presents the command inside a code block.\n2. The command appears as `module load cmake`.\n3. It uses lowercase letters for all three words and a single space between each word.\n4. No additional flags or arguments are shown.\n5. Therefore, the precise syntax matches what is displayed.",
+    "answer": "The command must be typed exactly as `module load cmake`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "Can you infer any prerequisites that must be satisfied before running `module load cmake` on Aurora?",
+    "reasoning": "1. The text only describes the act of loading CMake via the module system.\n2. It does not mention any additional software or environment requirements.\n3. Since the command itself is provided without caveats, the only implicit prerequisite is that the module system is available in the session.\n4. On Aurora, the module command is standard, so no extra steps are indicated.\n5. Hence, the sole prerequisite is having access to the module command.",
+    "answer": "The only prerequisite is that the module system is available in your session.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "If you needed to verify that the CMake module was successfully loaded after running the command, what logical step would you take based on typical module behavior?",
+    "reasoning": "1. The documentation shows how to load CMake but not how to verify it.\n2. In typical module environments, loading a module makes its binaries reachable via the PATH.\n3. A logical verification is to run a CMake command that reports its version, such as `cmake --version`.\n4. If the module loaded correctly, this command will execute and display version information.\n5. Failure would indicate the module was not loaded.",
+    "answer": "Run `cmake --version`; successful output confirms the module is loaded.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain why the documentation includes the phrase \u201cTo use CMake on Aurora, run:\u201d before the command.",
+    "reasoning": "1. The phrase introduces the required action for accessing CMake.\n2. It signals that the following command is a prerequisite for using the tool.\n3. By stating the purpose (\u201cto use CMake\u201d), it clarifies that loading the module is necessary before any CMake operations.\n4. This framing helps users understand the relationship between the command and the tool\u2019s availability.\n5. Therefore, the phrase serves as an instructional cue linking the command to its intended effect.",
+    "answer": "Because it tells users that loading the module is the required step before they can actually use CMake.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "Assuming you have already executed `module load cmake`, what would be the expected effect on the system\u2019s PATH environment variable?",
+    "reasoning": "1. Loading a module typically modifies environment variables so that the software it provides becomes reachable.\n2. The documentation\u2019s command `module load cmake` follows this convention.\n3. Therefore, after execution, the directory containing the CMake binaries is added to PATH.\n4. This enables the shell to locate `cmake` without specifying a full path.\n5. The expected effect is an updated PATH that includes CMake\u2019s bin directory.",
+    "answer": "The PATH variable is updated to include the directory where CMake\u2019s executables reside.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "What would be the consequence of omitting the `module load cmake` step when following a tutorial that assumes CMake is available on Aurora?",
+    "reasoning": "1. The tutorial presumes CMake can be invoked directly.\n2. Without loading the module, the environment lacks the CMake executable in its PATH.\n3. Attempting to run any CMake command would therefore result in a \u201ccommand not found\u201d error.\n4. This error would halt the tutorial\u2019s build steps.\n5. Consequently, the build process would fail until the module is loaded.",
+    "answer": "CMake commands would not be found, causing the tutorial\u2019s build steps to fail.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_build-tools_cmake-aurora.md:0:09f1cefb",
+    "source": "unknown"
+  },
+  {
+    "question": "How many total OpenMP threads will be running on a single node when the script is executed with the given variable settings?",
+    "reasoning": "1. The script sets NTHREADS=4, which is the number of OpenMP threads per MPI rank.\n2. NRANKS_PER_NODE is set to 26, meaning 26 MPI ranks are launched on each node.\n3. Total OpenMP threads per node = NRANKS_PER_NODE \u00d7 NTHREADS.\n4. Multiply 26 (ranks) by 4 (threads) to get 104 threads.\n5. Therefore, 104 OpenMP threads will be active on each node.",
+    "answer": "The script runs 104 OpenMP threads on each node.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "If the PBS job allocates two nodes, what will be the value of NTOTRANKS and how many MPI processes will be started on each node?",
+    "reasoning": "1. NNODES is computed as the line count of $PBS_NODEFILE; with two nodes, NNODES=2.\n2. NRANKS_PER_NODE is fixed at 26.\n3. NTOTRANKS is calculated as NNODES * NRANKS_PER_NODE.\n4. Multiply 2 (nodes) by 26 (ranks per node) to obtain NTOTRANKS=52.\n5. The mpiexec command uses --ppn ${NRANKS_PER_NODE}, so 26 MPI processes will be launched on each node.",
+    "answer": "NTOTRANKS will be 52, with 26 MPI processes started on each of the two nodes.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "Why does the script set NRANKS_PER_NODE to 26 instead of the full 104 physical cores available on an Aurora node?",
+    "reasoning": "1. Each Aurora node has 104 physical cores, but hyperthreading presents 208 logical CPUs.\n2. The example aims to bind one MPI rank per physical core while also using OpenMP threads.\n3. NTHREADS is set to 4, so each MPI rank will spawn 4 OpenMP threads.\n4. 26 ranks \u00d7 4 threads = 104 threads, matching the number of physical cores.\n5. Therefore, using 26 ranks per node ensures that the 4 threads of each rank occupy exactly one physical core each, preventing oversubscription.",
+    "answer": "NRANKS_PER_NODE is 26 so that each rank\u2019s 4 OpenMP threads together occupy one physical core, using all 104 cores without oversubscribing.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "What binding strategy does the mpiexec command employ, and how does it affect placement of MPI ranks and OpenMP threads?",
+    "reasoning": "1. The mpiexec options include --cpu-bind depth and --depth=${NDEPTH}.\n2. \"depth\" binding ties each MPI rank to a set of CPUs defined by the depth level in the hardware hierarchy.\n3. NDEPTH is set to 4, which corresponds to the core level on Aurora (socket \u2192 core \u2192 hardware thread).\n4. With --cpu-bind depth, each rank is bound to a distinct core.\n5. Because OMP_PLACES=cores, OpenMP threads are placed on the cores allocated to their rank, ensuring threads stay within the rank\u2019s bound core.",
+    "answer": "The command uses depth binding at level 4, binding each MPI rank to a distinct core, and OpenMP threads are confined to those cores via OMP_PLACES=cores.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the environment variable OMP_PLACES=cores interact with the MPI rank binding to ensure correct thread placement?",
+    "reasoning": "1. MPI ranks are bound to individual cores by the --cpu-bind depth option.\n2. OMP_PLACES=cores tells OpenMP to place its threads on whole cores rather than hardware threads.\n3. Since each rank already owns a core, OpenMP will distribute its NTHREADS threads across the logical CPUs of that core.\n4. This alignment prevents threads from spilling onto neighboring cores.\n5. The combination guarantees that each rank\u2019s threads stay within the core assigned to that rank.",
+    "answer": "OMP_PLACES=cores directs OpenMP to use the cores already bound to each MPI rank, keeping all threads of a rank on its assigned core.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "If a user wants to run one MPI rank per physical core with a single OpenMP thread per rank, what values should NTHREADS and NRANKS_PER_NODE be set to?",
+    "reasoning": "1. Each node has 104 physical cores.\n2. To have one rank per core, NRANKS_PER_NODE must equal the number of cores per node, i.e., 104.\n3. With a single OpenMP thread per rank, NTHREADS should be set to 1.\n4. This configuration would launch 104 ranks per node, each using one thread.\n5. The script would then need to adjust NTOTRANKS accordingly.",
+    "answer": "Set NRANKS_PER_NODE=104 and NTHREADS=1.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "What would be the effect of changing the mpiexec option '--cpu-bind depth' to '--cpu-bind socket'?",
+    "reasoning": "1. '--cpu-bind depth' binds each MPI rank to a specific core depth.\n2. '--cpu-bind socket' would bind each rank to an entire socket instead of a single core.\n3. On Aurora, each socket contains 52 physical cores.\n4. Binding to the socket would cause all threads of a rank to share the 52 cores of that socket, potentially leading to oversubscription if NTHREADS > 1.\n5. This would reduce the granularity of binding and could impact performance due to increased contention.",
+    "answer": "Changing to '--cpu-bind socket' would bind each MPI rank to a whole socket, causing all its threads to share 52 cores and likely leading to oversubscription and reduced performance.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain the purpose of the PBS directive '#PBS -l place=scatter' in the context of this job script.",
+    "reasoning": "1. The '-l place=' resource request controls how allocated CPUs are distributed across nodes.\n2. 'scatter' spreads the allocated CPUs across as many sockets and cores as possible.\n3. For a node with many cores, scattering helps avoid concentrating all ranks on a single socket.\n4. This complements the binding strategy by providing a balanced distribution of ranks across the node\u2019s hardware.\n5. Consequently, it promotes better memory bandwidth utilization and reduces contention.",
+    "answer": "The '#PBS -l place=scatter' directive distributes allocated CPUs across sockets and cores, ensuring MPI ranks are spread evenly over the node to improve bandwidth and reduce contention.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "Given the compilation command 'mpicxx -g -fopenmp -O3 main.cpp', which compiler features are enabled and why are they important for this example?",
+    "reasoning": "1. '-g' adds debugging symbols, allowing developers to debug the executable.\n2. '-fopenmp' enables OpenMP support, allowing the program to create OpenMP threads.\n3. '-O3' requests high-level optimization, improving performance.\n4. Using the MPICH wrapper 'mpicxx' ensures the code is linked against the MPI library.\n5. All three flags together produce a debuggable, highly optimized binary that can launch MPI ranks with OpenMP threading.",
+    "answer": "The command enables debugging symbols (-g), OpenMP support (-fopenmp), and high optimization (-O3), producing a debuggable, optimized MPI+OpenMP binary.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "If the job script is submitted with '#PBS -l select=1' but the variable NNODES is computed from $PBS_NODEFILE, what value will NNODES have and why?",
+    "reasoning": "1. '#PBS -l select=1' requests a single allocation block.\n2. On Aurora, a block corresponds to one compute node.\n3. $PBS_NODEFILE lists the hostnames of allocated nodes, one line per CPU slot.\n4. With a single node, the file will contain entries for that node only.\n5. Counting lines with 'wc -l' yields NNODES=1.",
+    "answer": "NNODES will be 1 because the job requests a single node, and the node file contains entries for only that node.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "How many total MPI processes will be launched across the entire allocation if the job requests 3 nodes, each with the script's default NRANKS_PER_NODE value?",
+    "reasoning": "1. The script sets NRANKS_PER_NODE=26.\n2. If three nodes are allocated, NNODES=3.\n3. NTOTRANKS is calculated as NNODES * NRANKS_PER_NODE.\n4. Multiply 3 by 26 to obtain NTOTRANKS=78.\n5. Therefore, 78 MPI processes will be launched in total.",
+    "answer": "A total of 78 MPI processes will be launched across the three nodes.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_compiling-and-linking_aurora-example-program-makefile.md:0:b2b67f9c",
+    "source": "unknown"
+  },
+  {
+    "question": "What does the script do when the file specified by the variable SIF does not exist?",
+    "reasoning": "1. The script checks the condition `if [[ ! -f \"$SIF\" ]]; then`.\n2. The `! -f` test returns true when the file does not exist.\n3. Inside the true branch, it echoes the message `=== Building SIF from docker://intel/oneapi-hpckit`.\n4. It then runs `apptainer build --fakeroot \"$SIF\" docker://intel/oneapi-hpckit` to create the SIF file.\n5. No else actions are taken for this block, so the script proceeds to the next section.",
+    "answer": "It prints a build message and runs `apptainer build --fakeroot \"$SIF\" docker://intel/oneapi-hpckit` to create the missing SIF file.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "Under which circumstances will the sandbox be created from the SIF file?",
+    "reasoning": "1. The sandbox creation block begins with `if [[ ! -d \"$SBX\" ]]; then`.\n2. The test `! -d` is true only when the directory `$SBX` does not exist.\n3. If true, the script echoes `=== Building sandbox from SIF`.\n4. It then executes `apptainer build --sandbox \"$SBX\" \"$SIF\"` to build the sandbox.\n5. Therefore, the sandbox is built only when the directory `$SBX` is absent, regardless of the SIF's prior state (the SIF would have been built earlier if missing).",
+    "answer": "The sandbox is built whenever the directory `$SBX` does not exist; the script then runs `apptainer build --sandbox \"$SBX\" \"$SIF\"`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "What output does the script produce if both the SIF file and the sandbox directory already exist?",
+    "reasoning": "1. The first `if` checks `[[ ! -f \"$SIF\" ]]`. Since the file exists, the condition is false, so the else branch runs.\n2. The else branch echoes `=== SIF exists: $SIF`.\n3. The second `if` checks `[[ ! -d \"$SBX\" ]]`. Because the directory exists, the condition is false, so its else branch runs.\n4. The else branch echoes `=== Sandbox exists: $SBX`.\n5. After the two conditionals, the script computes `SBX_ABS` and echoes `=== SBX_ABS=$SBX_ABS`.\n6. No build commands are executed in this scenario.",
+    "answer": "It prints `=== SIF exists: $SIF`, `=== Sandbox exists: $SBX`, and then `=== SBX_ABS=$SBX_ABS`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the script determine the absolute path of the sandbox directory, and where is that value stored?",
+    "reasoning": "1. After handling the sandbox creation, the script runs `SBX_ABS=\"$(readlink -f \"$SBX\")\"`.\n2. The command `readlink -f` resolves the supplied path to its canonical absolute pathname.\n3. The output of `readlink -f \"$SBX\"` is captured by command substitution `$(\u2026)`.\n4. The resulting absolute path is assigned to the variable `SBX_ABS`.\n5. The script then echoes the variable with `=== SBX_ABS=$SBX_ABS`.",
+    "answer": "It uses `readlink -f \"$SBX\"` to resolve the absolute path and stores the result in the variable `SBX_ABS`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "Which Docker image is used as the source when building the SIF file, and how is it referenced in the command?",
+    "reasoning": "1. The build command for the SIF is `apptainer build --fakeroot \"$SIF\" docker://intel/oneapi-hpckit`.\n2. The image source is specified after the target filename, prefixed by `docker://`.\n3. The text after the prefix is `intel/oneapi-hpckit`, indicating the Docker repository and image name.\n4. No other image is mentioned in the script.",
+    "answer": "The script builds the SIF from the Docker image `intel/oneapi-hpckit`, referenced as `docker://intel/oneapi-hpckit`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "What command and options are used to build a sandbox from an existing SIF file?",
+    "reasoning": "1. Inside the sandbox creation block, when the directory does not exist, the script runs `apptainer build --sandbox \"$SBX\" \"$SIF\"`.\n2. The `--sandbox` option tells Apptainer to create a writable directory tree instead of a single-file image.\n3. `$SBX` is the destination directory, and `$SIF` is the source image.\n4. No additional flags are present in this command.",
+    "answer": "`apptainer build --sandbox \"$SBX\" \"$SIF\"` is used to create the sandbox from the existing SIF.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "If the variable SIF is empty when the script runs, what will the script attempt to do in the first conditional block?",
+    "reasoning": "1. An empty `$SIF` expands to an empty string, so the test becomes `[[ ! -f \"\" ]]`.\n2. The `-f` test on an empty string evaluates to false (no file), thus `! -f` is true.\n3. Consequently, the script enters the true branch, echoes `=== Building SIF from docker://intel/oneapi-hpckit`.\n4. It then executes `apptainer build --fakeroot \"\" docker://intel/oneapi-hpckit`, attempting to write the SIF to an empty filename, which would likely fail.\n5. The script proceeds regardless of the command's success.",
+    "answer": "It treats the missing filename as absent, echoes the build message, and runs `apptainer build --fakeroot \"\" docker://intel/oneapi-hpckit` attempting to create a SIF with an empty name.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe the sequence of actions the script performs when the SIF file is missing but the sandbox directory already exists.",
+    "reasoning": "1. The first `if` sees that `[[ ! -f \"$SIF\" ]]` is true, so it builds the SIF using `apptainer build --fakeroot \"$SIF\" docker://intel/oneapi-hpckit` after printing a message.\n2. After the SIF is built, the script reaches the sandbox block.\n3. The sandbox test `[[ ! -d \"$SBX\" ]]` evaluates false because the directory exists.\n4. The else branch runs, printing `=== Sandbox exists: $SBX`.\n5. The script then calculates `SBX_ABS` with `readlink -f \"$SBX\"` and echoes it.\n6. No sandbox build command is executed because the directory already exists.",
+    "answer": "It builds the missing SIF, reports that the sandbox already exists, computes the sandbox\u2019s absolute path, and prints the corresponding messages.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "What condition must be true for the script to skip both the SIF and sandbox build steps entirely?",
+    "reasoning": "1. Skipping the SIF build requires the test `[[ ! -f \"$SIF\" ]]` to be false, meaning the file `$SIF` exists.\n2. Skipping the sandbox build requires the test `[[ ! -d \"$SBX\" ]]` to be false, meaning the directory `$SBX` exists.\n3. Both conditions are satisfied simultaneously only when both the SIF file and the sandbox directory are present.\n4. In that case, the script only executes the echo statements in the else branches and the `readlink` line.",
+    "answer": "Both the SIF file `$SIF` and the sandbox directory `$SBX` must already exist.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the script communicate to the user that it is about to create a sandbox, and what variable values are displayed in that message?",
+    "reasoning": "1. When the sandbox does not exist, the true branch of the second `if` runs.\n2. The script executes `echo \"=== Building sandbox from SIF\"`.\n3. This message does not include variable interpolation; it is a static string.\n4. Therefore, the user sees the literal text `=== Building sandbox from SIF` without any variable values.\n5. No other information about `$SBX` or `$SIF` is printed in that specific message.",
+    "answer": "It prints the static message `=== Building sandbox from SIF`; no variable values are included in that line.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the purpose of the `--fakeroot` option in the SIF build command, based on its usage in the script?",
+    "reasoning": "1. The script invokes `apptainer build --fakeroot \"$SIF\" docker://intel/oneapi-hpckit`.\n2. The `--fakeroot` flag appears directly after `apptainer build` and before the target filename.\n3. Its placement indicates it modifies the build behavior, likely allowing the build to run without real root privileges.\n4. Although the script does not explicitly explain the flag, the context shows it is required for building the SIF from the Docker image.\n5. Thus, the flag enables the build to proceed in a non\u2011root environment.",
+    "answer": "The `--fakeroot` option enables building the SIF without needing actual root privileges.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "If the script is executed with a relative path for SBX, what will be the format of the value printed for SBX_ABS?",
+    "reasoning": "1. After handling sandbox creation, the script runs `SBX_ABS=\"$(readlink -f \"$SBX\")\"`.\n2. `readlink -f` resolves the supplied path to its canonical absolute pathname, converting any relative components to an absolute path.\n3. The resulting string is stored in `SBX_ABS` and then echoed as `=== SBX_ABS=$SBX_ABS`.\n4. Therefore, regardless of the original relative input, the printed value will be a full absolute path beginning with `/`.\n5. No additional formatting is applied beyond the absolute path itself.",
+    "answer": "It prints the full absolute pathname of the sandbox directory, starting with `/`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_containers_containers.md:0:470b8e1f",
+    "source": "unknown"
+  },
+  {
+    "question": "What command should a user run to launch Copper with a custom log directory at `/var/log/copper` and a custom view directory at `/mnt/copper_view`?",
+    "reasoning": "1. Identify the launch script name: `launch_copper_aurora.sh`.\n2. Recognize the optional flag for the log directory base is `-d`.\n3. Recognize the optional flag for the view directory is `-v`.\n4. Insert the custom log directory after `-d` and the custom view directory after `-v`.\n5. Combine the elements into a single command line.",
+    "answer": "Run `launch_copper_aurora.sh -d /var/log/copper -v /mnt/copper_view`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "How would a user stop Copper while directing logs to `/tmp/logs` without specifying a view directory?",
+    "reasoning": "1. Identify the stop script: `stop_copper_aurora.sh`.\n2. Note that the log directory flag is `-d`.\n3. Since no view directory is needed, omit the `-v` flag.\n4. Append the custom log directory path after `-d`.\n5. Assemble the final command.",
+    "answer": "Execute `stop_copper_aurora.sh -d /tmp/logs`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "If the environment variable `USER` is set to `alice`, what is the full default Copper mount path?",
+    "reasoning": "1. The text states the common mount path pattern is `/tmp/${USER}/copper_mount`.\n2. Substitute `${USER}` with the value `alice`.\n3. Replace the variable placeholder with the actual username.\n4. The resulting path is `/tmp/alice/copper_mount`.",
+    "answer": "The default mount path is `/tmp/alice/copper_mount`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "Which CPU cores are listed as the common Copper service cores on Aurora?",
+    "reasoning": "1. The text provides a list of common service cores: `48,49,50,51`.\n2. Recognize that these are the cores designated for Copper services.\n3. No other cores are mentioned in the excerpt.",
+    "answer": "The common Copper service cores are 48, 49, 50, and 51.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "What optional flags can be supplied to `launch_copper_aurora.sh`, and what does each flag represent?",
+    "reasoning": "1. Examine the command syntax for `launch_copper_aurora.sh`.\n2. Identify the two optional flags: `-d` and `-v`.\n3. From the description, `-d` stands for the log directory base.\n4. `-v` stands for the CU_FUSE_MNT_VIEWDIR (the view directory for the mount).\n5. Summarize the purpose of each flag.",
+    "answer": "`-d` specifies the log directory base, and `-v` sets the CU_FUSE_MNT_VIEWDIR (mount view directory).",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "A user wants to launch Copper with a custom log directory `/scratch/logs` and later stop it using the same log directory. What sequence of commands should they execute?",
+    "reasoning": "1. For launching, use `launch_copper_aurora.sh` with `-d /scratch/logs`.\n2. No view directory is required, so omit `-v`.\n3. To stop, use `stop_copper_aurora.sh` with the same `-d /scratch/logs` flag.\n4. Ensure both commands are run in the correct order: launch first, then stop.\n5. Write the two commands as separate lines.",
+    "answer": "First run `launch_copper_aurora.sh -d /scratch/logs`, and later run `stop_copper_aurora.sh -d /scratch/logs`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "If the `USER` environment variable is undefined, what path does the default mount pattern `/tmp/${USER}/copper_mount` expand to?",
+    "reasoning": "1. The pattern uses `${USER}` for substitution.\n2. When `USER` is undefined, the variable expands to an empty string.\n3. Removing the variable leaves `/tmp//copper_mount`.\n4. Collapse the double slash to a single slash where appropriate, yielding `/tmp/copper_mount`.\n5. Conclude the resulting path.",
+    "answer": "It expands to `/tmp/copper_mount`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "How many distinct CPU cores are identified as common Copper service cores in the documentation?",
+    "reasoning": "1. The list of common cores is `48,49,50,51`.\n2. Count each core in the list.\n3. There are four entries.\n4. Therefore, four cores are designated as common.",
+    "answer": "Four CPU cores are listed as common Copper service cores.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "Does the order of the optional `-d` and `-v` flags matter when invoking `launch_copper_aurora.sh`?",
+    "reasoning": "1. The syntax shows both flags enclosed in square brackets, indicating they are optional.\n2. No positional requirement is expressed for either flag.\n3. Because they are independent options, the script can parse them in any order.\n4. Therefore, the order does not affect execution.",
+    "answer": "No, the `-d` and `-v` flags can be provided in any order.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the significance of the square brackets surrounding `-d log_dir_base` and `-v CU_FUSE_MNT_VIEWDIR` in the command listings?",
+    "reasoning": "1. In command syntax, square brackets denote optional elements.\n2. The brackets enclose each flag and its argument, indicating they are not mandatory.\n3. Users may include zero, one, or both options when running the script.\n4. This conveys flexibility in how the scripts are invoked.",
+    "answer": "The brackets indicate that `-d log_dir_base` and `-v CU_FUSE_MNT_VIEWDIR` are optional arguments.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "If a user only provides the `-d` flag with value `/tmp/logs` when launching Copper, what will the complete command look like?",
+    "reasoning": "1. Identify the launch script name: `launch_copper_aurora.sh`.\n2. Include the `-d` flag followed by the provided path `/tmp/logs`.\n3. Omit the `-v` flag because it is not supplied.\n4. Assemble the command string accordingly.",
+    "answer": "The command is `launch_copper_aurora.sh -d /tmp/logs`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "What file extensions do the scripts used to start and stop Copper have?",
+    "reasoning": "1. The script names are `launch_copper_aurora.sh` and `stop_copper_aurora.sh`.\n2. Both filenames end with `.sh`.\n3. The `.sh` extension denotes a shell script.\n4. No other extensions are present.",
+    "answer": "Both scripts have the `.sh` extension.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_copper_copper.md:0:b3a1d098",
+    "source": "unknown"
+  },
+  {
+    "question": "What are the potential consequences of increasing the select node count beyond the recommended maximum of 64 nodes?",
+    "reasoning": "1. The text states that bandwidth generally increases as select node count increases, up to a point.\n2. It also notes that the recommended maximum is 64 nodes to reduce impact on shared filesystems.\n3. Exceeding this limit would likely increase load on the shared filesystems beyond the intended reduction.\n4. Higher filesystem load can degrade performance for other users and may cause contention.\n5. Therefore, while throughput might still rise, the negative side effects on the shared environment outweigh the benefit.",
+    "answer": "Going beyond 64 nodes can overload shared filesystems, causing contention and reduced overall system performance despite any additional bandwidth gains.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "If the current network and filesystem load are high, how should you adjust the walltime for a data\u2011moving job?",
+    "reasoning": "1. The guidance says achieved throughput depends on current network and filesystem load.\n2. It also advises adjusting walltime accordingly.\n3. High load typically reduces throughput, meaning the job will take longer to complete.\n4. To accommodate the slower transfer rate, walltime should be increased to prevent premature termination.\n5. Therefore, the walltime should be set longer than the default estimate when load is high.",
+    "answer": "Increase the walltime to give the job extra time to finish under high network and filesystem load.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "Why might a script that is configured for 8 PPN fail when the PPN is increased to a higher value?",
+    "reasoning": "1. The document states that scripts are set for 8 PPN.\n2. It warns that going higher may cause failures.\n3. Scripts likely have resource limits, environment variables, or MPI launch parameters tuned for exactly 8 processes per node.\n4. Raising PPN could exceed those limits, leading to resource allocation errors or mismatched communication settings.\n5. Hence, the failure stems from the scripts not being designed to handle more than 8 processes per node.",
+    "answer": "Because the scripts are specifically configured for 8 processes per node, increasing PPN can exceed their resource limits and cause execution failures.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "What steps must be taken to use a filesystem other than the documented `flare:daos_user_fs` for a data\u2011moving job?",
+    "reasoning": "1. The text mentions the documented `filesystems` resource uses `flare:daos_user_fs`.\n2. It advises adjusting this setting as needed for other filesystems (e.g., `home`).\n3. Therefore, the user must modify the `filesystems` resource specification in the job script.\n4. The modification involves replacing `flare:daos_user_fs` with the desired filesystem identifier.\n5. No other changes are indicated, so updating that parameter is sufficient.",
+    "answer": "Replace the `filesystems` resource entry `flare:daos_user_fs` with the identifier of the desired filesystem, such as `home`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the recommended maximum of 64 nodes balance throughput gains against shared filesystem impact?",
+    "reasoning": "1. Bandwidth increases with node count up to a point, implying higher throughput with more nodes.\n2. However, the recommendation caps nodes at 64 to reduce impact on shared filesystems.\n3. This cap prevents excessive load that could degrade performance for other users.\n4. By limiting nodes, the system still gains considerable bandwidth while keeping filesystem contention acceptable.\n5. Thus, the limit represents a trade\u2011off between maximizing throughput and preserving shared resource health.",
+    "answer": "The 64\u2011node cap captures most of the bandwidth benefit while preventing excessive strain on shared filesystems, balancing performance with system fairness.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "If you observe that a data\u2011moving job is completing slower than expected, what two adjustments could you consider based on the guidance?",
+    "reasoning": "1. Slower completion suggests lower achieved throughput, possibly due to network or filesystem load.\n2. The guidance recommends adjusting walltime to match actual performance.\n3. It also notes that increasing select node count generally raises bandwidth, up to a limit.\n4. Therefore, you could (a) increase walltime to avoid premature termination, and (b) increase the node count (while staying \u226464) to boost throughput.\n5. Both adjustments address the observed slowdown.",
+    "answer": "Increase the walltime and, if still under 64 nodes, raise the select node count to improve throughput.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "What considerations should you keep in mind when setting the select node count to 32 with the default 8 PPN configuration?",
+    "reasoning": "1. The default script settings are 8 PPN, which aligns with the recommendation.\n2. A node count of 32 is well below the 64\u2011node maximum, so filesystem impact remains moderate.\n3. Bandwidth should increase compared to fewer nodes, assuming network capacity permits.\n4. However, the achieved throughput still depends on current network and filesystem load, so you may need to monitor those factors.\n5. Finally, ensure walltime is set appropriately for the expected transfer rate.",
+    "answer": "With 32 nodes at 8\u202fPPN you stay within recommended limits, gaining higher bandwidth while keeping filesystem impact low, but you must still account for current network/filesystem load and set sufficient walltime.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "Why does the guidance suggest that bandwidth increases with select node count only \"up to a point\"?",
+    "reasoning": "1. The statement acknowledges diminishing returns after a certain scale.\n2. As more nodes are added, network contention, latency, and filesystem saturation can limit further gains.\n3. The recommended cap of 64 nodes reflects the point where additional nodes no longer provide proportional bandwidth improvements.\n4. Beyond this point, extra nodes may even degrade performance due to increased overhead.\n5. Hence, the phrase indicates a practical ceiling dictated by system resources.",
+    "answer": "Because after a certain number of nodes, network contention and filesystem saturation limit further gains, making additional nodes provide diminishing or negative returns.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "If a job must run on the `home` filesystem instead of `flare:daos_user_fs`, what impact might this have on performance, and how could you mitigate it?",
+    "reasoning": "1. The guidance notes the `filesystems` resource can be adjusted for other filesystems like `home`.\n2. Different filesystems have distinct performance characteristics; `home` may have lower I/O bandwidth than `daos_user_fs`.\n3. Using a slower filesystem could reduce overall throughput.\n4. To mitigate, you could increase the select node count (within the 64\u2011node limit) to compensate for lower per\u2011node I/O speed.\n5. Additionally, adjusting walltime to reflect the slower transfer rate ensures the job completes successfully.",
+    "answer": "Switching to `home` may lower I/O throughput, so you can counteract this by using more nodes (up to 64) and extending the walltime to accommodate the slower transfer.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "How would you determine whether to increase the select node count or extend walltime when a data\u2011moving job is failing due to time\u2011out errors?",
+    "reasoning": "1. Time\u2011out errors indicate the job exceeded its allocated walltime.\n2. The guidance ties walltime to achieved throughput, which depends on network/filesystem load.\n3. If the load is high, throughput drops, so extending walltime directly addresses the issue.\n4. If the load is moderate but the job still times out, adding more nodes could raise bandwidth, reducing runtime.\n5. Therefore, assess current load: high load \u2192 extend walltime; moderate load \u2192 consider increasing node count (while \u226464).",
+    "answer": "Check the current network/filesystem load: if it\u2019s high, extend walltime; if load is moderate, increase the node count (up to 64) to speed up the transfer.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the rationale behind recommending scripts be set for 8 PPN, and what implications does this have for resource allocation?",
+    "reasoning": "1. The document explicitly states scripts are set for 8 PPN and that higher values may cause failures.\n2. This suggests the job scripts, MPI launch parameters, or environment are tuned for exactly 8 processes per node.\n3. Using 8 PPN likely matches the node\u2019s hardware configuration and avoids oversubscribing CPU cores or memory.\n4. Maintaining this PPN ensures stable execution and predictable resource usage.\n5. Deviating from 8 PPN could lead to resource contention, causing job failures.",
+    "answer": "The 8\u202fPPN setting aligns with the scripts\u2019 configuration and the node\u2019s resources, ensuring stable execution; increasing PPN can oversubscribe resources and trigger failures.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:51b51bb6",
+    "source": "unknown"
+  },
+  {
+    "question": "If a PyTorch script previously imported `oneccl_bindings_for_pytorch as torch_ccl`, what change must be made to the code after the Spring 2026 update?",
+    "reasoning": "1. The text states that the `torch_ccl` module has been removed.\n2. It also notes that `import oneccl_bindings_for_pytorch as torch_ccl` is no longer needed.\n3. Therefore, any existing import statement for `torch_ccl` must be deleted from the script.\n4. No replacement import is mentioned, so the script should simply omit that line.",
+    "answer": "Remove the line `import oneccl_bindings_for_pytorch as torch_ccl` from the script; no replacement import is required.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "A user receives an error when initializing `torch.distributed` with `backend='ccl'`. How should they modify the initialization call to be compatible with the new framework version?",
+    "reasoning": "1. The text indicates that when initializing `torch.distributed`, the `backend` must be changed from `ccl` to `xccl`.\n2. The error arises because the code still uses the old backend name.\n3. Updating the `backend` argument to `'xccl'` aligns with the required setting.\n4. No other changes to the initialization call are mentioned.",
+    "answer": "Change the `backend` argument to `'xccl'`, e.g., `torch.distributed.init_process_group(backend='xccl', \u2026)`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "What steps should a developer follow if they notice performance degradation after removing the `intel_extension_for_pytorch` import?",
+    "reasoning": "1. The text says that `import intel_extension_for_pytorch as ipex` is now deprecated because its functionality has been upstreamed.\n2. It also warns that performance variations may occur after removing the import.\n3. The recommended mitigation is to switch back to importing it.\n4. Therefore, the developer should re\u2011add the import statement to restore the previous performance.",
+    "answer": "Re\u2011add `import intel_extension_for_pytorch as ipex` to the code to restore the original performance.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "A training job fails because the environment variable `ONEAPI_DEVICE_SELECTOR` is set to its default value. How can the user modify this variable to use only Level Zero GPUs?",
+    "reasoning": "1. The default `ONEAPI_DEVICE_SELECTOR` is set to `\"opencl:gpu;level_zero:gpu\"`.\n2. The text provides a remedy: revert to Level Zero only by exporting `ONEAPI_DEVICE_SELECTOR=\"level_zero:gpu\"`.\n3. Changing the environment variable to this value restricts device selection to Level Zero GPUs.\n4. The user must issue the export command before launching the job.",
+    "answer": "Run `export ONEAPI_DEVICE_SELECTOR=\"level_zero:gpu\"` before starting the training job.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "Is Horovod still a supported option for distributed training with PyTorch in the Spring 2026 release, and what implication does this have for existing scripts that use Horovod?",
+    "reasoning": "1. The text explicitly states that `horovod` support for PyTorch has been removed.\n2. Removal means the library is no longer available or functional in this environment.\n3. Existing scripts that rely on Horovod will fail to import or run.\n4. Users must migrate to a supported backend such as `xccl` or another distributed framework.",
+    "answer": "No, Horovod is no longer supported; scripts using it must be rewritten to use a supported backend like `xccl`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the recommended backend for `torch.distributed` after the Spring 2026 update, and why was the previous backend deprecated?",
+    "reasoning": "1. The text requires changing the `backend` from `ccl` to `xccl` when initializing `torch.distributed`.\n2. This indicates that `xccl` is now the supported backend.\n3. Although the text does not explicitly state why `ccl` was deprecated, the required change implies that `ccl` is no longer maintained or compatible with the updated modules.\n4. Therefore, `xccl` is the recommended backend.",
+    "answer": "`xccl` is the recommended backend for `torch.distributed` because `ccl` has been deprecated in the new release.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "A user wants to use both OpenCL and Level Zero GPUs simultaneously. Based on the default `ONEAPI_DEVICE_SELECTOR`, will this be possible, and what does the selector string indicate?",
+    "reasoning": "1. The default `ONEAPI_DEVICE_SELECTOR` is set to `\"opencl:gpu;level_zero:gpu\"`.\n2. This string lists two selectors separated by a semicolon: `opencl:gpu` and `level_zero:gpu`.\n3. Each selector enables GPU devices for the respective runtimes.\n4. Therefore, both OpenCL and Level Zero GPUs are enabled by default.",
+    "answer": "Yes; the default selector `\"opencl:gpu;level_zero:gpu\"` enables both OpenCL and Level Zero GPUs.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "If a project relies on the `torch_ccl` module for collective communication, what impact does the Spring 2026 update have on the project's build, and what action should be taken?",
+    "reasoning": "1. The update removes the `torch_ccl` module entirely.\n2. Any code that imports or uses `torch_ccl` will encounter import errors.\n3. To maintain functionality, the project must replace `torch_ccl` calls with the new supported backend (`xccl`).\n4. This may involve updating import statements and changing backend specifications in `torch.distributed` initialization.",
+    "answer": "The removal of `torch_ccl` breaks the build; replace its usage with the `xccl` backend and adjust imports accordingly.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "How should the environment be configured to avoid potential issues caused by the default `ONEAPI_DEVICE_SELECTOR` setting?",
+    "reasoning": "1. The default selector includes both OpenCL and Level Zero GPUs.\n2. The text mentions that this may cause issues for some users.\n3. It provides a specific command to revert to Level Zero only.\n4. Applying that command will limit device selection and prevent the mentioned issues.",
+    "answer": "Set the variable with `export ONEAPI_DEVICE_SELECTOR=\"level_zero:gpu\"` to limit selection to Level Zero GPUs only.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the implication of the deprecation of `import intel_extension_for_pytorch as ipex` for future code maintenance, and what short\u2011term workaround does the text suggest?",
+    "reasoning": "1. Deprecation means the import is no longer recommended and may be removed in a future release.\n2. The functionality has been upstreamed, so the import is technically unnecessary.\n3. However, the text warns that performance variations can occur after its removal.\n4. The short\u2011term fix is to re\u2011introduce the import to retain performance while awaiting a stable upstream version.",
+    "answer": "Long\u2011term, code should drop the `ipex` import, but to avoid immediate performance drops, re\u2011add `import intel_extension_for_pytorch as ipex` as a temporary fix.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_pytorch.md:0:5720fc3e",
+    "source": "unknown"
+  },
+  {
+    "question": "What are the two primary components of a Dask cluster and what are their respective responsibilities?",
+    "reasoning": "1. The text states that a Dask cluster is composed of one scheduler and many workers.\n2. It describes the scheduler as the entity that coordinates the job.\n3. Workers are described as the entities that actually execute the work, accessing CPU or GPU resources.\n4. Therefore, the scheduler manages task distribution while workers perform the computation.",
+    "answer": "A Dask cluster consists of a scheduler, which coordinates task distribution, and workers, which execute the tasks using CPU or GPU resources.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "If a computation requires GPU acceleration, what type of workers should be launched according to the text?",
+    "reasoning": "1. The text mentions that workers can have access to CPU or GPU resources.\n2. It specifically shows how to start a cluster with GPU workers.\n3. To utilize GPU acceleration, the workers must be the GPU-capable ones.\n4. Therefore, the appropriate choice is GPU workers.",
+    "answer": "You should launch GPU workers to take advantage of GPU acceleration.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "Outline the sequence of actions needed to set up Dask on Aurora as described in the passage.",
+    "reasoning": "1. The passage begins by stating that Dask should be installed in a conda environment on Aurora.\n2. After installation, the next step is to start a cluster.\n3. The cluster should be started with GPU workers, as shown.\n4. Finally, a simple example script is run to demonstrate functionality.\n5. These steps form the complete setup process.",
+    "answer": "First install Dask in a conda environment, then start a scheduler and GPU workers, and finally run the example script.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "How does Dask achieve parallel execution across multiple machines according to the description?",
+    "reasoning": "1. The text explains that a Dask cluster contains many workers.\n2. Each worker can access its own CPU or GPU resources.\n3. The single scheduler coordinates the overall job.\n4. By distributing tasks from the scheduler to the multiple workers, work is performed concurrently.\n5. This distribution enables parallel execution.",
+    "answer": "Dask distributes tasks from a central scheduler to many workers, allowing them to run concurrently on their own CPU or GPU resources.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "What benefit does using GPU workers provide for Dask workloads, based on the information given?",
+    "reasoning": "1. Workers may have access to GPU resources.\n2. GPUs are specialized hardware for high\u2011throughput parallel calculations.\n3. By assigning tasks to GPU workers, computations that can exploit this hardware run faster.\n4. Hence, GPU workers improve performance for suitable workloads.",
+    "answer": "GPU workers can leverage GPU hardware to accelerate suitable computations, offering faster performance than CPU\u2011only workers.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "What would be the immediate impact on a Dask cluster if the single scheduler were to fail?",
+    "reasoning": "1. The scheduler\u2019s role is to coordinate the job among workers.\n2. Workers rely on the scheduler to receive tasks.\n3. If the scheduler stops functioning, no new tasks can be assigned.\n4. Existing tasks may continue, but overall progress halts.\n5. Therefore, the cluster would effectively stall.",
+    "answer": "The cluster would lose its coordination point, causing task scheduling to stop and the computation to stall.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "Why might a Dask deployment include both CPU and GPU workers on the same cluster?",
+    "reasoning": "1. The text notes that workers can have either CPU or GPU resources.\n2. Different tasks may be better suited to different hardware types.\n3. Having both types allows the scheduler to match tasks to the most efficient resource.\n4. This mixed configuration optimizes overall workload performance.",
+    "answer": "Including both CPU and GPU workers lets the scheduler assign each task to the most appropriate hardware, maximizing efficiency across varied workloads.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "What purpose does the simple example script serve after starting a Dask cluster with GPU workers?",
+    "reasoning": "1. The passage mentions starting a cluster with GPU workers and then running a simple example script.\n2. The script is described as an illustration of how to use the newly created cluster.\n3. Its role is to demonstrate that the installation and cluster startup were successful.\n4. Therefore, it acts as a functional test and usage example.",
+    "answer": "The example script demonstrates how to run a Dask workload on the GPU\u2011enabled cluster, confirming that the setup works.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "Which environment management tool does the text recommend for installing Dask on Aurora?",
+    "reasoning": "1. The passage explicitly states that Dask should be installed in a conda environment on Aurora.\n2. No other package managers are mentioned.\n3. Therefore, conda is the recommended tool.",
+    "answer": "The text recommends using a conda environment to install Dask on Aurora.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe the relationship between the scheduler and workers in terms of job management within a Dask cluster.",
+    "reasoning": "1. The scheduler is defined as the component that coordinates the job.\n2. Workers are the components that actually execute the work.\n3. Coordination implies the scheduler assigns tasks to workers.\n4. Workers then carry out those tasks using their resources.\n5. This division of labor defines their relationship.",
+    "answer": "The scheduler assigns tasks to the workers, which then execute those tasks using their CPU or GPU resources.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_frameworks_dask.md:0:91e62861",
+    "source": "unknown"
+  },
+  {
+    "question": "What single command should you run on Aurora to obtain all the dependencies required for using LibTorch?",
+    "reasoning": "1. The text states that the easiest way to use LibTorch on Aurora is to load the ML frameworks module.\n2. The command shown for loading this module is `module load frameworks`.\n3. Loading this module brings in the necessary components (oneAPI SDK and cmake) automatically.\n4. Therefore, executing this one command satisfies all dependency requirements.",
+    "answer": "Run `module load frameworks` to load all LibTorch dependencies.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "After executing `module load frameworks`, which version of the oneAPI SDK becomes available in the environment?",
+    "reasoning": "1. The description of the module load operation mentions that it also loads the consistent oneAPI SDK.\n2. The specific version of the SDK provided is given in parentheses as 2025.3.1.\n3. No other version is referenced, indicating that this is the version that will be loaded.\n4. Consequently, the environment will contain oneAPI SDK version 2025.3.1.",
+    "answer": "The oneAPI SDK version 2025.3.1 is loaded.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "Does loading the `frameworks` module automatically provide the `cmake` tool needed for building LibTorch projects?",
+    "reasoning": "1. The text lists the items loaded by the `module load frameworks` command.\n2. Among those items, `cmake` is explicitly mentioned.\n3. Because `cmake` is part of the loaded set, it becomes available without any extra steps.\n4. Therefore, the tool is automatically provided.",
+    "answer": "Yes, loading the `frameworks` module automatically makes `cmake` available.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "If a developer only needs `cmake` but not the oneAPI SDK, what does the text suggest as the recommended approach?",
+    "reasoning": "1. The text presents `module load frameworks` as the easiest way to obtain LibTorch, which also brings in the oneAPI SDK.\n2. No alternative command or module is mentioned for loading `cmake` alone.\n3. Because the only described method includes the SDK, the text does not propose a way to load just `cmake`.\n4. Hence, the recommended approach for obtaining `cmake` is to load the entire `frameworks` module.",
+    "answer": "The text only recommends loading the full `frameworks` module, which includes both `cmake` and the oneAPI SDK.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "List the three components that are loaded into the environment when the command `module load frameworks` is executed.",
+    "reasoning": "1. The command is described as loading the ML frameworks module.\n2. The description adds that this action also loads the consistent oneAPI SDK (version 2025.3.1).\n3. It further states that `cmake` is loaded as part of the same operation.\n4. Combining these points, the three components are: the ML frameworks environment, the oneAPI SDK, and `cmake`.",
+    "answer": "The command loads the ML frameworks environment, the oneAPI SDK (2025.3.1), and `cmake`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "Why does the documentation label `module load frameworks` as the \"easiest\" way to use LibTorch on Aurora?",
+    "reasoning": "1. The phrase \"easiest way\" is directly tied to the command that loads multiple pieces at once.\n2. Loading the frameworks module automatically brings in the oneAPI SDK and `cmake`, which are essential for LibTorch.\n3. Without this single command, a user would need to locate, load, and possibly configure each component individually.\n4. Automating these steps removes manual effort, making the process simpler.",
+    "answer": "Because a single command automatically loads all required components (oneAPI SDK and cmake), eliminating manual setup.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "If a user has already loaded a different module before running `module load frameworks`, will the oneAPI SDK version be affected?",
+    "reasoning": "1. The text specifies that loading the `frameworks` module loads the \"consistent\" oneAPI SDK version 2025.3.1.\n2. The word \"consistent\" implies that this version is enforced regardless of prior environment state.\n3. No indication is given that prior modules can override this version.\n4. Therefore, loading `frameworks` will set the SDK to the specified version irrespective of earlier loads.",
+    "answer": "Yes, loading `frameworks` will ensure the oneAPI SDK is set to version 2025.3.1, overriding any previous version.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "What steps are required to prepare the Aurora environment for compiling a LibTorch application that uses CMake?",
+    "reasoning": "1. The compilation requires both LibTorch and CMake.\n2. The documentation states that `module load frameworks` loads the ML frameworks module, which includes LibTorch dependencies, the oneAPI SDK, and CMake.\n3. By executing this single command, all necessary tools become available.\n4. No additional steps are mentioned for setting up the environment.",
+    "answer": "Execute `module load frameworks`; it provides LibTorch, the oneAPI SDK, and CMake needed for compilation.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "Can you determine from the text whether the oneAPI SDK version loaded is compatible with future releases of LibTorch?",
+    "reasoning": "1. The text only reports the specific version of the oneAPI SDK (2025.3.1) that is loaded.\n2. It does not discuss compatibility with other or future LibTorch releases.\n3. Without explicit statements, no conclusion about future compatibility can be drawn.\n4. Therefore, the text does not provide enough information to answer the compatibility question.",
+    "answer": "The text does not provide information about compatibility with future LibTorch releases.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "How would you verify that the correct version of the oneAPI SDK has been loaded after running `module load frameworks`?",
+    "reasoning": "1. The text tells us that loading the `frameworks` module loads the oneAPI SDK version 2025.3.1.\n2. While the verification command is not given, a typical approach is to query the loaded modules.\n3. Since the documentation does not specify a verification command, we rely on the guarantee that the module load operation installs the stated version.\n4. Consequently, confidence in the version comes from the module's definition rather than a runtime check described in the text.",
+    "answer": "The documentation guarantees that `module load frameworks` installs oneAPI SDK version 2025.3.1, so the loaded version is as specified.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "If a new project requires a specific version of CMake that is newer than the one provided by `module load frameworks`, what does the text suggest as a solution?",
+    "reasoning": "1. The text only mentions that `module load frameworks` loads CMake, without specifying its version.\n2. No alternative method or version selection is described.\n3. Because the documentation does not address version overrides or additional steps, it offers no guidance for this scenario.\n4. Hence, the text provides no solution for obtaining a newer CMake version.",
+    "answer": "The text does not provide a solution for obtaining a newer CMake version beyond what `module load frameworks` supplies.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain the relationship between the ML frameworks module and the oneAPI SDK as described in the text.",
+    "reasoning": "1. The ML frameworks module is the entry point mentioned for using LibTorch.\n2. Loading this module also triggers the loading of the oneAPI SDK.\n3. The SDK version loaded is explicitly stated as 2025.3.1, indicating that the frameworks module bundles this SDK.\n4. Therefore, the frameworks module depends on, and automatically includes, the oneAPI SDK as part of its environment.",
+    "answer": "The ML frameworks module automatically includes the oneAPI SDK (version 2025.3.1) as part of its loaded environment.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_inference_libtorch.md:0:07db4d8f",
+    "source": "unknown"
+  },
+  {
+    "question": "How can you check whether CPU devices are available on the node using dpctl, and what output indicates that none are present?",
+    "reasoning": "1. The code snippet calls `dpctl.has_cpu_devices()`.\n2. This function returns a Boolean indicating CPU device availability.\n3. In the provided output, the line `Found CPU devices:  False` is printed.\n4. The value `False` means no CPU devices were detected on the node.",
+    "answer": "Call `dpctl.has_cpu_devices()`; a returned value of `False` (as shown in the output) indicates that no CPU devices are available.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "What sequence of dpctl functions and Python statements would you use to retrieve and display the list of GPU devices and their count?",
+    "reasoning": "1. Use `dpctl.get_num_devices(device_type=\"gpu\")` to obtain the number of GPU devices.\n2. Store this count in a variable, e.g., `num_devices`.\n3. Use `dpctl.get_devices(device_type=\"gpu\")` to get the list of GPU device objects.\n4. Store the list in a variable, e.g., `device_list`.\n5. Print the count with `print(f\"Found {num_devices} GPU devices\")`.\n6. Iterate over `device_list` and print each device.\n7. The example in the text follows exactly these steps.",
+    "answer": "Call `dpctl.get_num_devices(device_type=\"gpu\")` and `dpctl.get_devices(device_type=\"gpu\")`, then print the count and iterate over the returned list to display each device.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "After dpctl version 0.17.0, what additional call must be made to correctly measure GPU kernel execution time, and why?",
+    "reasoning": "1. The text states that versions >\u202f0.17.0 run all kernels asynchronously.\n2. Asynchronous execution means the kernel may still be running when timing code proceeds.\n3. To ensure the kernel has completed, the `.sycl_queue.wait()` method must be invoked.\n4. This call blocks until all queued work on the device finishes, providing accurate timing.",
+    "answer": "Invoke `.sycl_queue.wait()` after launching the kernel to guarantee the kernel has finished before measuring execution time.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "Why should a user replace usage of the `dpctl.tensor` module with `dpnp` arrays on Intel GPUs?",
+    "reasoning": "1. The text notes that `dpctl.tensor` is deprecated as of dpctl\u202f0.21.1.\n2. It will be removed in a future release alongside oneAPI\u202f2026.0.\n3. `dpnp` provides a 1\u2011for\u20111 replacement for all `dpctl.tensor` operations.\n4. Using `dpnp` ensures continued support and compatibility with Intel GPUs.",
+    "answer": "Because `dpctl.tensor` is deprecated and will be removed, and `dpnp` offers a direct replacement for its functionality on Intel GPUs.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "In the `vecadd` kernel, how is the index of the current work item obtained, and what does this index represent?",
+    "reasoning": "1. Inside the kernel, the line `i = item.get_id(0)` retrieves an identifier.\n2. `item` is a `kapi.Item` representing the executing work item.\n3. `get_id(0)` returns the global ID along the first dimension.\n4. This ID corresponds to the position in the arrays that the work item will process.",
+    "answer": "The kernel calls `item.get_id(0)` to obtain the work\u2011item\u2019s global index, which identifies the element of the arrays that the work item should handle.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the `dpex.Range(N)` argument influence the execution of the `vecadd` kernel?",
+    "reasoning": "1. `dpex.Range(N)` creates a range of N work items.\n2. Each work item executes the kernel once.\n3. The kernel uses the work\u2011item ID to index arrays, so each of the N items processes a distinct element.\n4. Therefore, the kernel runs in parallel over N elements of the input arrays.",
+    "answer": "`dpex.Range(N)` creates N parallel work items, causing the kernel to execute once per array element across the N indices.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "Which programming model ensures that the `vecadd` kernel runs on the same device as the `dpnp` and `dpctl` arrays passed as arguments?",
+    "reasoning": "1. The text mentions that numba\u2011dpex follows the \"compute\u2011follows\u2011data\" model.\n2. This model dictates that computation is performed on the device where the data resides.\n3. Since the arrays are allocated on a specific device, the kernel automatically runs there.\n4. No explicit device selection is required in the example.",
+    "answer": "The compute\u2011follows\u2011data programming model guarantees that the kernel executes on the device holding the `dpnp`/`dpctl` arrays.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "Based on the provided output, how many GPU devices were detected and what specific GPU model do they represent?",
+    "reasoning": "1. The output includes the line `Found 12 GPU devices`.\n2. Following this line, twelve `<dpctl.SyclDevice ...>` entries are listed.\n3. Each entry shows `Intel(R) Data Center GPU Max 1550` as the device name.\n4. Therefore, the count is 12 and the model is Intel(R) Data Center GPU Max 1550.",
+    "answer": "Twelve GPU devices were found, each identified as an Intel(R) Data Center GPU Max\u202f1550.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "What are the consequences of omitting the `.sycl_queue.wait()` call when measuring execution time of a GPU kernel with dpctl version >\u202f0.17.0?",
+    "reasoning": "1. Kernels run asynchronously in these versions.\n2. Without waiting, the timing code may record the duration before the kernel finishes.\n3. This yields an underestimate of the true execution time, possibly reporting near\u2011zero time.\n4. Accurate timing therefore requires explicitly waiting for kernel completion.",
+    "answer": "The measured time will be inaccurate\u2014typically too short\u2014because the kernel may still be running when the timing ends.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "What effect does the `@dpex.kernel` decorator have on the `vecadd` function in the example?",
+    "reasoning": "1. The decorator is applied directly above the function definition.\n2. According to the text, it compiles the function with numba\u2011dpex into a data\u2011parallel kernel.\n3. This transformation enables the function to be executed on the GPU by `dpex.call_kernel`.\n4. Without the decorator, the function would remain a regular Python function and could not be launched as a kernel.",
+    "answer": "It marks `vecadd` for compilation by numba\u2011dpex into a GPU\u2011executable data\u2011parallel kernel.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the example verify that the vector addition performed by the `vecadd` kernel is correct?",
+    "reasoning": "1. After the kernel call, the code creates `c`, `a`, and `b` as `dpnp` arrays.\n2. It then uses `dpnp.allclose(c, a+b)` to compare the result array `c` with the expected sum `a+b`.\n3. The `assert` statement raises an error if the comparison fails.\n4. Successful execution without an assertion error confirms correctness.",
+    "answer": "It uses `assert dpnp.allclose(c, a+b)`, which checks that the kernel\u2019s output matches the expected element\u2011wise sum.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_data-science_python.md:0:4f94251f",
+    "source": "unknown"
+  },
+  {
+    "question": "Where should the `handle all stop print` command be issued to ensure that `gdb-oneapi` stops at a GPU segmentation fault that may occur later in the debugging session?",
+    "reasoning": "1. The text states that the command must be used before the first `run` command.\n2. It also mentions it can be placed sometime before you expect the fault to happen.\n3. Placing it after a fault has already occurred would be too late because the debugger would have already passed the fault point.\n4. Therefore, the command needs to be set up early, before any execution that could trigger the fault.",
+    "answer": "`gdb-oneapi` must receive the `handle all stop print` command before the first `run` (or any time before the fault is expected).",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_gdb-oneapi.md:0:98c22c78",
+    "source": "unknown"
+  },
+  {
+    "question": "What behavior does the `handle all stop print` command configure in `gdb-oneapi` with respect to GPU segmentation faults?",
+    "reasoning": "1. The command is introduced in the context of making the debugger stop where GPU segmentation faults occur.\n2. The phrase \u201cstop print\u201d indicates that the debugger will both halt execution and display information about the fault.\n3. By applying this setting to \u201call,\u201d it affects all signal types, including GPU page faults.\n4. Consequently, when a GPU segmentation fault happens, the debugger will pause and print the fault details.",
+    "answer": "It tells `gdb-oneapi` to halt execution and print information whenever a GPU segmentation fault (or any signal) occurs.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_gdb-oneapi.md:0:98c22c78",
+    "source": "unknown"
+  },
+  {
+    "question": "Why is it recommended to issue the `handle all stop print` command before the first `run` rather than after a fault has already been triggered?",
+    "reasoning": "1. The command configures how the debugger reacts to signals.\n2. Signal handling settings are applied at the time the program starts running.\n3. If the fault occurs before the setting is applied, the debugger will use the default handling, which may not stop.\n4. Setting it after the fault means the missed fault cannot be retroactively caught.\n5. Therefore, configuring it beforehand ensures the debugger will stop on any subsequent fault.",
+    "answer": "Because signal handling is established at program start, setting `handle all stop print` beforehand guarantees that any later GPU fault will be caught and stopped on.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_gdb-oneapi.md:0:98c22c78",
+    "source": "unknown"
+  },
+  {
+    "question": "If you forget to set `handle all stop print` before the first `run` and a GPU segmentation fault occurs, what will `gdb-oneapi` likely do?",
+    "reasoning": "1. The text implies that without the command, the debugger does not automatically stop at GPU faults.\n2. The default behavior for many signals is to continue execution or terminate without stopping for inspection.\n3. Since the special handling was never enabled, the fault will be treated with the default policy.\n4. Thus, the debugger will not pause at the fault location, making debugging harder.",
+    "answer": "`gdb-oneapi` will not automatically stop at the fault and will continue (or terminate) using its default signal handling.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_gdb-oneapi.md:0:98c22c78",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the timing of issuing `handle all stop print` relate to the occurrence of GPU page faults during a debugging session?",
+    "reasoning": "1. The command must be issued before any execution that could trigger a fault.\n2. GPU page faults can happen at any point after the program starts.\n3. By setting the command early, the debugger is prepared to intercept any fault that arises later.\n4. If set too late, faults that occurred earlier will have been missed.\n5. Therefore, early timing ensures coverage of all possible faults throughout the session.",
+    "answer": "Setting the command early ensures the debugger is ready to stop on any GPU page fault that occurs after the program begins.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_gdb-oneapi.md:0:98c22c78",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the purpose of the phrase \u201cor sometime before you expect the fault to happen\u201d in the instructions for using `handle all stop print`?",
+    "reasoning": "1. The phrase qualifies the requirement to issue the command before the first `run`.\n2. It acknowledges that a fault might be anticipated at a specific later point.\n3. The instruction allows flexibility: you can set the command any time prior to the expected fault, not strictly at the very start.\n4. This means you could start the program, pause, then issue the command before reaching the fault\u2011prone code.\n5. The key is that the command must be in effect before the fault occurs.",
+    "answer": "It indicates that the command can be issued at any point before the anticipated fault, as long as it is active before the fault actually happens.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_gdb-oneapi.md:0:98c22c78",
+    "source": "unknown"
+  },
+  {
+    "question": "How many total MPI processes will DDT start when the example command is used on 16 nodes with 12 MPI ranks per node?",
+    "reasoning": "1. The command line includes the comment \"starts up DDT on 16 nodes, with 12 MPI ranks per node\".\n2. Total MPI processes = number of nodes \u00d7 ranks per node.\n3. Multiply 16 nodes by 12 ranks per node.\n4. 16 \u00d7 12 = 192.\n5. Therefore, DDT will launch 192 MPI processes.",
+    "answer": "DDT will start 192 MPI processes.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the purpose of the `eu_debug_toggle $1` call inside the `if [ ${MY_LOCAL_RANK} -eq 0 ]; then` block?",
+    "reasoning": "1. The script snippet begins with a conditional checking if `MY_LOCAL_RANK` equals 0.\n2. When the condition is true, it executes `eu_debug_toggle $1`.\n3. The comment above the snippet says \"One rank per node toggles eu debug\".\n4. This indicates that only one rank per node (rank 0) should toggle the EU debugging flag.\n5. Hence, the call enables or disables EU debugging for that node.",
+    "answer": "It toggles EU debugging on the node, and only rank\u202f0 per node performs the toggle.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "List the exact sequence of commands that must be run on the lead Aurora compute node to enable EU debugging before launching DDT.",
+    "reasoning": "1. The text provides a block of commands under the lead Aurora compute node prompt.\n2. First, it sets `NNODES` by counting lines in `$PBS_NODEFILE`.\n3. Second, it runs `mpiexec -n $NNODES ./helper_toggle_eu_debug.sh 1` to toggle EU debug on all nodes.\n4. Third, it exports the environment variable `ZET_ENABLE_PROGRAM_DEBUGGING=1`.\n5. These three commands are executed in the shown order before starting DDT.",
+    "answer": "Run `export NNODES=$(wc -l < $PBS_NODEFILE)`, then `mpiexec -n $NNODES ./helper_toggle_eu_debug.sh 1`, and finally `export ZET_ENABLE_PROGRAM_DEBUGGING=1`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "Which environment variable must be set to enable program debugging for the DDT session?",
+    "reasoning": "1. In the sequence of preparatory commands, the third line is `export ZET_ENABLE_PROGRAM_DEBUGGING=1`.\n2. The variable name clearly indicates it enables program debugging.\n3. No other variable in the text serves this purpose.\n4. Therefore, this is the required variable.",
+    "answer": "Set `ZET_ENABLE_PROGRAM_DEBUGGING=1`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "If `$PBS_NODEFILE` contains 8 lines, what values will `NNODES` and the argument to `helper_toggle_eu_debug.sh` have when the preparatory commands are executed?",
+    "reasoning": "1. `NNODES` is assigned using ``wc -l < $PBS_NODEFILE`` which counts the number of lines.\n2. With 8 lines, `NNODES` becomes 8.\n3. The `mpiexec` command then runs `./helper_toggle_eu_debug.sh 1`.\n4. The argument `1` is hard\u2011coded and does not depend on `NNODES`.\n5. Thus, `NNODES` = 8 and the script receives the argument `1`.",
+    "answer": "`NNODES` will be 8, and `helper_toggle_eu_debug.sh` is called with the argument `1`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain the CPU binding configuration specified in the `--mpiargs` option of the DDT command.",
+    "reasoning": "1. The `--mpiargs` string contains `-l --ppn 12 --cpu-bind verbose,list:...`.\n2. The `list:` part enumerates ranges of CPU IDs paired with logical cores.\n3. The pattern `0-7,104-111:8-15,112-119:...` repeats for each rank, assigning a distinct set of 8 CPUs per rank.\n4. Each rank receives a contiguous block of CPUs, and the `verbose` flag requests detailed binding output.\n5. Therefore, the configuration binds each of the 12 ranks per node to a specific list of CPUs as described.",
+    "answer": "It binds each of the 12 MPI ranks per node to a distinct list of CPUs using a verbose, explicit list mapping (e.g., `0-7,104-111` for rank\u202f0, `8-15,112-119` for rank\u202f1, etc.).",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "What steps does a user take on the client side after the DDT connection request popup appears?",
+    "reasoning": "1. The text says: \"On the client, you should see a connection pop\u2011up... Click the Connect button.\"\n2. After connecting, a DETAILS pane appears.\n3. The user must ensure the Implementation is set to \"Generic\".\n4. The user must verify and adjust the number of OpenMP threads and other run parameters.\n5. For PVC debugging, the \"Intel Xe\" box should be checked.\n6. Once satisfied, the user clicks the Run button.\n7. The GUI then shows the processes starting, and upon successful start the debugging interface appears.",
+    "answer": "Click Connect, set Implementation to Generic, verify OpenMP threads and other parameters (checking Intel Xe for PVC), then click Run to launch the debugging session.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "How can a user identify GPU threads in the DDT debugging GUI after hitting a breakpoint in a GPU\u2011offloaded kernel?",
+    "reasoning": "1. The text states: \"If you set a breakpoint or otherwise stop in the source code for a GPU\u2011offloaded kernel, you should be able to click the Thread radio button and see threads with a 'GPU' badge on them.\"\n2. Therefore, after pausing execution, the user selects the Thread view.\n3. Threads that belong to the GPU will be marked with a GPU badge.\n4. This visual cue distinguishes GPU threads from CPU threads.",
+    "answer": "Select the Thread view after stopping at a breakpoint; GPU threads will be labeled with a \"GPU\" badge.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the effect of the `-envall` flag within the `--mpiargs` of the DDT command?",
+    "reasoning": "1. The `--mpiargs` string ends with `-envall`.\n2. In MPI launch options, `-envall` tells the runtime to export all environment variables to the launched processes.\n3. This ensures that variables such as `ZET_ENABLE_PROGRAM_DEBUGGING` are available to each MPI rank.\n4. Thus, the flag propagates the entire environment to the debugged application.",
+    "answer": "`-envall` exports all current environment variables to every MPI process launched by DDT.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "If a user wants to debug an executable named `simulation.x` instead of `a.out`, how should the DDT command be modified?",
+    "reasoning": "1. The original command ends with `./a.out` as the program to run.\n2. To run a different executable, replace the path after the MPI arguments.\n3. The rest of the command (options, `--np`, `--mpiargs`) remains unchanged.\n4. Therefore, substitute `./a.out` with `./simulation.x`.\n5. The modified command is identical except for the final executable name.",
+    "answer": "Replace `./a.out` with `./simulation.x` at the end of the command while keeping all other options the same.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "Why does the script toggle EU debugging only when `MY_LOCAL_RANK` equals 0, and what would happen if every rank attempted the toggle?",
+    "reasoning": "1. The conditional `if [ ${MY_LOCAL_RANK} -eq 0 ]; then` ensures only one rank per node runs the toggle.\n2. The comment \"One rank per node toggles eu debug\" confirms this design.\n3. EU debugging likely requires a single activation per node; multiple toggles could cause race conditions or repeatedly enable/disable the flag.\n4. Limiting to rank\u202f0 prevents redundant or conflicting toggles, ensuring a consistent debug state across the node.\n5. If every rank attempted the toggle, the debug flag could be turned on and off repeatedly, leading to undefined behavior.",
+    "answer": "Only rank\u202f0 per node toggles EU debugging to avoid race conditions; if all ranks toggled it, the flag could be repeatedly switched, causing inconsistent or undefined debugging behavior.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_debugging_ddt-aurora.md:0:b458c7e0",
+    "source": "unknown"
+  },
+  {
+    "question": "Which metric ID should be used to collect GPU Memory Bandwidth Utilization, and is it reported per tile or per device?",
+    "reasoning": "1. The metrics list enumerates each metric with an ID and description.\n2. Scan the list for the description containing \"Memory Bandwidth Utilization\".\n3. The entry \"17. GPU Memory Bandwidth Utilization (%)\" matches the description.\n4. The description states \"per tile or device\" indicating it can be reported at both levels.\n5. Therefore, metric ID 17 corresponds to GPU Memory Bandwidth Utilization and can be reported per tile or per device.",
+    "answer": "Metric ID 17 corresponds to GPU Memory Bandwidth Utilization, and it can be reported per tile or per device.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "If you want to dump GPU utilization (ID 0) and GPU power (ID 1) for all devices every 2 seconds, stopping after 5 dumps, which command should you use?",
+    "reasoning": "1. The required metrics are GPU Utilization (ID 0) and GPU Power (ID 1).\n2. To specify multiple metrics, use the -m option with IDs separated by commas: \"-m 0,1\".\n3. To target all devices, the -d option value \"-1\" means all devices.\n4. The interval between dumps is set with -i, so use \"-i 2\" for 2\u2011second intervals.\n5. To stop after 5 dumps, use the -n option with value 5.\n6. Combine these options with the subcommand \"dump\":\n   xpu-smi dump -d -1 -m 0,1 -i 2 -n 5",
+    "answer": "Use: `xpu-smi dump -d -1 -m 0,1 -i 2 -n 5`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "How would you request the dump output in JSON format while collecting GPU temperature (ID 3) for device tile 0 only, for a single device with PCI BDF address 0000:65:00.0?",
+    "reasoning": "1. JSON output is enabled with the -j or --json option.\n2. GPU temperature corresponds to metric ID 3.\n3. To select a specific tile, use the -t option; tile 0 is specified as \"-t 0\".\n4. To target a specific device by PCI BDF address, use the -d option with the address \"0000:65:00.0\".\n5. Since only one dump is needed, omit -n (it defaults to a single dump).\n6. Assemble the command: `xpu-smi dump -d 0000:65:00.0 -t 0 -m 3 -j`.",
+    "answer": "`xpu-smi dump -d 0000:65:00.0 -t 0 -m 3 -j` produces JSON output for GPU temperature of tile\u202f0 on that device.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the difference between the -i option and the --ims option when dumping statistics?",
+    "reasoning": "1. The -i option description says it sets \"The interval (in seconds) to dump the device statistics to screen\".\n2. The --ims option description says it sets \"The interval (in milliseconds) to dump the device statistics to file for high\u2011frequency monitoring\".\n3. Therefore, -i controls screen output frequency in seconds, while --ims controls file output frequency in milliseconds for high\u2011frequency sampling.",
+    "answer": "-i sets the screen dump interval in seconds, whereas --ims sets the file dump interval in milliseconds for high\u2011frequency monitoring.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "Which subcommand would you use to retrieve the health status of GPU components, and how would you invoke it with the help flag?",
+    "reasoning": "1. The subcommands list includes \"health\" with the description \"Get the GPU device component health status\".\n2. To see help for a subcommand, the general pattern is to add the -h flag after the subcommand.\n3. Therefore, invoke the health subcommand with help as: `xpu-smi health -h`.",
+    "answer": "Use the `health` subcommand with help: `xpu-smi health -h`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "You need to collect high\u2011frequency samples of GPU power, GPU frequency, and GPU temperature. Which metrics IDs should you include, and which option should you use to set a 500\u202fms interval?",
+    "reasoning": "1. The recommended metrics for high\u2011frequency sampling are listed and include GPU power, GPU frequency, and GPU temperature.\n2. From the metrics list: GPU Power is ID 1, GPU Frequency is ID 2, GPU Core Temperature is ID 3.\n3. High\u2011frequency interval is set with the --ims option, which expects milliseconds.\n4. To set a 500\u202fms interval, use \"--ims 500\".\n5. Combine the metric IDs with -m \"1,2,3\".\n6. The full command fragment would be: `-m 1,2,3 --ims 500`.",
+    "answer": "Include metric IDs 1, 2, and 3, and set the interval with `--ims 500`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "How can you dump raw statistics to a file named \"gpu_stats.log\" while also displaying a timestamp date in each entry?",
+    "reasoning": "1. To write to a file, the option \"--file\" is used.\n2. To include a date timestamp, the option \"--date\" is provided.\n3. The command must specify the output file name after \"--file\".\n4. Assemble the command: `xpu-smi dump --file gpu_stats.log --date`.\n5. No other options are required for this basic dump.",
+    "answer": "`xpu-smi dump --file gpu_stats.log --date` writes raw stats to the file with timestamps.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "Which metric ID corresponds to \"GPU EU Array Stall (%)\" and what does its description imply about its measurement scope?",
+    "reasoning": "1. Scan the metrics list for the description containing \"EU Array Stall\".\n2. The entry \"10. GPU EU Array Stall (%)\" matches.\n3. The description adds \"the normalized sum of all cycles on all EUs during which the EUs were stalled. At least one thread is loaded, but the EU is stalled. Per tile or device. Device-level is the average value of tiles for multi\u2011tiles.\"\n4. This indicates the metric is measured per tile or per device, with device\u2011level values being averages across tiles.\n5. Therefore, metric ID 10 is for GPU EU Array Stall (%), reported per tile or averaged per device.",
+    "answer": "Metric ID 10 is \"GPU EU Array Stall (%)\", measured per tile or averaged per device.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "If you only want to monitor the PCIe read and write rates for a single device, which metric IDs should you select and how would you limit the dump to that device using its device ID 2?",
+    "reasoning": "1. PCIe read and write rates correspond to metric IDs 19 and 20 respectively.\n2. To select multiple metrics, list them with commas in the -m option: \"-m 19,20\".\n3. To target a specific device by its ID, use the -d option with the device ID value \"2\".\n4. Combine these options: `xpu-smi dump -d 2 -m 19,20`.\n5. No additional options are required for a single dump.",
+    "answer": "`xpu-smi dump -d 2 -m 19,20` collects PCIe read and write rates for device\u202f2.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain how you would discover all GPU devices on the system and then immediately display their topology.",
+    "reasoning": "1. The subcommand for discovering devices is \"discovery\".\n2. The subcommand for obtaining system topology is \"topology\".\n3. To run them sequentially, execute each subcommand separately.\n4. First command: `xpu-smi discovery` lists installed GPU devices.\n5. Second command: `xpu-smi topology` shows the system topology.\n6. Running them one after the other satisfies the requirement.",
+    "answer": "Run `xpu-smi discovery` to list devices, then `xpu-smi topology` to display the system topology.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "You need to reset the counters for all tiles on all devices. Which metric ID should you use, and how would you specify that all devices and all tiles are targeted?",
+    "reasoning": "1. The metric for resetting counters is listed as \"12. Reset Counter\".\n2. To target all devices, the -d option value \"-1\" means all devices.\n3. If a device has multiple tiles, omitting the -t option applies the command to all tiles.\n4. Combine these: `xpu-smi dump -d -1 -m 12`.\n5. No tile option is needed because all tiles are implied.",
+    "answer": "`xpu-smi dump -d -1 -m 12` resets counters for all tiles on all devices.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "What command would you use to list the processes currently using the GPUs, and which subcommand provides this functionality?",
+    "reasoning": "1. The subcommands list includes \"ps\" with the description \"List status of processes\".\n2. To invoke this subcommand, use the main command followed by \"ps\".\n3. No additional options are required for a basic listing.\n4. Therefore, the command is `xpu-smi ps`.",
+    "answer": "Run `xpu-smi ps` to list the processes using the GPUs.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_performance-tools_xpu-smi.md:0:b3d65e52",
+    "source": "unknown"
+  },
+  {
+    "question": "What header file must be included in a C source file to use the OpenCL API?",
+    "reasoning": "1. The text states that OpenCL is a C API.\n2. It specifies the exact include directive for C usage.\n3. The directive shown is `#include <CL/opencl.h>`.\n4. Therefore, this is the required header for C programs.",
+    "answer": "You need to include the header file `<CL/opencl.h>`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "If you are building an OpenCL application with a Makefile, which linker flag should you add to ensure the OpenCL loader library is linked?",
+    "reasoning": "1. The documentation mentions that applications using the OpenCL API must be linked to the loader library.\n2. It specifies the exact linker flag needed for Make builds.\n3. The flag given is `-lOpenCL`.\n4. Adding this flag during linking satisfies the requirement.",
+    "answer": "Add the `-lOpenCL` linker flag to the Makefile.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe the CMake commands required to locate the OpenCL package and link it to a target named `my_target`.",
+    "reasoning": "1. The text provides a two\u2011line CMake snippet.\n2. The first line calls `find_package(OpenCL REQUIRED)` to locate the package.\n3. The second line uses `target_link_libraries(my_target PRIVATE OpenCL::OpenCL)` to link the found package to the target.\n4. Both steps are necessary to properly link OpenCL with CMake.",
+    "answer": "Use `find_package(OpenCL REQUIRED)` followed by `target_link_libraries(my_target PRIVATE OpenCL::OpenCL)`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "When CMake cannot automatically locate the OpenCL library, which two CMake variables can you set to give it explicit locations?",
+    "reasoning": "1. The passage explains that CMake may need help finding the OpenCL library.\n2. It lists two variables that can be provided as hints: `OpenCL_LIBRARY` and `OpenCL_INCLUDE_DIR`.\n3. Setting these variables directs CMake to the correct library and header locations.\n4. No other variables are mentioned for this purpose.",
+    "answer": "`OpenCL_LIBRARY` and `OpenCL_INCLUDE_DIR`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain how to compute the `OPENCL_BASE_DIR` environment variable when using the `icx` compiler on Aurora.",
+    "reasoning": "1. The text shows a command that sets `OPENCL_BASE_DIR`.\n2. It uses `$(dirname $(which icx))/..` to derive the directory.\n3. `which icx` returns the full path to the `icx` executable.\n4. `dirname` extracts the directory containing `icx`.\n5. Appending `/..` moves one level up, giving the base directory for OpenCL.\n6. The resulting value is exported as `OPENCL_BASE_DIR`.",
+    "answer": "Set `OPENCL_BASE_DIR` to the parent directory of the folder containing the `icx` executable by running `export OPENCL_BASE_DIR=$(dirname $(which icx))/..`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "After defining `OPENCL_BASE_DIR`, write the CMake command line that points CMake to the OpenCL shared library and include directory.",
+    "reasoning": "1. The documentation provides a multi\u2011line CMake invocation.\n2. It uses `-DOpenCL_LIBRARY=${OPENCL_BASE_DIR}/lib/libOpenCL.so` to specify the library path.\n3. It also uses `-DOpenCL_INCLUDE_DIR=${OPENCL_BASE_DIR}/include/sycl` for the headers.\n4. Both options are passed to `cmake` together with any other options.\n5. Combining them yields the full command.",
+    "answer": "`cmake -DOpenCL_LIBRARY=${OPENCL_BASE_DIR}/lib/libOpenCL.so -DOpenCL_INCLUDE_DIR=${OPENCL_BASE_DIR}/include/sycl <other_cmake_options>`",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "What header file should a C++ program include to use the OpenCL C++ bindings?",
+    "reasoning": "1. The text mentions that C++ bindings exist for OpenCL.\n2. It provides the exact include directive for C++ usage.\n3. The directive is `#include <CL/opencl.hpp>`.\n4. Therefore, this is the required header for C++ applications.",
+    "answer": "Include the header `<CL/opencl.hpp>`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "Why might you need to set `OpenCL_LIBRARY` and `OpenCL_INCLUDE_DIR` manually when configuring a CMake project on Aurora?",
+    "reasoning": "1. CMake searches for libraries and headers automatically, but it may not know the location of Aurora's OpenCL installation.\n2. The text states that during the configure step, CMake may need help finding the OpenCL library.\n3. Providing explicit paths via `OpenCL_LIBRARY` and `OpenCL_INCLUDE_DIR` ensures CMake can locate the correct files.\n4. This avoids configuration failures due to missing or misplaced defaults.",
+    "answer": "Because CMake might not automatically locate Aurora\u2019s OpenCL installation, manually setting those variables directs it to the correct library and header locations.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "If you prefer a private linkage of OpenCL to your target in CMake, which keyword should you use in `target_link_libraries`?",
+    "reasoning": "1. The example `target_link_libraries(my_target PRIVATE OpenCL::OpenCL)` shows the use of the `PRIVATE` keyword.\n2. `PRIVATE` indicates that the linkage is not propagated to dependents of `my_target`.\n3. This matches the requirement for a private link.\n4. No other keyword is shown for this purpose.",
+    "answer": "Use the `PRIVATE` keyword, as in `target_link_libraries(my_target PRIVATE OpenCL::OpenCL)`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "Outline the full sequence of steps to compile a C OpenCL program using a Makefile on Aurora, from including headers to linking.",
+    "reasoning": "1. First, the source file must include the OpenCL C header: `#include <CL/opencl.h>`.\n2. The source is compiled with the chosen compiler (e.g., `icx`).\n3. During the linking stage, the OpenCL loader library must be linked using the `-lOpenCL` flag.\n4. The Makefile should therefore contain a rule that adds `-lOpenCL` to the linker command.\n5. This sequence ensures both compilation and proper linkage of OpenCL.",
+    "answer": "Include `<CL/opencl.h>` in the source, compile with your compiler, and add `-lOpenCL` to the linker flags in the Makefile.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the CMake approach to linking OpenCL differ from the Make approach, based on the provided text?",
+    "reasoning": "1. In Make, linking is done manually by adding the `-lOpenCL` flag.\n2. In CMake, the process is abstracted: `find_package(OpenCL REQUIRED)` locates the library, and `target_link_libraries` links it using the imported target `OpenCL::OpenCL`.\n3. CMake can also receive explicit library and include paths via variables, which is not shown for Make.\n4. Therefore, CMake provides higher\u2011level, portable handling of the library, while Make relies on explicit flags.",
+    "answer": "CMake uses `find_package` and `target_link_libraries` with an imported target, optionally accepting explicit paths, whereas Make requires you to manually add the `-lOpenCL` flag.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_opencl-aurora.md:0:29a0ae82",
+    "source": "unknown"
+  },
+  {
+    "question": "If a user wants to compile a Kokkos application with CMake on Aurora, which environment variables must be correctly set for the compiler to locate the Kokkos headers and libraries?",
+    "reasoning": "1. The text states that loading the Kokkos module sets several environment variables.\n2. `KOKKOS_ROOT` points to the base installation directory containing `lib64/` and `include/`.\n3. `CPATH` is prepended with `$KOKKOS_ROOT/include`, which CMake uses to find header files.\n4. `LIBRARY_PATH` and `LD_LIBRARY_PATH` are both prepended with `$KOKKOS_ROOT/lib64`, allowing the linker and runtime loader to locate library files.\n5. Therefore, for CMake to locate both headers and libraries, `CPATH`, `LIBRARY_PATH`, and `LD_LIBRARY_PATH` (derived from `KOKKOS_ROOT`) must be correctly set.",
+    "answer": "CMake relies on `CPATH`, `LIBRARY_PATH`, and `LD_LIBRARY_PATH`, which are populated from `KOKKOS_ROOT` when the module is loaded.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "What execution backends are available in the prebuilt Kokkos package on Aurora, and which hardware architectures does each target?",
+    "reasoning": "1. The description lists three backends included in the prebuilt package.\n2. The Serial backend runs on a single CPU core without parallelism.\n3. The OpenMP backend utilizes multiple CPU cores via OpenMP directives.\n4. The SYCL backend is designed for GPU execution.\n5. Thus, Serial and OpenMP target CPU execution, while SYCL targets GPU execution.",
+    "answer": "The prebuilt Kokkos provides Serial and OpenMP for CPU execution and SYCL for GPU execution.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "Why does the SYCL backend on Aurora require ahead-of-time (AOT) compilation instead of just-in-time (JIT) compilation?",
+    "reasoning": "1. The text explicitly mentions that SYCL on Aurora uses AOT compilation, not JIT.\n2. Aurora\u2019s GPU environment does not support runtime compilation of kernels, which is required for JIT.\n3. AOT compilation generates device code before execution, ensuring compatibility with the system\u2019s static GPU drivers.\n4. Therefore, the SYCL backend must use AOT to work within Aurora\u2019s constraints.",
+    "answer": "Because Aurora\u2019s GPU environment lacks JIT support, the SYCL backend must compile kernels ahead of time.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "After running `module load kokkos`, how does the `LD_LIBRARY_PATH` variable change, and why is this change important for running Kokkos applications?",
+    "reasoning": "1. The module load command sets `LD_LIBRARY_PATH` by prepending `$KOKKOS_ROOT/lib64`.\n2. Prepending ensures that the Kokkos libraries are searched before any other libraries with the same name.\n3. At runtime, the dynamic linker uses `LD_LIBRARY_PATH` to locate shared libraries.\n4. Including the Kokkos library directory guarantees that the correct Kokkos shared objects are loaded when the application starts.\n5. Hence, the change is essential for successful execution of Kokkos programs.",
+    "answer": "`LD_LIBRARY_PATH` is prefixed with `$KOKKOS_ROOT/lib64`, ensuring the runtime linker finds Kokkos\u2019s shared libraries first.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "If a user accidentally overwrites `CPATH` after loading the Kokkos module, what consequence will this have on a subsequent CMake configuration step?",
+    "reasoning": "1. `CPATH` is set to include `$KOKKOS_ROOT/include` after the module load.\n2. CMake consults `CPATH` to locate header directories during configuration.\n3. Overwriting `CPATH` removes the Kokkos include path from the search list.\n4. Without the include path, CMake will fail to find Kokkos headers, leading to configuration errors.\n5. Therefore, the build will not succeed unless `CPATH` is restored.",
+    "answer": "CMake will be unable to locate Kokkos headers, causing the configuration to fail.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "How would a developer ensure that the Kokkos libraries are found before any other libraries with the same name on the system?",
+    "reasoning": "1. The module load command prepends `$KOKKOS_ROOT/lib64` to `LIBRARY_PATH` and `LD_LIBRARY_PATH`.\n2. Prepending places the Kokkos library directory at the front of the search order.\n3. The linker and runtime loader prioritize directories earlier in these variables.\n4. Consequently, Kokkos libraries will be selected over similarly named libraries elsewhere.\n5. No additional steps are required beyond loading the module.",
+    "answer": "By loading the Kokkos module, which prepends its `lib64` directory to the library search paths, Kokkos libraries are prioritized.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "A user wants to compile a Kokkos program that uses only the OpenMP backend. Which environment variable(s) must they verify, and what value should they expect for `KOKKOS_ROOT`?",
+    "reasoning": "1. The OpenMP backend is included in the prebuilt package, so the module provides all necessary paths.\n2. The critical variable is `KOKKOS_ROOT`, which points to the installation root containing both `include/` and `lib64/`.\n3. After `module load kokkos`, `KOKKOS_ROOT` will be set to the directory where Kokkos was installed on Aurora.\n4. The user does not need to modify other variables; they must simply ensure `KOKKOS_ROOT` is defined.\n5. Therefore, they should check that `KOKKOS_ROOT` is set to the path shown by the module.",
+    "answer": "They need to confirm that `KOKKOS_ROOT` is defined and points to the Kokkos installation directory provided by the module.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain why the module command uses `prepend` rather than `append` when modifying `LIBRARY_PATH` and `CPATH`.",
+    "reasoning": "1. Prepending adds the new directory to the beginning of the search list.\n2. This gives the Kokkos directories higher priority over existing entries.\n3. If another library with the same name exists elsewhere, the linker will select the Kokkos version first.\n4. Appending would place Kokkos after other entries, risking accidental use of incompatible libraries.\n5. Therefore, prepend ensures correct and deterministic library/header resolution.",
+    "answer": "Prepending gives Kokkos\u2019s directories priority in the search order, preventing accidental selection of conflicting libraries or headers.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "What would happen if a user tries to run a Kokkos application on Aurora without first executing `module load kokkos`?",
+    "reasoning": "1. Without loading the module, none of the environment variables (`KOKKOS_ROOT`, `LIBRARY_PATH`, `CPATH`, `LD_LIBRARY_PATH`) are set.\n2. The compiler and linker would lack paths to Kokkos headers and libraries.\n3. The application would fail at compile time (missing headers) or at runtime (missing shared libraries).\n4. Additionally, the SYCL backend would not have the required AOT-compiled components.\n5. Hence, the program cannot be built or executed successfully.",
+    "answer": "The build or execution would fail because the compiler and linker cannot locate Kokkos headers and libraries.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "If a system administrator wants to verify that the Kokkos module correctly set `LD_LIBRARY_PATH`, which command sequence should they use after loading the module?",
+    "reasoning": "1. After `module load kokkos`, the environment variable is modified.\n2. To inspect its value, the standard command is `echo $LD_LIBRARY_PATH`.\n3. This will display the current search path, showing `$KOKKOS_ROOT/lib64` at the front.\n4. The administrator can compare the output to the expected prefix.\n5. No other commands are required for verification.",
+    "answer": "Run `echo $LD_LIBRARY_PATH` and confirm that `$KOKKOS_ROOT/lib64` appears at the beginning of the output.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe the relationship between `KOKKOS_ROOT` and the other environment variables set by the module load command.",
+    "reasoning": "1. `KOKKOS_ROOT` is the base directory of the Kokkos installation.\n2. `CPATH` is set to `$KOKKOS_ROOT/include`, providing the header search path.\n3. Both `LIBRARY_PATH` and `LD_LIBRARY_PATH` are set to `$KOKKOS_ROOT/lib64`, giving the linker and runtime loader access to the libraries.\n4. Thus, `KOKKOS_ROOT` serves as the anchor from which the other variables derive their values.\n5. Changing `KOKKOS_ROOT` would automatically affect the other paths if the module were reloaded.",
+    "answer": "`KOKKOS_ROOT` is the root directory, and the module derives `CPATH`, `LIBRARY_PATH`, and `LD_LIBRARY_PATH` from it by appending `/include` or `/lib64`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "A developer needs to compile a Kokkos program that links against a custom library located in `/opt/custom/lib`. How should they modify the environment after loading the Kokkos module to ensure both Kokkos and the custom library are found?",
+    "reasoning": "1. After loading Kokkos, `LIBRARY_PATH` and `LD_LIBRARY_PATH` already have `$KOKKOS_ROOT/lib64` at the front.\n2. To add the custom library, they can prepend its path to the same variables, preserving Kokkos priority.\n3. For example, `export LIBRARY_PATH=/opt/custom/lib:$LIBRARY_PATH` and `export LD_LIBRARY_PATH=/opt/custom/lib:$LD_LIBRARY_PATH`.\n4. This keeps Kokkos directories first while still allowing the linker to locate the custom library.\n5. No change to `CPATH` is needed unless the custom library also provides headers.\n6. The final environment will contain both paths in the correct order.",
+    "answer": "Prepend `/opt/custom/lib` to `LIBRARY_PATH` and `LD_LIBRARY_PATH` (e.g., `export LIBRARY_PATH=/opt/custom/lib:$LIBRARY_PATH`) so both Kokkos and the custom library are searchable.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:7c58c01d",
+    "source": "unknown"
+  },
+  {
+    "question": "For how many days will Aurora be unavailable due to the Flare upgrade?",
+    "reasoning": "1. The text states the upgrade is scheduled from Feb\u202f2 to Feb\u202f5,\u202f2026.\n2. To find the duration, count each calendar day inclusive of the start and end dates.\n3. Feb\u202f2,\u202f3,\u202f4, and\u202f5 constitute four separate days.\n4. Therefore, the outage spans four full days.",
+    "answer": "Aurora will be unavailable for four days.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "What specific software version is being installed during the Flare upgrade?",
+    "reasoning": "1. The update description lists \u201cNEO 7.2-021 software updates\u201d.\n2. This indicates the software component being updated is the NEO package.\n3. The version number provided is 7.2-021.\n4. No other software versions are mentioned.",
+    "answer": "The NEO software is being updated to version\u202f7.2\u2011021.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "Which two types of updates are included in the Flare upgrade?",
+    "reasoning": "1. The bullet point enumerates the contents of the upgrade.\n2. It mentions \u201cNEO 7.2-021 software updates\u201d as one item.\n3. It also mentions \u201chardware firmware updates\u201d as a second item.\n4. No additional update categories are listed.",
+    "answer": "The upgrade includes NEO software updates and hardware firmware updates.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "If a researcher plans to run a job on Aurora on February\u202f3,\u202f2026, what should they expect?",
+    "reasoning": "1. Aurora is stated to be unavailable during the Flare upgrade.\n2. The upgrade period covers Feb\u202f2 through Feb\u202f5,\u202f2026.\n3. February\u202f3 falls within that interval.\n4. Therefore, Aurora will not be accessible on that date.\n5. The researcher should anticipate that their job cannot be submitted or executed on Aurora on Feb\u202f3.",
+    "answer": "They should expect Aurora to be unavailable and their job cannot run on February\u202f3,\u202f2026.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "Is the Aurora system itself being directly upgraded, according to the text?",
+    "reasoning": "1. The text says \u201cFlare is scheduled to be upgraded\u201d.\n2. It then notes that \u201cresulting in Aurora being unavailable\u201d.\n3. This implies Aurora is not the target of the upgrade but is impacted by Flare\u2019s upgrade.\n4. No statement indicates Aurora receives any direct updates.",
+    "answer": "No, Aurora is not directly upgraded; it is only affected by Flare\u2019s upgrade.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the earliest date on which Aurora will be back online after the upgrade?",
+    "reasoning": "1. The upgrade ends on Feb\u202f5,\u202f2026.\n2. The text says Aurora is unavailable during the upgrade period.\n3. Assuming services resume immediately after the upgrade completes, the first day it would be available is the day after Feb\u202f5.\n4. The day after Feb\u202f5,\u202f2026, is Feb\u202f6,\u202f2026.",
+    "answer": "Aurora should be back online on February\u202f6,\u202f2026.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "Does the text indicate whether the hardware firmware updates are part of the NEO software version 7.2-021?",
+    "reasoning": "1. The bullet lists two separate items: \u201cNEO 7.2-021 software updates\u201d and \u201chardware firmware updates\u201d.\n2. The separation suggests they are distinct update categories.\n3. No wording links the firmware updates to the NEO version.\n4. Therefore, the firmware updates are not described as being part of NEO\u202f7.2\u2011021.",
+    "answer": "No, the hardware firmware updates are listed separately from the NEO\u202f7.2\u2011021 software updates.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "If the upgrade were delayed by one day, what would be the new end date for Aurora\u2019s unavailability?",
+    "reasoning": "1. The original schedule ends on Feb\u202f5,\u202f2026.\n2. A one\u2011day delay would push the end of the upgrade to the next calendar day.\n3. Adding one day to Feb\u202f5 yields Feb\u202f6,\u202f2026.\n4. Consequently, Aurora would remain unavailable through Feb\u202f6.",
+    "answer": "Aurora would be unavailable through February\u202f6,\u202f2026.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "Based on the information, which component\u2019s name suggests it is a software platform rather than hardware?",
+    "reasoning": "1. The two components mentioned are \u201cFlare\u201d and \u201cNEO\u201d.\n2. \u201cFlare\u201d is described as being upgraded, implying a system or service.\n3. \u201cNEO\u201d is explicitly called a software update (NEO\u202f7.2\u2011021 software updates).\n4. Therefore, NEO is the component identified as a software platform.",
+    "answer": "NEO is the component identified as a software platform.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "What logical relationship can be inferred between the Flare upgrade and Aurora\u2019s availability?",
+    "reasoning": "1. The text states that Flare\u2019s upgrade results in Aurora being unavailable.\n2. This indicates a cause\u2011and\u2011effect relationship: Flare\u2019s upgrade causes Aurora\u2019s downtime.\n3. The wording \u201cresulting in\u201d explicitly defines the dependency.\n4. Thus, Aurora\u2019s availability is contingent on the completion of Flare\u2019s upgrade.",
+    "answer": "The Flare upgrade causes Aurora\u2019s unavailability; Aurora remains down until the Flare upgrade finishes.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_system-updates.md:0:39375f31",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the script ensure that the `hello_affinity` application runs in MPI mode?",
+    "reasoning": "1. The text states that the example runs `hello_affinity` from the getting\u2011started guide in **mpi\u2011mode**.\n2. When a job is marked as **mpi\u2011mode**, Balsam automatically launches the command with **mpiexec**.\n3. Therefore, by specifying mpi\u2011mode for the job, the script triggers the use of mpiexec for `hello_affinity`.",
+    "answer": "The script marks the job as `mpi\u2011mode`, causing Balsam to launch `hello_affinity` with `mpiexec`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "What command structure is used to execute an echo command that runs on a single GPU tile?",
+    "reasoning": "1. The description mentions an example of executing an echo command that takes an argument.\n2. It also notes that this command runs on a **single GPU tile**, implying it is not launched in mpi\u2011mode.\n3. Consequently, the command is submitted as a regular (non\u2011MPI) job, allowing Balsam to schedule it on one GPU tile.",
+    "answer": "The echo command is submitted as a regular, non\u2011MPI job, so Balsam runs it on a single GPU tile.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "Which Python classes are imported from the Balsam API for defining and submitting jobs in this example?",
+    "reasoning": "1. The code snippet shows the import line: `from balsam.api import ApplicationDefinition, Job`.\n2. This line explicitly brings two classes into the script's namespace.\n3. No other classes are imported in the shown excerpt.",
+    "answer": "The script imports `ApplicationDefinition` and `Job` from `balsam.api`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "If you want to add a new application to the ensemble, which class should you instantiate?",
+    "reasoning": "1. The imported classes include `ApplicationDefinition`, which by its name represents the definition of an application.\n2. In Balsam, application definitions are created using this class before jobs are created.\n3. Therefore, to add a new application, you would create an instance of `ApplicationDefinition`.",
+    "answer": "Instantiate `ApplicationDefinition` to add a new application.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the example differentiate between MPI and non\u2011MPI jobs?",
+    "reasoning": "1. The text refers to running `hello_affinity` in **mpi\u2011mode**, which triggers `mpiexec`.\n2. It also mentions an echo command that runs on a single GPU tile, implying it is **not** in mpi\u2011mode.\n3. Thus, the distinction is made by the mode flag: jobs marked as mpi\u2011mode use `mpiexec`; others run as standard commands.",
+    "answer": "Jobs marked as `mpi\u2011mode` are launched with `mpiexec`; jobs without that flag run as regular commands.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the name of the file that contains the ensemble example code?",
+    "reasoning": "1. The heading above the code block reads `balsam_job_ensemble.py`.\n2. This is presented as the filename for the example script.\n3. No other filename is mentioned in the excerpt.",
+    "answer": "The example code is stored in `balsam_job_ensemble.py`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "In this context, what role does `mpiexec` play when running the `hello_affinity` application?",
+    "reasoning": "1. The text says that running `hello_affinity` in **mpi\u2011mode** will execute the application with `mpiexec`.\n2. `mpiexec` is the standard launcher for MPI programs, distributing the executable across multiple ranks.\n3. Therefore, `mpiexec` is responsible for launching the MPI processes for `hello_affinity`.",
+    "answer": "`mpiexec` launches the `hello_affinity` application across multiple MPI ranks.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "How would you schedule a job that should use only one GPU tile according to the example?",
+    "reasoning": "1. The example of the echo command runs on a single GPU tile and is described separately from the MPI example.\n2. It is implied that such a job is submitted without the mpi\u2011mode flag.\n3. Submitting the command as a regular (non\u2011MPI) job tells Balsam to allocate a single GPU tile for it.",
+    "answer": "Submit the command without `mpi\u2011mode`; Balsam will allocate a single GPU tile for the job.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:8d56ec35",
+    "source": "unknown"
+  },
+  {
+    "question": "What exact command line will be executed when an instance of HelloAffinity is launched?",
+    "reasoning": "1. The class defines a field called `command_template`.\n2. The value of `command_template` is the string `$HOME/GettingStarted/HelperScripts/Aurora/set_affinity_gpu_aurora.sh $HOME/GettingStarted/Examples/Aurora/affinity_gpu/sycl/hello_affinity`.\n3. When the application runs, the template is used as the command line.\n4. No additional placeholders or substitutions are shown, so the command line is exactly the template string with the `$HOME` variable expanded by the shell.\n5. Therefore the command that will be executed is the script path followed by the path to the hello_affinity executable.",
+    "answer": "The executed command is `$HOME/GettingStarted/HelperScripts/Aurora/set_affinity_gpu_aurora.sh $HOME/GettingStarted/Examples/Aurora/affinity_gpu/sycl/hello_affinity`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "In which directory does the GPU affinity wrapper script reside according to the definition?",
+    "reasoning": "1. The `command_template` contains the first path `$HOME/GettingStarted/HelperScripts/Aurora/set_affinity_gpu_aurora.sh`.\n2. The part before the script name is `$HOME/GettingStarted/HelperScripts/Aurora`.\n3. This directory path indicates where the script is located.\n4. No other directories are mentioned for the script.",
+    "answer": "The script is located in `$HOME/GettingStarted/HelperScripts/Aurora`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "If the user's HOME environment variable is set to `/home/alice`, what is the absolute path to the `hello_affinity` executable used in the command?",
+    "reasoning": "1. The second part of the `command_template` is `$HOME/GettingStarted/Examples/Aurora/affinity_gpu/sycl/hello_affinity`.\n2. Substitute `$HOME` with `/home/alice`.\n3. Concatenating yields `/home/alice/GettingStarted/Examples/Aurora/affinity_gpu/sycl/hello_affinity`.\n4. This is the full path to the executable.",
+    "answer": "`/home/alice/GettingStarted/Examples/Aurora/affinity_gpu/sycl/hello_affinity`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the purpose of the `site` attribute in the HelloAffinity class?",
+    "reasoning": "1. The class defines `site = \"test_aurora\"`.\n2. In an application definition framework, a `site` attribute usually identifies the compute site or resource where the application is intended to run.\n3. The value `test_aurora` therefore labels the target environment for this application.\n4. This information can be used by schedulers or deployment tools to select appropriate resources.",
+    "answer": "The `site` attribute labels the target compute site (`test_aurora`) for the application.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "What effect does calling `HelloAffinity.sync()` have in the context of this definition?",
+    "reasoning": "1. After the class definition, the statement `HelloAffinity.sync()` is executed.\n2. In typical application\u2011definition APIs, a `sync` method registers the definition with a central registry or writes it to persistent storage.\n3. By invoking it, the HelloAffinity definition becomes available to the rest of the system.\n4. No further code is shown, so the primary effect is registration/synchronization of the definition.",
+    "answer": "`HelloAffinity.sync()` registers the application definition so it can be used by the system.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "How does the `command_template` combine the GPU affinity script with the example program?",
+    "reasoning": "1. The template contains two space\u2011separated paths.\n2. The first path points to `set_affinity_gpu_aurora.sh`, a wrapper script.\n3. The second path points to the `hello_affinity` executable.\n4. When the command runs, the script receives the executable path as its first argument, thereby wrapping the program with GPU affinity logic.\n5. This ordering ensures the script controls the execution environment of the program.",
+    "answer": "The template runs `set_affinity_gpu_aurora.sh` and passes the `hello_affinity` executable as its argument, letting the script set GPU affinity before launching the program.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "If `set_affinity_gpu_aurora.sh` expects the target executable as its first argument, how is this requirement satisfied by the definition?",
+    "reasoning": "1. The `command_template` lists the script path followed by the executable path.\n2. In a shell command, arguments are passed in the order they appear.\n3. Therefore the executable path becomes the first argument to the script.\n4. This matches the script\u2019s expectation without any extra syntax.",
+    "answer": "Because the executable path follows the script in the command line, it is passed as the script\u2019s first argument.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "Assuming a scheduler uses the `command_template` for job submission, what role does this field play?",
+    "reasoning": "1. Schedulers need a concrete command to launch on compute nodes.\n2. The `command_template` provides that exact command string.\n3. The scheduler will expand `$HOME` on the target node and execute the resulting command.\n4. Thus the field determines the exact process that will run, including the GPU\u2011affinity wrapper.",
+    "answer": "The `command_template` supplies the exact command the scheduler will execute on the compute node.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe how environment variable expansion works in the `command_template` string.",
+    "reasoning": "1. The template contains `$HOME` twice.\n2. When the command is passed to a shell, `$HOME` is replaced with the value of the HOME environment variable for the user running the job.\n3. This substitution yields absolute paths based on the user\u2019s home directory.\n4. No other variables are present, so only `$HOME` is expanded.",
+    "answer": "The shell replaces each `$HOME` with the user\u2019s home directory, turning the template into absolute paths before execution.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "If the HelloAffinity class is defined in a module that is imported elsewhere, what must be done before the application can be executed?",
+    "reasoning": "1. The class definition alone does not register the application.\n2. The file includes a call to `HelloAffinity.sync()` right after the class body.\n3. Importing the module executes that call, performing the registration.\n4. Therefore, simply importing the module is sufficient; no additional steps are required.",
+    "answer": "Importing the module automatically runs `HelloAffinity.sync()`, registering the application for execution.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_balsam.md:0:d7dad71d",
+    "source": "unknown"
+  },
+  {
+    "question": "If you want each worker to execute three simulations instead of two, how would you modify the exit criteria in `run_libe_forces.py`?",
+    "reasoning": "1. The text shows the current line sets `sim_max=nsim_workers*2` to run two simulations per worker.\n2. To run three simulations per worker, the multiplier should be changed from 2 to 3.\n3. The modified line would therefore be `ensemble.exit_criteria = ExitCriteria(sim_max=nsim_workers*3)`.\n4. No other changes are required because `nsim_workers` already represents the number of workers.",
+    "answer": "Change the line to `ensemble.exit_criteria = ExitCriteria(sim_max=nsim_workers*3)` so each worker runs three simulations.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "What compile command would you use to build the `forces` application for a GPU architecture different from `spir64`, assuming you need to target `spirv64`?",
+    "reasoning": "1. The provided compile command includes the flag `-fopenmp-targets=spir64` to specify the target.\n2. To target a different architecture, replace `spir64` with the desired target name.\n3. Keeping all other flags unchanged, the new command becomes `mpicc -DGPU -O3 -fiopenmp -fopenmp-targets=spirv64 -o forces.x forces.c`.\n4. This command will compile `forces.c` for the `spirv64` GPU target.",
+    "answer": "Use `mpicc -DGPU -O3 -fiopenmp -fopenmp-targets=spirv64 -o forces.x forces.c`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "How many MPI ranks are launched when you run `python run_libe_forces.py -n 7` after cleaning up, and how many GPUs does each worker use?",
+    "reasoning": "1. The text states that after running `./cleanup.sh` and `python run_libe_forces.py -n 7`, the program runs with two cores (MPI ranks).\n2. It also mentions that two GPUs are used per worker.\n3. Therefore, the run employs two MPI ranks, each assigned two GPUs.\n4. No additional workers are mentioned for this configuration.",
+    "answer": "Two MPI ranks are launched, and each worker utilizes two GPUs.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the total number of workers (including the persistent generator) when you execute `python run_libe_forces.py -n 13`?",
+    "reasoning": "1. The text says that running with `-n 13` provides twelve workers for simulations and an extra worker for the persistent generator.\n2. Adding the persistent generator worker to the twelve simulation workers gives a total of thirteen workers.\n3. The `-n` flag directly specifies the total number of workers launched.\n4. Hence, the total matches the value passed to `-n`.",
+    "answer": "Thirteen workers are launched: twelve simulation workers plus one persistent generator.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "If you request three nodes in the interactive PBS job (`-l select=3`), how many GPUs will be available for the `forces_gpu` tutorial assuming each node has four GPUs?",
+    "reasoning": "1. The tutorial runs one worker per GPU.\n2. With three nodes and four GPUs per node, the total GPU count is 3\u202f\u00d7\u202f4\u202f=\u202f12.\n3. The interactive session will therefore have twelve GPUs available.\n4. Workers can be allocated to use all twelve GPUs.",
+    "answer": "Twelve GPUs will be available (3 nodes\u202f\u00d7\u202f4 GPUs per node).",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "Explain the sequence of commands you would run to clean the previous build artifacts, recompile the `forces` application for GPU, and then start the tutorial with eight workers.",
+    "reasoning": "1. To clean previous artifacts, the script `./cleanup.sh` is used as shown in the text.\n2. After cleaning, compile `forces` with the provided `mpicc` command.\n3. Change directory to `../forces_gpu` to access the tutorial scripts.\n4. Run the tutorial with `-n 8` to launch eight workers.\n5. The full command sequence is:\n   - `./cleanup.sh`\n   - `mpicc -DGPU -O3 -fiopenmp -fopenmp-targets=spir64 -o forces.x forces.c`\n   - `cd ../forces_gpu`\n   - `python run_libe_forces.py -n 8`.",
+    "answer": "Run `./cleanup.sh`, compile with `mpicc -DGPU -O3 -fiopenmp -fopenmp-targets=spir64 -o forces.x forces.c`, `cd ../forces_gpu`, then start the tutorial via `python run_libe_forces.py -n 8`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "What environment variable must be set or sourced to ensure the Python virtual environment is active inside the interactive PBS session?",
+    "reasoning": "1. The text shows the command `. /path/to-venv/bin/activate` to reactivate the virtual environment.\n2. This command sources the `activate` script located in the virtual environment's `bin` directory.\n3. Therefore, the path to the virtual environment (`/path/to-venv`) must be known and the `activate` script must be sourced.\n4. No additional environment variable is required beyond executing this source command.",
+    "answer": "Source the activation script with `. /path/to-venv/bin/activate` to activate the virtual environment.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "If you want to run the tutorial on a single node that has eight GPUs, what value should you pass to the `-n` option to utilize all GPUs while keeping one worker for the persistent generator?",
+    "reasoning": "1. One worker is needed for the persistent generator.\n2. The remaining workers should match the number of GPUs, which is eight.\n3. Total workers = persistent generator + GPU workers = 1 + 8 = 9.\n4. The `-n` flag specifies total workers, so you should use `-n 9`.",
+    "answer": "Use `-n 9` to launch nine workers: eight for GPUs and one persistent generator.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "Describe how you would modify the PBS submission command to request a walltime of 30 minutes instead of 15 minutes.",
+    "reasoning": "1. The current PBS command includes `-l walltime=15:00`.\n2. To change the walltime, replace `15:00` with `30:00`.\n3. The modified command becomes `qsub -A <myproject> -l select=2 -l walltime=30:00 -lfilesystems=home:flare -q debug -I`.\n4. No other parameters need alteration.",
+    "answer": "Change the command to `qsub -A <myproject> -l select=2 -l walltime=30:00 -lfilesystems=home:flare -q debug -I`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "After compiling the `forces` application, which directory should you be in to execute the Python tutorial script?",
+    "reasoning": "1. The compilation occurs in the `forces_app` directory.\n2. The tutorial script resides in the sibling directory `forces_gpu`.\n3. The text instructs to `cd ../forces_gpu` after compiling.\n4. Therefore, you must be in the `forces_gpu` directory to run the Python script.",
+    "answer": "Navigate to the `forces_gpu` directory (`cd ../forces_gpu`) before running the tutorial.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "If you observe that only six workers are active when running `python run_libe_forces.py -n 13`, what could be a likely cause based on the provided instructions?",
+    "reasoning": "1. The tutorial expects twelve simulation workers plus one persistent generator for a total of thirteen.\n2. The text notes that each worker corresponds to a GPU.\n3. If only six workers are active, it suggests that only six GPUs are available.\n4. This could happen if the interactive session was requested on a single node with six GPUs or if the job allocation limited GPU resources.\n5. Therefore, the likely cause is insufficient GPU allocation for the requested number of workers.",
+    "answer": "The job likely allocated only six GPUs, limiting the number of active workers to six.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "What command would you use to view a summary of the runs after executing the tutorial, and what file does it read?",
+    "reasoning": "1. The text mentions that looking at `libE_stats.txt` provides a summary.\n2. To view the file, a typical command is `cat libE_stats.txt` or any text viewer.\n3. Since the instruction only states to look at the file, using `cat libE_stats.txt` suffices.\n4. This reads the `libE_stats.txt` file generated by libEnsemble.",
+    "answer": "Run `cat libE_stats.txt` to display the run summary.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "How would you adjust the PBS submission script to request four nodes instead of two while keeping all other options unchanged?",
+    "reasoning": "1. The PBS command includes `-l select=2` to request two nodes.\n2. To request four nodes, replace `select=2` with `select=4`.\n3. The rest of the options (`-A <myproject>`, `-l walltime=15:00`, `-lfilesystems=home:flare`, `-q debug`, `-I`) remain the same.\n4. The updated command is `qsub -A <myproject> -l select=4 -l walltime=15:00 -lfilesystems=home:flare -q debug -I`.",
+    "answer": "Change the command to `qsub -A <myproject> -l select=4 -l walltime=15:00 -lfilesystems=home:flare -q debug -I`.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "What is the purpose of the `-DGPU` flag in the compilation command, and why is it necessary for this tutorial?",
+    "reasoning": "1. The `-DGPU` flag defines a preprocessor macro named `GPU` during compilation.\n2. The `forces` application is a C program that uses conditional compilation to enable GPU-specific code when `GPU` is defined.\n3. Without this flag, the GPU-related sections would be excluded, and the program would not utilize the GPUs.\n4. Since the tutorial demonstrates GPU usage, the flag is required to activate that code path.",
+    "answer": "`-DGPU` defines the `GPU` macro, enabling GPU-specific code in the application; it\u2019s essential for the tutorial\u2019s GPU execution.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "If you wanted each worker to use only one GPU instead of two, which part of the workflow would you need to modify?",
+    "reasoning": "1. The text states that \u201cGPU settings for each worker simulation are printed\u201d and that the default uses two GPUs per worker.\n2. The number of GPUs per worker is determined by the libEnsemble configuration, not by the compile command.\n3. To change this, you would edit the Python script (`run_libe_forces.py`) where the resources per worker are specified, likely adjusting a parameter that assigns GPUs per worker.\n4. Therefore, the modification must be made in the Python tutorial script\u2019s resource allocation section.",
+    "answer": "Edit `run_libe_forces.py` to change the resource allocation that assigns two GPUs per worker to one GPU per worker.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "What steps must you take to ensure that the `forces` executable is built for the correct target architecture before running the tutorial?",
+    "reasoning": "1. Identify the target architecture required for the Aurora GPUs; the text uses `spir64`.\n2. Use the compile command with `-fopenmp-targets=spir64` to specify that target.\n3. Include the `-DGPU` flag to enable GPU code, and optimization flags `-O3`.\n4. Execute the command in the `forces_app` directory after cloning the repository.\n5. Verify that `forces.x` is created without errors before proceeding.",
+    "answer": "Run `mpicc -DGPU -O3 -fiopenmp -fopenmp-targets=spir64 -o forces.x forces.c` in the `forces_app` directory to build the executable for the `spir64` target.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  },
+  {
+    "question": "Why does the tutorial recommend running `./cleanup.sh` before a second execution of `run_libe_forces.py` with a different `-n` value?",
+    "reasoning": "1. `./cleanup.sh` removes previous run artifacts, such as temporary files and possibly lingering MPI processes.\n2. Changing the `-n` value alters the number of workers, which could conflict with leftover state from a prior run.\n3. Cleaning ensures a fresh environment, preventing errors or resource contention.\n4. Therefore, the script prepares the system for a new configuration.",
+    "answer": "It removes leftover files and state from the previous run, ensuring a clean environment for the new worker configuration.",
+    "chunk_id": "docs_alcf_anl_gov_aurora_workflows_libensemble.md:0:af29e4f4",
+    "source": "unknown"
+  }
+]

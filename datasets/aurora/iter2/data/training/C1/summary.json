@@ -1,0 +1,10 @@
+{
+  "name": "C1",
+  "train_count": 579,
+  "val_count": 64,
+  "first_chunk_ids": [
+    "docs_alcf_anl_gov_aurora_programming-models_sycl-aurora.md:0:3ac1b15f",
+    "docs_alcf_anl_gov_aurora_programming-models_kokkos-aurora.md:0:021dd4a6",
+    "docs_alcf_anl_gov_aurora_programming-models_hip-aurora.md:0:c7c54e99"
+  ]
+}

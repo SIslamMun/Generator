@@ -1,0 +1,10 @@
+{
+  "name": "C3",
+  "train_count": 2799,
+  "val_count": 311,
+  "first_chunk_ids": [
+    "docs_alcf_anl_gov_aurora_bugs-table.md:0:5f102708",
+    "docs_alcf_anl_gov_aurora_data-management_moving_data_to_aurora_datamover.md:0:e2",
+    "docs_alcf_anl_gov_aurora_data-management_daos_daos-overview.md:0:aa353d9a"
+  ]
+}

@@ -1,0 +1,8 @@
+[
+  {"name": "base_llama",  "path": "NousResearch/Meta-Llama-3.1-8B-Instruct"},
+  {"name": "llama_A",     "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/llama_A/merged_16bit"},
+  {"name": "llama_B",     "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/llama_B/merged_16bit"},
+  {"name": "llama_C1",    "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/llama_C1/merged_16bit"},
+  {"name": "llama_C2",    "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/llama_C2/merged_16bit"},
+  {"name": "llama_C3",    "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/llama_C3/merged_16bit"}
+]

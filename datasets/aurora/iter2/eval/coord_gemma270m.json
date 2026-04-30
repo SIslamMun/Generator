@@ -1,0 +1,5 @@
+[
+  {"topic": "C1", "name": "gemma270m_C1", "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/gemma270m_C1/merged_16bit"},
+  {"topic": "C2", "name": "gemma270m_C2", "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/gemma270m_C2/merged_16bit"},
+  {"topic": "C3", "name": "gemma1b_C3_subbed_for_gemma270m_C3", "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/gemma1b_C3/merged_16bit", "_note": "gemma270m_C3 training kept crashing on a long-sequence sample in C3 with both sdpa and eager; substituted gemma1b_C3 for this slot"}
+]

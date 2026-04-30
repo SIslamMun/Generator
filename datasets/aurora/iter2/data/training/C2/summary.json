@@ -1,0 +1,10 @@
+{
+  "name": "C2",
+  "train_count": 1117,
+  "val_count": 124,
+  "first_chunk_ids": [
+    "docs_alcf_anl_gov_aurora_data-science_python.md:0:3ff43cb6",
+    "docs_alcf_anl_gov_aurora_data-science_python.md:0:3ff43cb6",
+    "docs_alcf_anl_gov_aurora_data-science_inference_openvino.md:0:ed5436e0"
+  ]
+}

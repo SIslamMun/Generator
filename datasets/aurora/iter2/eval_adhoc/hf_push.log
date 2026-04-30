@@ -1,0 +1,84 @@
+[notice] A new release of pip is available: 25.0.1 -> 26.1
+[notice] To update, run: pip install --upgrade pip
+
+=== pushing gemma1b_C1 -> shazzadulimun/gemma3-1b-aurora-C1-progmodels-gguf (1914 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/gemma3-1b-aurora-C1-progmodels-gguf url=https://huggingface.co/shazzadulimun/gemma3-1b-aurora-C1-progmodels-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+Removing 2 file(s) from commit that have not changed.
+No files have been modified since last commit. Skipping to prevent empty commit.
+url=https://huggingface.co/shazzadulimun/gemma3-1b-aurora-C1-progmodels-gguf/commit/412fe29309a25149c46f93481e4582da0e1150fe
+  ✓ pushed: https://huggingface.co/shazzadulimun/gemma3-1b-aurora-C1-progmodels-gguf
+
+=== pushing gemma1b_C2 -> shazzadulimun/gemma3-1b-aurora-C2-datascience-gguf (1914 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/gemma3-1b-aurora-C2-datascience-gguf url=https://huggingface.co/shazzadulimun/gemma3-1b-aurora-C2-datascience-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+Removing 2 file(s) from commit that have not changed.
+No files have been modified since last commit. Skipping to prevent empty commit.
+url=https://huggingface.co/shazzadulimun/gemma3-1b-aurora-C2-datascience-gguf/commit/2f73514c98eeb80acd1825d80be54315bf165fc2
+  ✓ pushed: https://huggingface.co/shazzadulimun/gemma3-1b-aurora-C2-datascience-gguf
+[skip gemma1b_C3] no GGUF (failed conversion or not yet trained)
+
+=== pushing llama_C3 -> shazzadulimun/llama31-8b-aurora-C3-systems-gguf (15324 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/llama31-8b-aurora-C3-systems-gguf url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-C3-systems-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-C3-systems-gguf/commit/699bd30bd1f5fc52c949c5d490f13d21530dc47f
+  ✓ pushed: https://huggingface.co/shazzadulimun/llama31-8b-aurora-C3-systems-gguf
+
+=== pushing llama_C2 -> shazzadulimun/llama31-8b-aurora-C2-datascience-gguf (15324 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/llama31-8b-aurora-C2-datascience-gguf url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-C2-datascience-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-C2-datascience-gguf/commit/b9f37f5b1dc40569d013cfbd498da503555680f2
+  ✓ pushed: https://huggingface.co/shazzadulimun/llama31-8b-aurora-C2-datascience-gguf
+
+=== pushing llama_C1 -> shazzadulimun/llama31-8b-aurora-C1-progmodels-gguf (15324 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/llama31-8b-aurora-C1-progmodels-gguf url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-C1-progmodels-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-C1-progmodels-gguf/commit/5e33c2ef65b344f6808bbdadca44df6ad71c0902
+  ✓ pushed: https://huggingface.co/shazzadulimun/llama31-8b-aurora-C1-progmodels-gguf
+
+=== pushing gemma270m_C2 -> shazzadulimun/gemma3-270m-aurora-C2-datascience-gguf (518 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/gemma3-270m-aurora-C2-datascience-gguf url=https://huggingface.co/shazzadulimun/gemma3-270m-aurora-C2-datascience-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+url=https://huggingface.co/shazzadulimun/gemma3-270m-aurora-C2-datascience-gguf/commit/6a18e20699a0a7fed48b27a56c3f7f7ae3bb52f6
+  ✓ pushed: https://huggingface.co/shazzadulimun/gemma3-270m-aurora-C2-datascience-gguf
+
+=== pushing gemma270m_C1 -> shazzadulimun/gemma3-270m-aurora-C1-progmodels-gguf (518 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/gemma3-270m-aurora-C1-progmodels-gguf url=https://huggingface.co/shazzadulimun/gemma3-270m-aurora-C1-progmodels-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+url=https://huggingface.co/shazzadulimun/gemma3-270m-aurora-C1-progmodels-gguf/commit/3fc86adaf4333de80f2363d6e23b322f00c434f9
+  ✓ pushed: https://huggingface.co/shazzadulimun/gemma3-270m-aurora-C1-progmodels-gguf
+
+=== pushing llama_B -> shazzadulimun/llama31-8b-aurora-B-gguf (15324 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/llama31-8b-aurora-B-gguf url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-B-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-B-gguf/commit/21921bdaa24bbea01c825a28fde4b7330028c5c1
+  ✓ pushed: https://huggingface.co/shazzadulimun/llama31-8b-aurora-B-gguf
+
+=== pushing llama_A -> shazzadulimun/llama31-8b-aurora-A-gguf (15324 MB) ===
+Warning: `hf repo` is deprecated in favor of `hf repos`.
+repo_id=shazzadulimun/llama31-8b-aurora-A-gguf url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-A-gguf
+Start hashing 2 files.
+Finished hashing 2 files.
+Removing 1 file(s) from commit that have not changed.
+url=https://huggingface.co/shazzadulimun/llama31-8b-aurora-A-gguf/commit/7f02cdde00128ee701edbe8a506933109774b697
+  ✓ pushed: https://huggingface.co/shazzadulimun/llama31-8b-aurora-A-gguf
+
+=================================================================
+SUMMARY: 9 pushed, 0 failed, 1 skipped of 10
+All repos: https://huggingface.co/shazzadulimun

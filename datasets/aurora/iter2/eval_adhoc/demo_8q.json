@@ -1,0 +1,18 @@
+[
+  {"id": "e1", "diff": "easy", "q": "What is the single module load command on Aurora that brings in IPEX-enabled PyTorch and TensorFlow?",
+   "gold": "module load frameworks"},
+  {"id": "e2", "diff": "easy", "q": "What is the absolute mount path of Aurora's project Lustre filesystem?",
+   "gold": "/lus/flare (project dirs under /lus/flare/projects/<project>/)"},
+  {"id": "e3", "diff": "easy", "q": "Which PyTorch device string targets the Intel GPU on Aurora?",
+   "gold": "'xpu' — e.g. tensor.to('xpu'). Requires `import intel_extension_for_pytorch` first."},
+  {"id": "m1", "diff": "medium", "q": "Show the full mpiexec command to run 96 MPI ranks across 8 Aurora nodes with one rank per PVC tile, each rank pinned to a distinct tile.",
+   "gold": "mpiexec -n 96 -ppn 12 gpu_tile_compact.sh ./my_app — the gpu_tile_compact.sh wrapper sets ZE_AFFINITY_MASK so each of 12 ranks/node lands on a distinct PVC tile."},
+  {"id": "m2", "diff": "medium", "q": "Show the icpx command to ahead-of-time (AOT) compile a SYCL source file kernel.cpp specifically for Aurora's PVC GPUs.",
+   "gold": "icpx -fsycl -fsycl-targets=spir64_gen -Xs '-device pvc' kernel.cpp -o kernel"},
+  {"id": "m3", "diff": "medium", "q": "What backend should torch.distributed.init_process_group use on Aurora for multi-tile collective communication, and what import is needed first?",
+   "gold": "backend='ccl' (Intel oneCCL). Must `import oneccl_bindings_for_pytorch` first to register it. NCCL is CUDA-only."},
+  {"id": "h1", "diff": "hard", "q": "I'm porting a Cray ALPS job script that calls `aprun -n 192 -N 24 ./solver`. What is the equivalent on Aurora?",
+   "gold": "mpiexec -n 192 -ppn 24 ./solver. Aurora uses MPICH/PALS mpiexec — NOT Cray ALPS aprun. -N renames to -ppn, -n stays the same."},
+  {"id": "h2", "diff": "hard", "q": "I have CUDA training code that does model.to('cuda:0') and torch.cuda.empty_cache(). What's the minimal patch to make it run on Aurora's PVC?",
+   "gold": "Add `import intel_extension_for_pytorch` near top, replace 'cuda:0' with 'xpu:0' (or 'xpu'), replace torch.cuda.empty_cache() with torch.xpu.empty_cache(). For distributed: swap NCCL → CCL via oneccl_bindings_for_pytorch + backend='ccl'."}
+]

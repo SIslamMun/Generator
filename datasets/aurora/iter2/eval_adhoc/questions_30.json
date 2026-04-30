@@ -1,0 +1,214 @@
+[
+  {
+    "id": "e01-frameworks-module",
+    "difficulty": "easy",
+    "topic": "data-science",
+    "q": "What is the single module load command on Aurora that brings in IPEX-enabled PyTorch and TensorFlow?",
+    "gold": "module load frameworks"
+  },
+  {
+    "id": "e02-pbs-queue-name",
+    "difficulty": "easy",
+    "topic": "systems",
+    "q": "What is the production PBS queue name on Aurora?",
+    "gold": "prod (the production queue is named 'prod' on Aurora)"
+  },
+  {
+    "id": "e03-flare-path",
+    "difficulty": "easy",
+    "topic": "systems",
+    "q": "What is the absolute mount path of Aurora's project Lustre filesystem?",
+    "gold": "/lus/flare (project directories live under /lus/flare/projects/<project>/)"
+  },
+  {
+    "id": "e04-mpi-launcher",
+    "difficulty": "easy",
+    "topic": "systems",
+    "q": "Which MPI launcher binary is used to start MPI ranks on Aurora compute nodes?",
+    "gold": "mpiexec (Aurora uses mpiexec from MPICH/PALS — NOT srun, NOT aprun)"
+  },
+  {
+    "id": "e05-gpu-name",
+    "difficulty": "easy",
+    "topic": "systems",
+    "q": "What is the official name of the GPU model in each Aurora compute node?",
+    "gold": "Intel Data Center GPU Max 1550 (also known as Ponte Vecchio / PVC). Each node has 6 GPUs / 12 tiles."
+  },
+  {
+    "id": "e06-tiles-per-node",
+    "difficulty": "easy",
+    "topic": "systems",
+    "q": "How many PVC GPU tiles are exposed per Aurora compute node?",
+    "gold": "12 tiles per node (6 GPUs × 2 tiles each)"
+  },
+  {
+    "id": "e07-pytorch-device",
+    "difficulty": "easy",
+    "topic": "data-science",
+    "q": "Which PyTorch device string targets the Intel GPU on Aurora?",
+    "gold": "'xpu' (e.g. tensor.to('xpu') or torch.device('xpu')). Requires `import intel_extension_for_pytorch` first."
+  },
+  {
+    "id": "e08-sycl-compiler",
+    "difficulty": "easy",
+    "topic": "programming-models",
+    "q": "What is the Intel oneAPI compiler driver name for compiling SYCL C++ code on Aurora?",
+    "gold": "icpx (with the -fsycl flag). The legacy 'dpcpp' driver is deprecated."
+  },
+  {
+    "id": "e09-debugger-gpu",
+    "difficulty": "easy",
+    "topic": "debugging",
+    "q": "What command-line debugger ships with oneAPI for stepping through SYCL kernels on a PVC GPU?",
+    "gold": "gdb-oneapi (Intel's GDB extension that supports SYCL/OpenCL/Level-Zero device-code debugging)."
+  },
+  {
+    "id": "e10-container-runtime",
+    "difficulty": "easy",
+    "topic": "containers",
+    "q": "Which container runtime is supported on Aurora compute nodes?",
+    "gold": "Apptainer (formerly Singularity). Load via `module load apptainer`. Docker is not supported."
+  },
+
+  {
+    "id": "m01-pbs-script",
+    "difficulty": "medium",
+    "topic": "systems",
+    "q": "Write a minimal PBS script header (just the #PBS lines) requesting 4 nodes for 60 minutes on the prod queue, charging project gpu_hack, with home and flare filesystems mounted, and merging stderr into stdout.",
+    "gold": "#!/bin/bash -l\n#PBS -A gpu_hack\n#PBS -q prod\n#PBS -l select=4\n#PBS -l walltime=01:00:00\n#PBS -l filesystems=home:flare\n#PBS -j oe"
+  },
+  {
+    "id": "m02-mpiexec-tile-binding",
+    "difficulty": "medium",
+    "topic": "systems",
+    "q": "Show the full mpiexec command to run 96 MPI ranks across 8 Aurora nodes with one rank per PVC tile (12 ranks/node), each rank pinned to a distinct tile.",
+    "gold": "mpiexec -n 96 -ppn 12 gpu_tile_compact.sh ./my_app — `gpu_tile_compact.sh` sets ZE_AFFINITY_MASK so each of the 12 ranks per node lands on a distinct PVC tile."
+  },
+  {
+    "id": "m03-ze-affinity-syntax",
+    "difficulty": "medium",
+    "topic": "systems",
+    "q": "Set the ZE_AFFINITY_MASK environment variable so a single process sees only tile 0 of GPU 1.",
+    "gold": "export ZE_AFFINITY_MASK=1.0  (format is <device-id>.<sub-device-id>; tile 0 of GPU 1 = '1.0')."
+  },
+  {
+    "id": "m04-pytorch-distributed",
+    "difficulty": "medium",
+    "topic": "data-science",
+    "q": "What backend should torch.distributed.init_process_group use on Aurora for multi-tile collective communication, and what import is needed first?",
+    "gold": "Use backend='ccl' (Intel oneCCL). Must `import oneccl_bindings_for_pytorch` before init_process_group to register it. NCCL is CUDA-only."
+  },
+  {
+    "id": "m05-vllm-launch",
+    "difficulty": "medium",
+    "topic": "data-science",
+    "q": "What launcher pattern serves a model with vLLM across all 12 PVC tiles of a single Aurora node?",
+    "gold": "mpiexec -n 12 -ppn 12 gpu_tile_compact.sh vllm serve <model> --tensor-parallel-size 12. The wrapper binds each rank to one tile; --tensor-parallel-size 12 shards the model."
+  },
+  {
+    "id": "m06-sycl-aot",
+    "difficulty": "medium",
+    "topic": "programming-models",
+    "q": "Show the icpx command to ahead-of-time (AOT) compile a SYCL source file kernel.cpp specifically for Aurora's PVC GPUs.",
+    "gold": "icpx -fsycl -fsycl-targets=spir64_gen -Xs '-device pvc' kernel.cpp -o kernel"
+  },
+  {
+    "id": "m07-vtune-gpu",
+    "difficulty": "medium",
+    "topic": "performance-tools",
+    "q": "Give the one-line VTune command to collect a GPU hotspots profile of ./my_app on Aurora.",
+    "gold": "vtune -collect gpu-hotspots -result-dir vtune_gpu ./my_app  (then summarize with `vtune -report summary -result-dir vtune_gpu` or open vtune-gui)."
+  },
+  {
+    "id": "m08-daos-mount",
+    "difficulty": "medium",
+    "topic": "data-management",
+    "q": "Show the commands to (a) create a POSIX container in DAOS pool `mypool`, (b) mount it at /tmp/dfuse_mnt on a compute node.",
+    "gold": "(a) daos cont create mypool --type POSIX  (returns a UUID/label)\n(b) dfuse --pool mypool --container <cont> --mountpoint /tmp/dfuse_mnt\n(unmount with `fusermount3 -u /tmp/dfuse_mnt`)"
+  },
+  {
+    "id": "m09-flare-stripe",
+    "difficulty": "medium",
+    "topic": "data-management",
+    "q": "Recommend a single `lfs setstripe` command for a directory that will hold multi-GB checkpoint files on /lus/flare.",
+    "gold": "lfs setstripe -c 48 -S 16M <dir>  (48 OST stripe count, 16 MiB stripe size — recommended high-bandwidth setting for large files on flare)"
+  },
+  {
+    "id": "m10-cuda-port",
+    "difficulty": "medium",
+    "topic": "data-science",
+    "q": "I have CUDA training code that does `model.to('cuda:0')` and `torch.cuda.empty_cache()`. What is the minimal patch to make it run on Aurora's PVC?",
+    "gold": "Add `import intel_extension_for_pytorch` at the top, replace 'cuda:0' with 'xpu:0' (or 'xpu'), and replace `torch.cuda.empty_cache()` with `torch.xpu.empty_cache()`. For distributed, swap NCCL for CCL via oneccl_bindings_for_pytorch and backend='ccl'."
+  },
+
+  {
+    "id": "h01-sycl-link-flag",
+    "difficulty": "hard",
+    "topic": "programming-models",
+    "q": "When linking a multi-file SYCL application with icpx, do you need `-fsycl` only at compile time, only at link time, or both? Why?",
+    "gold": "Both. `-fsycl` at compile time enables the SYCL frontend; at link time it pulls in the SYCL runtime libraries and triggers the device-code packaging (sycl-post-link). Omitting it from the link step produces 'undefined reference' errors against the SYCL runtime symbols."
+  },
+  {
+    "id": "h02-aprun-trick",
+    "difficulty": "hard",
+    "topic": "systems",
+    "q": "I'm porting a Cray job script that calls `aprun -n 192 -N 24 ./solver`. What is the equivalent on Aurora and why?",
+    "gold": "Equivalent: mpiexec -n 192 -ppn 24 ./solver (optionally with gpu_tile_compact.sh for tile binding). Aurora uses MPICH/PALS mpiexec — NOT Cray ALPS aprun. The flag rename: -N → -ppn, -n stays the same."
+  },
+  {
+    "id": "h03-frameworks-vs-pip",
+    "difficulty": "hard",
+    "topic": "data-science",
+    "q": "Why is it dangerous to `pip install torch` into the venv after `module load frameworks` on Aurora, and what's the symptom if you do?",
+    "gold": "Frameworks ships an Aurora-tuned torch (2.10.x) tightly coupled to IPEX, torchvision, and the oneAPI SYCL runtime. `pip install torch` pulls a generic CPU/CUDA wheel (e.g. torch 2.6.0+cpu), which gets prepended in the venv's site-packages and overrides the frameworks one. Symptoms: ImportError on torchvision::nms (operator missing because the new torch + frameworks-built torchvision are mismatched), XPU disappears, training crashes at import. Fix: pip uninstall torch (and torchao/torchvision if also clobbered) to restore the frameworks build."
+  },
+  {
+    "id": "h04-set-u-pbs",
+    "difficulty": "hard",
+    "topic": "systems",
+    "q": "Why might starting a PBS script with `set -u` cause it to die silently right after `source env.sh` (which runs `module load`), and how do you fix it?",
+    "gold": "Lmod's `module` shell function references some unbound shell variables internally during a load. With `set -u` (nounset) active, the first such reference triggers an unbound-variable error and the shell exits before any of your script's commands run — leaving zero output (the redirected stdout file is empty). Fix: don't use `set -u` in PBS scripts that source env.sh, OR temporarily `set +u` around the `source ... env.sh` and re-enable after."
+  },
+  {
+    "id": "h05-pbs-jobid-path",
+    "difficulty": "hard",
+    "topic": "systems",
+    "q": "If I write `#PBS -o phase1_${PBS_JOBID}.out`, does PBS substitute the job ID into the filename? Why or why not, and what's the recommended pattern?",
+    "gold": "No — PBS does NOT substitute shell variables in #PBS directives. The directive is parsed before the shell starts, so the literal string `phase1_${PBS_JOBID}.out` is taken verbatim as the filename. Recommended patterns: (1) use a directory-only -o (e.g. `#PBS -o /path/to/logs/`) and let PBS append `<jobname>.o<jobid>`, or (2) omit -o entirely so PBS uses default `<jobname>.o<jobid>` in the submission directory."
+  },
+  {
+    "id": "h06-mpich-gpu-aware",
+    "difficulty": "hard",
+    "topic": "systems",
+    "q": "What environment variable enables GPU-aware MPI on Aurora's MPICH so that you can pass an XPU device pointer directly to MPI_Send/Recv?",
+    "gold": "MPICH_GPU_SUPPORT_ENABLED=1 (must be set before mpiexec). With this, MPICH recognizes Level Zero / SYCL device pointers in MPI_Send/Recv and uses GPU-IPC or RDMA paths instead of staging through the host."
+  },
+  {
+    "id": "h07-pp-mp-ddp",
+    "difficulty": "hard",
+    "topic": "data-science",
+    "q": "I want to fine-tune a 70B Llama with LoRA on a single Aurora node (12 PVC tiles). What's the difference between using HF `device_map='auto'` (naive model parallel) vs setting up DDP + ZeRO across all 12 tiles, and which would I pick for this size?",
+    "gold": "device_map='auto' is naive layer-by-layer pipeline (model parallel): one tile at a time runs forward/backward, others sit idle. Throughput is roughly 1/12 of one tile (no pipelining) — very slow but trivial to set up. DDP+ZeRO replicates layers across tiles and shards optimizer states (ZeRO-2/3) so all 12 tiles compute in parallel, reducing per-step time ~10-12x with comm overhead. For 70B + LoRA on 1 node, DDP+ZeRO-3 is the right choice — model_parallel via device_map only makes sense as a quick smoke test or when the model can't fit on a single tile and you don't have time to set up distributed training."
+  },
+  {
+    "id": "h08-sophia-rate-limit",
+    "difficulty": "hard",
+    "topic": "data-science",
+    "q": "I'm hitting Sophia's gpt-oss-120b inference endpoint from 20 ranks × 4 worker threads each (80 concurrent HTTPS requests). I'm seeing ~10% of requests fail with HTTP 429 / 503. What's the cause and a fix that doesn't reduce my total request count?",
+    "gold": "The Sophia gpt-oss-120b service is rate-limited around ~50 concurrent requests; 80 simultaneous in-flight requests overwhelm it, returning 429 (Too Many Requests) or 503 (Service Unavailable). Two fixes that preserve total throughput: (1) reduce concurrency to ~40 (e.g. workers=2 per rank instead of 4), and (2) stagger rank startup with `sleep $((RANK*30))` so the 20 ranks don't all hit the endpoint in the same second. Combined: 20 ranks × 2 workers = 40 concurrent, ramped over 10 min. Also implement HTTP retry-with-backoff on 429/503."
+  },
+  {
+    "id": "h09-gemma-sdpa-bug",
+    "difficulty": "hard",
+    "topic": "data-science",
+    "q": "I'm training Gemma-3 (270M) with LoRA on a PVC tile via HuggingFace + IPEX, attn_implementation='sdpa', and it crashes with 'Segmentation fault from GPU at ... type: 0 (NotPresent), level: 1 (PDE), access: 1 (Write)' partway through training. What's the cause and how do you work around it?",
+    "gold": "PVC's SDPA backend on PyTorch 2.10 / IPEX has a bug broadcasting Gemma-3's grouped-query attention (Q has more heads than K/V), triggering a GPU page fault on certain batch shapes. Workaround: pass `attn_implementation='eager'` instead of 'sdpa' when loading the model. Eager attention is slower but bypasses the SDPA broadcasting bug. (For very long sequences in C3-style splits, the bug can also recur with eager — drop max_seq_length or filter out the longest examples.)"
+  },
+  {
+    "id": "h10-sycl-versioning",
+    "difficulty": "hard",
+    "topic": "programming-models",
+    "q": "I installed Unsloth's `intel-gpu-torch290` extras into a separate venv. When I try to import torch I get 'libsycl.so.8: undefined symbol: urEnqueueCooperativeKernelLaunchExp, version LIBUR_LOADER_0.12'. What's the root cause and what would have to change to make Unsloth work on this Aurora system today?",
+    "gold": "Unsloth's bundled libsycl.so.8 (from a 2026.x oneAPI snapshot) calls `urEnqueueCooperativeKernelLaunchExp`, a Unified Runtime experimental API present in newer UR loader builds but NOT in the libur_loader.so.0.12.0 shipped with Aurora's installed oneAPI (compiler/2025.3). The symbol versioning advertises LIBUR_LOADER_0.12 in both, but the symbol set is a strict superset on Unsloth's side. Workarounds require getting a newer system UR loader (Aurora-side oneAPI upgrade — out of user control) or rebuilding Unsloth's torch-2.9.0+xpu wheel against Aurora's exact toolchain (multi-day effort). Practical conclusion: Unsloth is not usable on Aurora today; stick with the frameworks-shipped torch 2.10 + IPEX path for XPU training."
+  }
+]

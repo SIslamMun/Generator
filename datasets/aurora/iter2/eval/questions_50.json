@@ -1,0 +1,322 @@
+[
+  {
+    "id": "c1-sycl-compile",
+    "topic": "C1",
+    "q": "Which compiler and flags should I use to compile a single SYCL source file aurora_kernel.cpp for the Aurora PVC GPUs using the Intel oneAPI toolchain?",
+    "gold": "Use the Intel oneAPI C++ compiler icpx with -fsycl: `icpx -fsycl aurora_kernel.cpp -o aurora_kernel`. The legacy `dpcpp` driver is deprecated and should not be used."
+  },
+  {
+    "id": "c1-sycl-aot",
+    "topic": "C1",
+    "q": "How do I do ahead-of-time (AOT) SYCL compilation specifically targeting the PVC GPUs on Aurora?",
+    "gold": "Add `-fsycl-targets=spir64_gen` and pass `-Xs '-device pvc'` (or `-device 0x0bd0`) via `-Xsycl-target-backend`, e.g. `icpx -fsycl -fsycl-targets=spir64_gen -Xs '-device pvc' app.cpp -o app`."
+  },
+  {
+    "id": "c1-openmp-target",
+    "topic": "C1",
+    "q": "How do I enable OpenMP target offload to the Aurora PVC GPUs with icpx?",
+    "gold": "Use `icpx -fiopenmp -fopenmp-targets=spir64` (or `-fopenmp-targets=spir64_gen` with `-Xopenmp-target-backend '-device pvc'` for AOT). Annotate offload regions with `#pragma omp target` directives."
+  },
+  {
+    "id": "c1-kokkos-backend",
+    "topic": "C1",
+    "q": "When building Kokkos for Aurora, which Kokkos backend targets the Intel PVC GPUs and what CMake flag enables it?",
+    "gold": "Use the Kokkos SYCL backend: `-DKokkos_ENABLE_SYCL=ON` plus `-DKokkos_ARCH_INTEL_PVC=ON`. Build with the Intel oneAPI compilers (icpx)."
+  },
+  {
+    "id": "c1-dpcpp-deprecation",
+    "topic": "C1",
+    "q": "I have a Makefile that calls `dpcpp` on Aurora. Why is this a problem and what should I replace it with?",
+    "gold": "`dpcpp` is the deprecated SYCL driver from older oneAPI releases and is no longer the recommended SYCL compiler on Aurora. Replace it with `icpx -fsycl`, which is the supported oneAPI C++ compiler and SYCL driver going forward."
+  },
+  {
+    "id": "c1-julia-aurora",
+    "topic": "C1",
+    "q": "How do I get a working Julia environment on Aurora that can target the PVC GPUs?",
+    "gold": "Load the Julia module (e.g. `module load julia`) and use the oneAPI.jl package which wraps Intel oneAPI Level Zero for Julia. After `using oneAPI`, you can dispatch kernels to the PVC GPUs via oneAPI.jl's array and kernel APIs."
+  },
+  {
+    "id": "c1-level0-devices",
+    "topic": "C1",
+    "q": "What command-line tool ships with oneAPI Level Zero to list the devices and tile structure visible on an Aurora node?",
+    "gold": "`zello_world` and `zello_sysman` ship with the Level Zero loader and can enumerate devices. More commonly `sycl-ls` (from oneAPI) lists SYCL/Level-Zero devices and their tile sub-devices on the node."
+  },
+  {
+    "id": "c1-opencl-platform",
+    "topic": "C1",
+    "q": "Which OpenCL platform name is exposed on Aurora compute nodes, and how do I list the OpenCL devices visible to my job?",
+    "gold": "The Intel(R) OpenCL Graphics platform is exposed for the PVC GPUs (and Intel(R) OpenCL for the Sapphire Rapids CPUs). Use `clinfo -l` to list platforms and devices, or `sycl-ls` for SYCL-style enumeration."
+  },
+  {
+    "id": "c1-cmake-aurora",
+    "topic": "C1",
+    "q": "Where do I get a recent CMake on Aurora and which module should I load before invoking `cmake` from a build script?",
+    "gold": "Load CMake via `module load cmake` (the ALCF-provided cmake module). The `frameworks` module also brings in a recent toolchain. After loading, `cmake --version` should report a 3.x release suitable for modern projects."
+  },
+  {
+    "id": "c1-icpx-vs-icx",
+    "topic": "C1",
+    "q": "On Aurora, what is the difference between `icx` and `icpx`, and which should I use to build C++ SYCL code?",
+    "gold": "`icx` is the Intel oneAPI C compiler; `icpx` is the corresponding C++ compiler. For SYCL (which is C++) use `icpx -fsycl`; use `icx` for plain C sources."
+  },
+  {
+    "id": "c1-sycl-device-filter",
+    "topic": "C1",
+    "q": "What environment variable can I set so my SYCL program only sees the Level Zero PVC GPU backend (and not OpenCL or CPU devices)?",
+    "gold": "Set `ONEAPI_DEVICE_SELECTOR=level_zero:gpu` (the modern oneAPI selector). The older `SYCL_DEVICE_FILTER=level_zero:gpu` is also accepted in some toolchain versions but is being phased out."
+  },
+  {
+    "id": "c1-omp-num-threads",
+    "topic": "C1",
+    "q": "What is a sensible default for OMP_NUM_THREADS for a CPU-only OpenMP job using one socket of Aurora's Sapphire Rapids CPUs?",
+    "gold": "Aurora's Sapphire Rapids has 52 physical cores per socket (104 per node, 2 sockets). For a single-socket job, set `OMP_NUM_THREADS=52` and pin via `OMP_PLACES=cores` and `OMP_PROC_BIND=close` for best NUMA behavior."
+  },
+  {
+    "id": "c1-hip-aurora",
+    "topic": "C1",
+    "q": "Aurora is an Intel GPU system. How can I run code originally written in HIP (AMD's CUDA-like API) on Aurora?",
+    "gold": "Use chipStar (formerly chip-SPV), which implements HIP on top of OpenCL/Level Zero so HIP code can target Intel PVC GPUs. Load the chipStar module if available, then compile your HIP code with the chipStar `hipcc` wrapper."
+  },
+  {
+    "id": "c1-link-vs-compile",
+    "topic": "C1",
+    "q": "When linking a multi-file SYCL application with icpx, do I need `-fsycl` only at compile time or also at link time?",
+    "gold": "Pass `-fsycl` at both the compile and link steps. The link step needs `-fsycl` so the SYCL runtime libraries and device-code packaging are pulled in correctly."
+  },
+
+  {
+    "id": "c2-pytorch-load",
+    "topic": "C2",
+    "q": "Show me the exact module load command and the Python snippet to move a torch tensor onto an Aurora PVC GPU.",
+    "gold": "`module load frameworks` (the ALCF frameworks module brings in IPEX-enabled PyTorch). Then in Python: `import torch; import intel_extension_for_pytorch  # registers XPU backend; x = torch.randn(1024, device='xpu')` (or `.to('xpu')` from CPU)."
+  },
+  {
+    "id": "c2-pytorch-xpu-check",
+    "topic": "C2",
+    "q": "What's the one-liner to confirm that PyTorch can see the Intel XPU backend on an Aurora compute node?",
+    "gold": "`python -c 'import torch, intel_extension_for_pytorch; print(torch.xpu.is_available(), torch.xpu.device_count())'` — should print True and a positive device count (12 tiles on a full Aurora node)."
+  },
+  {
+    "id": "c2-vllm-tp",
+    "topic": "C2",
+    "q": "How do I launch vLLM on a single Aurora node and which argument shards the model across all 12 PVC tiles?",
+    "gold": "Use `mpirun` (or `mpiexec`) with `gpu_tile_compact.sh` to bind one rank per tile, then `vllm serve <model> --tensor-parallel-size 12`. The `--tensor-parallel-size` argument controls TP sharding across the tiles."
+  },
+  {
+    "id": "c2-deepspeed-aurora",
+    "topic": "C2",
+    "q": "On Aurora, what backend should DeepSpeed use for collective communications across PVC tiles?",
+    "gold": "Use the oneCCL communication backend (`comms.backend = 'ccl'` or DEEPSPEED_BACKEND=ccl). oneCCL is the optimized collective library for Intel hardware and Level Zero."
+  },
+  {
+    "id": "c2-megatron-launch",
+    "topic": "C2",
+    "q": "What launcher pattern is used for Megatron-DeepSpeed on Aurora to bind one rank per PVC tile?",
+    "gold": "Launch with `mpiexec -n <total_ranks> -ppn 12 gpu_tile_compact.sh python pretrain_gpt.py ...`. The wrapper `gpu_tile_compact.sh` sets ZE_AFFINITY_MASK so each rank sees exactly one tile."
+  },
+  {
+    "id": "c2-jupyter-port",
+    "topic": "C2",
+    "q": "I want to run a Jupyter notebook on an Aurora compute node and connect from my laptop. What is the recommended pattern?",
+    "gold": "Inside an interactive PBS job, run `jupyter lab --no-browser --port=<P> --ip=$(hostname -i)`, then from your laptop set up an SSH tunnel via the login node: `ssh -L <P>:<compute-host>:<P> aurora.alcf.anl.gov`, and open `http://localhost:<P>` in the browser."
+  },
+  {
+    "id": "c2-frameworks-module",
+    "topic": "C2",
+    "q": "What does `module load frameworks` give me on Aurora?",
+    "gold": "The ALCF `frameworks` module loads a curated Python environment with PyTorch (with Intel Extension for PyTorch / IPEX), TensorFlow, Horovod, oneCCL bindings, and other ML/DS dependencies pre-built for Aurora's PVC GPUs."
+  },
+  {
+    "id": "c2-tf-xpu",
+    "topic": "C2",
+    "q": "How do I get TensorFlow with Intel GPU support on Aurora?",
+    "gold": "Use the TensorFlow build provided by `module load frameworks`, which includes Intel-optimized TensorFlow (intel-extension-for-tensorflow / ITEX). After loading, TF will see the XPU devices automatically; verify with `tf.config.list_physical_devices('XPU')`."
+  },
+  {
+    "id": "c2-sklearn-intelex",
+    "topic": "C2",
+    "q": "How can I accelerate scikit-learn computations on Aurora using Intel-optimized kernels?",
+    "gold": "Use `scikit-learn-intelex` (sklearnex). Either `python -m sklearnex your_script.py` or in code call `from sklearnex import patch_sklearn; patch_sklearn()` before importing scikit-learn estimators."
+  },
+  {
+    "id": "c2-dask-jobqueue",
+    "topic": "C2",
+    "q": "Which Dask backend should I use to submit Dask workers as PBS jobs on Aurora?",
+    "gold": "Use `dask-jobqueue.PBSCluster` configured with the Aurora PBS queue, account, and select/walltime resources. Each worker submits as its own PBS job; the scheduler runs on a login node or interactive node."
+  },
+  {
+    "id": "c2-pyg-xpu",
+    "topic": "C2",
+    "q": "Can PyTorch Geometric (PyG) tensors and models run on the Aurora XPU backend?",
+    "gold": "Yes — install PyG against the IPEX-enabled PyTorch from the `frameworks` module. Move PyG `Data`/`Batch` objects to `.to('xpu')` like any other PyTorch tensor; aggregations dispatch via PyTorch's XPU kernels."
+  },
+  {
+    "id": "c2-oneccl-backend",
+    "topic": "C2",
+    "q": "When initializing torch.distributed for multi-node training on Aurora, which `backend` argument should I pass?",
+    "gold": "Pass `backend='ccl'` (Intel's oneCCL) — `import oneccl_bindings_for_pytorch` first to register it, then `torch.distributed.init_process_group(backend='ccl', ...)`. NCCL is CUDA-only and won't work on Aurora."
+  },
+  {
+    "id": "c2-libtorch-cpp",
+    "topic": "C2",
+    "q": "How do I load a TorchScript model in C++ on Aurora and run inference on a PVC GPU?",
+    "gold": "Build against libtorch with IPEX C++ headers. In code: `#include <torch/script.h>` and `#include <intel_extension_for_pytorch.h>` (or the IPEX C++ header), load with `torch::jit::load(path)`, then `module.to(at::Device(\"xpu\"))` and run inference on tensors moved to XPU."
+  },
+  {
+    "id": "c2-vllm-which-image",
+    "topic": "C2",
+    "q": "Which vLLM build should I use on Aurora and what is the install path or module?",
+    "gold": "Use the Intel-XPU build of vLLM (vllm-xpu) provided through the `frameworks` module or via `pip install vllm` from the ALCF-recommended index URL. The standard CUDA wheel will NOT work on Aurora."
+  },
+  {
+    "id": "c2-openvino",
+    "topic": "C2",
+    "q": "Which Intel inference runtime is provided on Aurora for deploying optimized models on the PVC GPUs?",
+    "gold": "OpenVINO. Load `module load openvino` (or use the version bundled with `frameworks`), then use the `ov.Core()` API and select the GPU device (`ov.compile_model(model, 'GPU')`) to run on the PVC GPUs."
+  },
+
+  {
+    "id": "c3-pbs-script",
+    "topic": "C3",
+    "q": "Write a minimal Aurora PBS batch script that requests 4 nodes for 60 minutes on the debug queue, charges project gpu_hack, with filesystems=home:flare, then runs mpiexec over 96 ranks.",
+    "gold": "#!/bin/bash -l\n#PBS -A gpu_hack\n#PBS -q debug\n#PBS -l select=4\n#PBS -l walltime=01:00:00\n#PBS -l filesystems=home:flare\n#PBS -j oe\n\nmpiexec -n 96 -ppn 24 ./my_app\n"
+  },
+  {
+    "id": "c3-mpiexec-oneppn",
+    "topic": "C3",
+    "q": "How do I launch exactly one MPI rank per node across 8 Aurora nodes with mpiexec?",
+    "gold": "`mpiexec -n 8 -ppn 1 ./my_app` — `-n` is total ranks, `-ppn` is ranks per node. With 8 nodes and ppn=1 you get one rank per node."
+  },
+  {
+    "id": "c3-ze-affinity",
+    "topic": "C3",
+    "q": "What does the ZE_AFFINITY_MASK environment variable do on Aurora, and what value would I set so the process sees only tile 0 of GPU 1?",
+    "gold": "ZE_AFFINITY_MASK restricts which Level Zero devices/sub-devices a process can see. To expose only tile 0 of GPU 1, set `ZE_AFFINITY_MASK=1.0` (the format is `device.subdevice`). To see only tile 1 of GPU 0, you'd use `0.1`."
+  },
+  {
+    "id": "c3-tile-compact",
+    "topic": "C3",
+    "q": "What is gpu_tile_compact.sh and why do MPI launches on Aurora use it?",
+    "gold": "`gpu_tile_compact.sh` is a wrapper script that pins each MPI rank to a single PVC tile by setting ZE_AFFINITY_MASK based on PMIx local rank, so 12 ranks per node land on 12 distinct tiles in compact order. Used as `mpiexec ... gpu_tile_compact.sh ./my_app`."
+  },
+  {
+    "id": "c3-flare-path",
+    "topic": "C3",
+    "q": "What is the path to my Aurora project directory on the Lustre 'flare' filesystem, and what is a recommended `lfs setstripe` for very large files?",
+    "gold": "Project directories live at `/lus/flare/projects/<project>/` on Aurora (note `/lus/flare/...`, not `/flare/...`). For large files, set a high stripe count: e.g. `lfs setstripe -c 48 -S 16M <dir>` (48 OSTs, 16 MiB stripes) for files in the multi-GB range."
+  },
+  {
+    "id": "c3-lfs-getstripe",
+    "topic": "C3",
+    "q": "How do I check the current Lustre stripe layout of a file on Aurora's /lus/flare filesystem?",
+    "gold": "`lfs getstripe <path>` prints the stripe count, stripe size, and OST indices currently assigned to the file or directory."
+  },
+  {
+    "id": "c3-daos-pool",
+    "topic": "C3",
+    "q": "How do I create a POSIX container in my DAOS pool on Aurora and mount it via dfuse on a compute node?",
+    "gold": "Create the container: `daos cont create <pool> --type POSIX` (which prints a container UUID/label). Mount with dfuse: `dfuse --pool <pool> --container <cont> --mountpoint /tmp/dfuse_mnt`. Unmount with `fusermount3 -u /tmp/dfuse_mnt`."
+  },
+  {
+    "id": "c3-dfuse-options",
+    "topic": "C3",
+    "q": "What dfuse options improve performance for a metadata-heavy workload reading many small files from a DAOS POSIX container on Aurora?",
+    "gold": "Enable interception/caching options: `--multi-user`, `--disable-caching=false`, and pre-stage with the libioil interception library (`LD_PRELOAD=libioil.so`). The DAOS user guide also recommends `--singlethreaded` for single-rank readers and tuning `--thread-count` for parallel readers."
+  },
+  {
+    "id": "c3-globus-endpoint",
+    "topic": "C3",
+    "q": "What is the Globus endpoint name for transferring data to/from Aurora, and where in the filesystem can I write?",
+    "gold": "Use the `alcf#aurora` (or `ALCF Aurora`) Globus endpoint. From there you can browse `/lus/flare/projects/<project>/` and your `/home/<user>/` namespace; write into the project flare path for large datasets (home is quota-limited)."
+  },
+  {
+    "id": "c3-datamover",
+    "topic": "C3",
+    "q": "What is the ALCF Datamover service and when should I use it instead of running Globus from a login node?",
+    "gold": "Datamover nodes are dedicated transfer hosts at ALCF that run Globus on behalf of users for large/long-running transfers. Use them (instead of Aurora login nodes) when the transfer is large or slow, to avoid timeouts and to keep login-node CPU free for interactive work."
+  },
+  {
+    "id": "c3-copper",
+    "topic": "C3",
+    "q": "What problem does Copper solve on Aurora and when should I use it?",
+    "gold": "Copper accelerates the staging and reading of shared library files (Python `.so`, conda envs, container layers, etc.) at scale by caching them on a tmpfs / overlay across compute nodes, avoiding metadata storms on Lustre when thousands of ranks all import the same files."
+  },
+  {
+    "id": "c3-gdb-oneapi",
+    "topic": "C3",
+    "q": "Which debugger do I use to step through SYCL kernels running on a PVC GPU on Aurora?",
+    "gold": "Use `gdb-oneapi` (Intel's GDB extension for SYCL/OpenCL/Level-Zero device code). Compile with `-g -O0` and `-fsycl`, then `gdb-oneapi ./my_app` and set breakpoints inside kernels just as you would for host code."
+  },
+  {
+    "id": "c3-ddt-debug",
+    "topic": "C3",
+    "q": "What parallel debugger does Aurora provide that has a GUI and supports debugging MPI ranks across nodes?",
+    "gold": "Linaro DDT (formerly Allinea DDT). It supports parallel MPI debugging across many ranks/nodes and uses gdb-oneapi internally for GPU kernel debugging. Launch via `module load forge` and `ddt --connect mpiexec -n <N> ./my_app`."
+  },
+  {
+    "id": "c3-vtune-gpu",
+    "topic": "C3",
+    "q": "What is the one-line VTune invocation to collect a GPU hotspots profile of my app on Aurora?",
+    "gold": "`vtune -collect gpu-hotspots -result-dir vtune_gpu ./my_app` (or `gpu-offload` for an offload-focused view). Open the result with `vtune-gui vtune_gpu` or summarize via `vtune -report summary -result-dir vtune_gpu`."
+  },
+  {
+    "id": "c3-iprof",
+    "topic": "C3",
+    "q": "What is `iprof` on Aurora and how do I use it for a quick kernel timeline?",
+    "gold": "`iprof` is a lightweight Intel GPU profiler that wraps Level Zero/OpenCL tracing for quick kernel-level timing. Run as `iprof ./my_app` to get a per-kernel summary; no recompilation needed."
+  },
+  {
+    "id": "c3-xpu-smi",
+    "topic": "C3",
+    "q": "What command-line tool monitors the runtime state (utilization, memory, temperature) of the PVC GPUs on an Aurora compute node?",
+    "gold": "`xpu-smi` (Intel's XPU System Management Interface). `xpu-smi discovery` lists devices, `xpu-smi stats -d <id>` shows utilization, memory, frequencies, and temps in real time."
+  },
+  {
+    "id": "c3-advisor",
+    "topic": "C3",
+    "q": "Which Intel tool on Aurora analyzes my code for offload opportunities and vectorization advice on the PVC GPUs?",
+    "gold": "Intel Advisor — run `advisor --collect=offload ./my_app` for offload modeling or `advisor --collect=roofline` for the GPU/CPU roofline. Open the result in `advisor-gui` for the recommendations view."
+  },
+  {
+    "id": "c3-aps",
+    "topic": "C3",
+    "q": "What is APS on Aurora and what high-level question does it answer?",
+    "gold": "APS = Application Performance Snapshot (part of Intel VTune). It gives a quick top-down summary of MPI vs. compute time, memory bandwidth, and OpenMP imbalance to help triage where to dig deeper. Run via `aps ./my_app`, then `aps-report aps_result_<...>` for the summary."
+  },
+  {
+    "id": "c3-paraview-client",
+    "topic": "C3",
+    "q": "What's the recommended way to visualize large datasets stored on Aurora's flare filesystem with ParaView?",
+    "gold": "Run ParaView in client/server mode: launch the `pvserver` on Aurora compute nodes (one rank per tile via mpiexec) connected to your local ParaView client over an SSH tunnel. Datasets stay on flare; only rendered images and metadata cross the network."
+  },
+  {
+    "id": "c3-adios2",
+    "topic": "C3",
+    "q": "What I/O library does ALCF recommend for high-throughput parallel I/O on Aurora's Lustre /flare filesystem?",
+    "gold": "ADIOS2 — provides BP file engines, in-memory staging, and SST/SSC streaming. It works well on Lustre with stripe-aware writes and supports native MPI-IO and DAOS backends as well."
+  },
+  {
+    "id": "c3-parsl-aurora",
+    "topic": "C3",
+    "q": "How can I orchestrate many independent PBS jobs on Aurora with Parsl?",
+    "gold": "Use Parsl with the `PBSProProvider` (or `PBSPro` provider) configured for the Aurora queue/account. Parsl's `HighThroughputExecutor` will then submit blocks of compute as PBS jobs and dispatch your `@python_app`/`@bash_app` tasks across them."
+  },
+  {
+    "id": "c3-balsam",
+    "topic": "C3",
+    "q": "What is Balsam and what does it offer beyond plain PBS submission on Aurora?",
+    "gold": "Balsam is an ALCF-developed workflow service that batches many small tasks into PBS allocations, manages task DAGs, persists state in a database, and supports multi-site execution. Useful when you have thousands of short tasks that would each waste node-hours as standalone PBS jobs."
+  },
+  {
+    "id": "c3-containers",
+    "topic": "C3",
+    "q": "Which container runtime is supported on Aurora compute nodes, and how do I run a container image?",
+    "gold": "Apptainer (formerly Singularity) is the supported container runtime. Load with `module load apptainer` and run as `apptainer exec <image.sif> <command>`, or shell in with `apptainer shell <image.sif>`. Bind /lus/flare with `--bind /lus/flare:/lus/flare`."
+  },
+  {
+    "id": "c3-aprun-trick",
+    "topic": "C3",
+    "q": "I'm porting a Cray ALPS launcher script that uses `aprun -n 96 ./my_app`. What is the equivalent on Aurora?",
+    "gold": "Aurora does not use ALPS/aprun. The equivalent launcher is `mpiexec -n 96 -ppn 12 ./my_app` (PALS-based mpiexec from the Aurora MPI implementation). For one rank per tile add the `gpu_tile_compact.sh` wrapper."
+  }
+]

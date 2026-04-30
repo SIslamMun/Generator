@@ -1,0 +1,5 @@
+[
+  {"topic": "C1", "name": "gemma1b_C1", "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/gemma1b_C1/merged_16bit"},
+  {"topic": "C2", "name": "gemma1b_C2", "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/gemma1b_C2/merged_16bit"},
+  {"topic": "C3", "name": "gemma1b_C3", "path": "/lus/flare/projects/gpu_hack/sislam6/work/runs/iter2/artifacts/gemma1b_C3/merged_16bit"}
+]

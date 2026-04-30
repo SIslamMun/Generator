@@ -1,0 +1,10 @@
+{
+  "name": "A",
+  "train_count": 4495,
+  "val_count": 499,
+  "first_chunk_ids": [
+    "docs_alcf_anl_gov_aurora_programming-models_openmp-aurora.md:0:a6b767e5",
+    "docs_alcf_anl_gov_aurora_known-issues.md:0:160b6289",
+    "docs_alcf_anl_gov_aurora_debugging_Intel_sanitizer.md:0:4a3bfab1"
+  ]
+}

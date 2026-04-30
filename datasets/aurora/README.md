@@ -1,0 +1,200 @@
+# Aurora Datasets — LoRA fine-tuning corpus for ALCF Aurora
+
+Synthetic QA + Chain-of-Thought datasets used to fine-tune small/medium LLMs to be expert
+assistants for the **ALCF Aurora supercomputer** (Intel Xeon Sapphire Rapids + Intel Max
+1550 / Ponte Vecchio GPUs, oneAPI / SYCL, PBS scheduler).
+
+All data was distilled by the [`generator`](../../) CLI in this repo from `gpt-oss-120b`
+(served on ALCF Sophia) over a curated chunk corpus of `docs.alcf.anl.gov/aurora`.
+
+## TL;DR
+
+| Iter | Dataset | Rows | Source chunks | Best result |
+|------|---------|------|---------------|-------------|
+| iter1 | chat | 2,000 | ~250 raw | 0.61 train loss, baseline merged 16-bit pushed to HF |
+| iter2 | **A** | **4,495** | 416 cleaned (20×~250 disjoint slices) | **llama_A: 2.80/5 on 53-Q holdout (+59% vs base)** |
+| iter2 | B | 3,903 | 416 cleaned (single-rank scan) | llama_B: 2.45/5 |
+| iter2 | C1 (Programming Models) | 579 | topic-filtered | llama_C1: 1.97/5 |
+| iter2 | C2 (Data Science / AI) | 1,117 | topic-filtered | llama_C2: 2.13/5 |
+| iter2 | C3 (Systems / Ops) | 2,799 | topic-filtered | llama_C3: 2.31/5 |
+| iter3 | **A3** | 2,080 | 635 semantic chunks (denser embedding) | mega-train sweep: 1B → 120B (in progress) |
+
+iter2 winner `llama_A` and the 9 sibling iter2 GGUFs are published at
+**[hf.co/shazzadulimun](https://huggingface.co/shazzadulimun)**.
+
+---
+
+## Pipeline
+
+```
+docs.alcf.anl.gov/aurora  (web crawl)
+       │
+       ▼
+  scripts/ingest          → markdown chunks
+       │
+       ▼
+  generator chunk-pack    → LanceDB vector store + dedup + topic tagging
+       │
+       ▼
+  generator generate-cot  → raw {Q, reasoning, answer} JSON  (per-rank shards)
+       │  (teacher: openai/gpt-oss-120b on Sophia, vLLM)
+       ▼
+  curate / merge          → A3_curated.json  /  cot_run*.json
+       │
+       ▼
+  to_chatml               → train.jsonl + val.jsonl  (ChatML rows)
+       │
+       ▼
+  LoRA train (PEFT, IPEX/PyTorch 2.10 XPU on Aurora PVC tiles)
+       │
+       ▼
+  merge → 16-bit HF model → llama.cpp convert → f16 GGUF → HuggingFace
+```
+
+---
+
+## Directory layout
+
+```
+datasets/aurora/
+├── README.md                 ← this file
+├── iter1/
+│   ├── SUMMARY.md            ← iter1 retrospective
+│   └── eval_results.json
+├── iter2/
+│   ├── SUMMARY.md            ← iter2 retrospective (10 models, scorecard)
+│   ├── data/
+│   │   ├── A/cot_run01..20.json     ← raw 20-rank generation, disjoint chunk slices
+│   │   ├── B/cot_run.json           ← single-rank, full-corpus scan
+│   │   └── training/
+│   │       ├── A/{train,val,summary}.json[l]    ← 4495/562 rows  ← winner dataset
+│   │       ├── B/{train,val}.jsonl              ← 3903/493
+│   │       ├── C1/{train,val}.jsonl             ← 579/?  Programming Models specialist
+│   │       ├── C2/{train,val}.jsonl             ← 1117/? Data Science / AI specialist
+│   │       └── C3/{train,val}.jsonl             ← 2799/362 Systems / Ops specialist
+│   └── eval/
+│       ├── questions_50.json        ← 50-Q Aurora holdout (handwritten + curated)
+│       ├── scores.json              ← gpt-oss-120b judge, 0-5 scale, full scorecard
+│       ├── answers_baselines.json   ← raw answers from 5 baseline models
+│       ├── coord_llama_answers.json
+│       ├── coord_gemma1b_answers.json
+│       ├── coord_gemma270m_answers.json
+│       └── model_registry.json
+└── iter3/
+    └── data/
+        ├── slices/slice01..20.txt   ← chunk-id slices (disjoint), one per rank
+        ├── all_chunks.txt           ← 635 chunk IDs, all
+        ├── A3/cot_run01..20.json    ← raw 20-rank generation, ~8,111 pairs total
+        ├── A3_curated.json          ← merged + dedup + length-filtered
+        ├── curate_rank_0..3.json    ← 4-rank parallel curate shards
+        └── training/A3/{train,val,summary}.json[l] ← 2080/249 rows
+```
+
+---
+
+## Data format (ChatML)
+
+Each `train.jsonl` / `val.jsonl` row is one ChatML conversation. The reasoning trace is
+embedded inside the assistant turn so a single SFT pass teaches both the answer style and
+the chain of thought:
+
+```json
+{
+  "conversations": [
+    {"role": "system",    "content": "You are an expert assistant for users of the ALCF Aurora supercomputer ..."},
+    {"role": "user",      "content": "How do I launch a multi-node MPI job on Aurora that uses one rank per GPU tile?"},
+    {"role": "assistant", "content": "**Reasoning:**\nAurora has 6 PVC GPUs × 2 tiles = 12 tiles per node. The standard helper is `gpu_tile_compact.sh` which pins a rank to its tile via `ZE_AFFINITY_MASK`. ...\n\n**Answer:**\n```bash\nmpiexec -n $((NODES*12)) -ppn 12 --cpu-bind=depth -d 8 \\\n    ./gpu_tile_compact.sh ./your_app\n```"}
+  ]
+}
+```
+
+System prompt is identical across all rows in a file (set per-dataset). Reasoning ↔ answer
+formatting (`**Reasoning:**` then `**Answer:**`) is consistent so models converge on it
+quickly during SFT.
+
+---
+
+## How datasets differ
+
+- **A vs B** — A is generated by 20 parallel ranks each handling a *disjoint slice* of the
+  416-chunk corpus (so the teacher sees fresh context per shard, no overlap, more diverse
+  rephrasings). B is a single rank scanning the full corpus once. A produced ~15% better
+  eval — diversity > repetition for this corpus size.
+- **C1 / C2 / C3 — topic specialists.** Same chunks as A, but filtered per topic before
+  generation. Built to test a "coordinator + 3 experts" routing setup. Result: each
+  specialist underperformed `llama_A` on the holistic 50-Q benchmark; the breadth of A
+  beat the depth of any single C.
+- **iter3 / A3** — uses a denser semantic embedding (635 chunks vs 416) and re-runs the
+  same 20-rank disjoint-slice generation. Then a 4-rank parallel curate pass dedups + drops
+  short / low-info pairs (8,111 raw → 2,080 final). Used for the mega-train size sweep
+  (1B → 120B trained on the same data so size becomes the only variable).
+
+---
+
+## Reproduce
+
+```bash
+# 1. Build the chunk store (already in this repo: see Generator/scripts/)
+generator chunk-pack \
+    --source docs.alcf.anl.gov/aurora \
+    --out lancedb/
+
+# 2. Generate raw QA + CoT (per-rank, parallel)
+for k in $(seq -f "%02g" 1 20); do
+  (sleep $((10#$k * 30)) && \
+    generator generate-cot lancedb/ \
+      -o data/A/cot_run${k}.json \
+      --config iter3_config.yaml \
+      --target-pairs 2000 \
+      --chunk-ids @slices/slice${k}.txt \
+      --provider vllm --model openai/gpt-oss-120b --workers 2) &
+done
+wait
+
+# 3. Curate / dedup / convert to ChatML
+generator curate data/A/ -o data/A_curated.json
+generator to-chatml data/A_curated.json -o data/training/A/
+
+# 4. LoRA fine-tune (Aurora PVC tile, IPEX backend)
+python train_qa_xpu.py \
+    --base meta-llama/Llama-3.1-8B-Instruct \
+    --data data/training/A/ \
+    --out artifacts/llama_A/
+```
+
+Full per-iteration commands and Aurora-specific PBS scripts live under
+[`Generator/scripts/`](../../scripts/) and the user's `work/runs/iter*/scripts/` tree.
+
+---
+
+## Eval — iter2 53-Q holdout (gpt-oss-120b judge, 0-5 scale)
+
+Top of the iter2 scorecard (see `iter2/eval/scores.json` for full):
+
+| Model | Avg | Δ vs base |
+|---|---|---|
+| **llama_A (winner)** | **2.80** | **+59%** |
+| llama_C3 (Systems) | 2.31 | +31% |
+| llama_C2 (Data Sci) | 2.13 | +21% |
+| llama_B | 2.45 | +39% |
+| llama_C1 (ProgModels) | 1.97 | +12% |
+| Llama-3.1-8B-Instruct (base) | 1.76 | — |
+| gemma-3-1b-it base | 1.31 | — |
+
+Pretrained baselines (gpt-4o, claude-sonnet-4-5, gpt-oss-120b teacher) score 3.6–4.1 — they
+remain the eval ceiling. Goal of this work isn't to beat them but to **distill** Aurora-
+specific competency into 8B / 1B / 270M models that fit in a single Aurora tile or run on
+a laptop.
+
+---
+
+## License & provenance
+
+- **Source corpus:** `docs.alcf.anl.gov/aurora` — public ALCF user docs, Apache-2.0 in
+  spirit; redistributed here as derived QA pairs (not verbatim).
+- **Teacher:** `openai/gpt-oss-120b` (Apache-2.0). All synthetic data inherits its
+  permissive license. Independent verification recommended for production use.
+- **License:** released under Apache-2.0 alongside the [`generator`](../../) CLI.
+
+If you build on this, cite the Aurora user docs as the underlying source and note that
+the QA layer is gpt-oss-120b-distilled.

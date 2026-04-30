@@ -1,0 +1,65 @@
+{
+  "ranks": 4,
+  "rank_summaries": [
+    {
+      "rank": 0,
+      "total": 4,
+      "raw_count": 2155,
+      "after_basic": 2146,
+      "kept": 580,
+      "score_dist": {
+        "err": 1355,
+        "0-3": 186,
+        "4-6": 25,
+        "7-10": 580,
+        "lt_thresh": 211
+      }
+    },
+    {
+      "rank": 1,
+      "total": 4,
+      "raw_count": 2003,
+      "after_basic": 1996,
+      "kept": 562,
+      "score_dist": {
+        "err": 1210,
+        "0-3": 201,
+        "4-6": 23,
+        "7-10": 562,
+        "lt_thresh": 224
+      }
+    },
+    {
+      "rank": 2,
+      "total": 4,
+      "raw_count": 2007,
+      "after_basic": 2002,
+      "kept": 600,
+      "score_dist": {
+        "err": 1224,
+        "0-3": 162,
+        "4-6": 16,
+        "7-10": 600,
+        "lt_thresh": 178
+      }
+    },
+    {
+      "rank": 3,
+      "total": 4,
+      "raw_count": 1946,
+      "after_basic": 1939,
+      "kept": 575,
+      "score_dist": {
+        "err": 1193,
+        "0-3": 146,
+        "4-6": 25,
+        "7-10": 575,
+        "lt_thresh": 171
+      }
+    }
+  ],
+  "merged_kept": 2317,
+  "after_dedup": 2311,
+  "train_count": 2080,
+  "val_count": 231
+}
