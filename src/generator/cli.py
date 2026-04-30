@@ -523,11 +523,12 @@ def enrich(input_file, output, config, provider, model, batch_size, no_preserve_
 @click.option("--target-pairs", type=int, help="Total target pairs (calculates per-chunk)")
 @click.option("--batch-size", type=int, default=50, help="Chunks per batch")
 @click.option("--max-chunks", type=int, help="Max chunks to process (for testing)")
+@click.option("--chunk-ids", type=str, help="Comma-separated chunk IDs (or @file.txt with one per line) — for slicing across parallel jobs")
 @click.option("--topic", help="Topic filter (e.g., 'HDF5') - removes off-topic pairs after generation")
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
 @click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended for Ollama)")
-def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, topic, provider, model, workers):
+def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, chunk_ids, topic, provider, model, workers):
     """
     Generate CoT (Chain-of-Thought) pairs from LanceDB chunks.
     
@@ -552,6 +553,19 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
     if filtering_config.get("enabled", True):
         llm_config["filtering"] = filtering_config
 
+    # Resolve chunk_ids: comma-separated string, or @path/to/file with one per line
+    chunk_id_list = None
+    if chunk_ids:
+        if chunk_ids.startswith("@"):
+            chunk_id_list = [
+                line.strip()
+                for line in Path(chunk_ids[1:]).read_text().splitlines()
+                if line.strip()
+            ]
+        else:
+            chunk_id_list = [c.strip() for c in chunk_ids.split(",") if c.strip()]
+        console.print(f"[cyan]Filtering to {len(chunk_id_list)} specific chunks[/cyan]")
+
     # Generate CoT pairs
     result = generate_cot_pairs(
         lancedb_path=lancedb_path,
@@ -562,6 +576,7 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
         target_pairs=target_pairs,
         batch_size=batch_size,
         max_chunks=max_chunks,
+        chunk_ids=chunk_id_list,
         workers=workers,
     )
 

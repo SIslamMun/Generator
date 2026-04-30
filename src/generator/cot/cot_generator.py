@@ -30,6 +30,7 @@ def generate_cot_pairs(
     target_pairs: Optional[int] = None,
     batch_size: int = 50,
     max_chunks: Optional[int] = None,
+    chunk_ids: Optional[List[str]] = None,
     workers: int = 1,
 ) -> Dict:
     """
@@ -76,6 +77,8 @@ def generate_cot_pairs(
     text_col = 'content' if 'content' in chunks_df.columns else 'text'
     chunks_df = chunks_df[chunks_df[text_col].str.strip() != ""]
 
+    if chunk_ids:
+        chunks_df = chunks_df[chunks_df["id"].isin(chunk_ids)]
     if max_chunks:
         chunks_df = chunks_df.head(max_chunks)
 

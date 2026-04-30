@@ -1,11 +1,20 @@
 """Stage: train-chat — Gemma3 + LoRA on ChatML JSONL."""
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 from ._subprocess import run
 from .gen_cot import chat_data_paths
+
+
+def _xpu_available() -> bool:
+    try:
+        import torch
+        return bool(getattr(torch, "xpu", None) and torch.xpu.is_available())
+    except Exception:
+        return False
 
 
 def chat_artifact_paths(cfg: dict):
@@ -22,8 +31,14 @@ def run_train_chat(cfg: dict) -> None:
     part  = chat_artifact_paths(cfg)
     part["lora"].parent.mkdir(parents=True, exist_ok=True)
 
-    train_script = Path(__file__).resolve().parent.parent.parent.parent.parent / \
-                   "finetuned_unsloth" / "train" / "train_qa.py"
+    base = Path(__file__).resolve().parent.parent.parent.parent.parent / \
+                   "finetuned_unsloth" / "train"
+    # Aurora / Intel XPU: route to the IPEX trainer instead of unsloth/CUDA.
+    backend = (cfg.get("backend") or os.environ.get("GENERATOR_BACKEND") or "auto").lower()
+    if backend == "xpu" or (backend == "auto" and _xpu_available()):
+        train_script = base / "train_qa_xpu.py"
+    else:
+        train_script = base / "train_qa.py"
     if not train_script.exists():
         raise FileNotFoundError(f"chat trainer missing: {train_script}")
 
