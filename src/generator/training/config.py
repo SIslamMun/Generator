@@ -1,11 +1,24 @@
 """YAML config schema, defaults, validation, and interactive wizard."""
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Optional
 
 import yaml
+
+
+def slugify(text: str) -> str:
+    """Topic string → directory-safe slug. `Jarvis-CD HPC` → `jarvis-cd-hpc`."""
+    s = re.sub(r"[^\w\s-]", "", (text or "").strip().lower())
+    s = re.sub(r"[-\s_]+", "-", s)
+    return s.strip("-") or "untitled"
+
+
+def derive_output_dir(topic: str, base: str = "./runs") -> str:
+    """Default output_dir for a topic: <base>/<topic-slug>."""
+    return f"{base}/{slugify(topic)}"
 
 
 # ────────────────────────── defaults ──────────────────────────
@@ -64,7 +77,7 @@ TOOL_DEFAULTS = {
 }
 
 GLOBAL_DEFAULTS = {
-    "output_dir": "./runs/run_v1",
+    "output_dir": None,            # if absent/null, derived from topic → ./runs/<topic-slug>
     "topic": "my-domain",
     "llm": {
         "provider": "ollama",
@@ -83,8 +96,10 @@ def load_config(path: str | Path) -> dict:
     if not p.exists():
         raise FileNotFoundError(f"config not found: {p}")
     cfg = yaml.safe_load(p.read_text()) or {}
-    # Merge with defaults so missing keys fall back gracefully.
-    return _deep_merge(GLOBAL_DEFAULTS, cfg)
+    merged = _deep_merge(GLOBAL_DEFAULTS, cfg)
+    if not merged.get("output_dir"):
+        merged["output_dir"] = derive_output_dir(merged.get("topic", "untitled"))
+    return merged
 
 
 def save_config(cfg: dict, path: str | Path) -> Path:
@@ -117,8 +132,8 @@ def wizard(kind: str = "both") -> dict:
     cfg["tool"]["enabled"] = kind in ("tool", "both")
 
     c.rule("[bold]Generator training pipeline · interactive setup[/bold]")
-    cfg["output_dir"] = Prompt.ask("📁 Output directory", default=cfg["output_dir"])
-    cfg["topic"]      = Prompt.ask("🎯 Topic / domain (display only)", default=cfg["topic"])
+    cfg["topic"]      = Prompt.ask("🎯 Topic / domain (drives output folder name)", default=cfg["topic"])
+    cfg["output_dir"] = Prompt.ask("📁 Output directory", default=derive_output_dir(cfg["topic"]))
 
     c.rule("[bold]LLM[/bold]")
     cfg["llm"]["provider"] = Prompt.ask(
