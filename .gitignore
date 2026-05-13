@@ -72,6 +72,9 @@ lancedb*/
 unsloth_compiled_cache/
 jarvis_config/
 
+# Generated tool-use corpora (large, kept locally / on scratch)
+misc/jarvis/v7_*/
+
 # Google Cloud SDK (not part of project)
 google/
 

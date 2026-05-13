@@ -1,0 +1,55 @@
+# Real-target run — proves the pipeline scales beyond the smoke test.
+# 1000 chat + 1000 tool examples, full LanceDB. ~3-4 hr end-to-end on GH200.
+
+output_dir: ./runs/scale_v1
+topic: "Jarvis-CD HPC workflows"
+
+llm:
+  provider: ollama
+  model: gpt-oss:20b
+  workers: 4
+
+chat:
+  enabled: true
+  data:
+    lancedb_path: ./lancedb_scale          # rebuilt below from full clio-kit tree
+    table: code_chunks
+    target_pairs: 1000
+    max_chunks: 1000                       # cap so workload is predictable
+  curate:
+    threshold: 6.0                          # mid: not too lax, not too strict
+  train:
+    base_model: unsloth/gemma-3-270m-it
+    lora_r: 128
+    lora_alpha: 256
+    epochs: 3
+    batch_size: 16
+    lr: 2e-4
+    bf16: true
+    save_merged: true
+  eval:
+    enabled: true
+    val_split: 0.05
+    baseline: unsloth/gemma-3-270m-it
+    max_examples: 0
+
+tool:
+  enabled: true
+  data:
+    tools_path: configs/tools/jarvis_tools.json
+    target_pairs: 1000
+    ratios: { single: 0.10, multi: 0.15, chain: 0.45, error: 0.30 }
+    tools_per_example: 10
+    distractor_strategy: mixed
+  train:
+    base_model: unsloth/functiongemma-270m-it
+    lora_r: 128
+    lora_alpha: 256
+    epochs: 3
+    batch_size: 16
+    lr: 2e-4
+    bf16: true
+    save_merged: true
+  eval:
+    enabled: true
+    max_examples: 50
