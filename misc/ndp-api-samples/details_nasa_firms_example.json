@@ -1,0 +1,44 @@
+{
+  "id": "1f29f678-924c-456d-95d4-aa0bc7de7037",
+  "name": "satellite-based-active-fire-detections-nasa-firms-api",
+  "title": "Satellite-Based Active Fire Detections (NASA FIRMS API)",
+  "owner_org": "nasa-firms",
+  "notes": "<p>This IPython notebook downloads fire detections from the NASA Fire Information for Resource Management System (FIRMS) API. The user must specify a coordinate bounding box, start date, day range, and satellite source (VIIRS, MODIS, OR LANDSAT). Execution of the full IPYNB returns a CSV file including the coordinate points and timestamps for fire hotspot detections retrieved from the user-defined source and spatiotemporal constraints.</p><p><br></p><p><strong>IMPORTANT: Access to NASA FIRMS API services requires a map access key, which can be acquired for free: </strong><a href=\"https://firms.modaps.eosdis.nasa.gov/api/map_key/\" rel=\"noopener noreferrer\" target=\"_blank\"><strong>https://firms.modaps.eosdis.nasa.gov/api/map_key/</strong></a>.</p>",
+  "resources": [
+    {
+      "id": "7a1f8f98-bc8a-4c31-ac96-8916a4efaa14",
+      "url": "https://github.com/hahmed17/wildfire-digital-twin/blob/main/data/FIRMS_detections.ipynb",
+      "name": "Satellite Detections Retrieval - IPython Notebook",
+      "description": "<p>This links directly to the executable IPython notebook that establishes a connection to the NASA FIRMS API, retrieves satellite detection coordinates and timestamps, and downloads the data as CSV files.</p>",
+      "format": ""
+    },
+    {
+      "id": "dd90e33a-0ae6-46e9-8f7c-c05327dc95fc",
+      "url": "https://github.com/hahmed17/wildfire-digital-twin/",
+      "name": "Satellite Detections Retrieval - GitHub Repository",
+      "description": "<p>This links directly to the public GitHub repository where the code is published and used with a wildfire digital twin.</p>",
+      "format": ""
+    }
+  ],
+  "extras": {
+    "creationMethod": "<p>This IPython notebook was designed for the purpose of integrating with a wildfire digital twin in a National Data Platform user workspace. Satellite detection data were retrieved via the NASA FIRMS API (<a href=\"https://firms.modaps.eosdis.nasa.gov/api/\" rel=\"noopener noreferrer\" target=\"_blank\">https://firms.modaps.eosdis.nasa.gov/api/</a>).</p>",
+    "creatorEmail": "h7ahmed@ucsd.edu",
+    "creatorName": "Hena Ahmed",
+    "dataAuthType": "public",
+    "dataType": "IPYNB",
+    "docsURL": "https://github.com/hahmed17/wildfire-digital-twin/blob/9c3dc8ca804dafed9be5d38335f15d75a1d972e6/data/FIRMS_detections.ipynb",
+    "issueDate": "2026-02-26",
+    "lastUpdateDate": "2026-02-26",
+    "license": "cc0",
+    "ndp_creator_md5": "5fbc9b6d7ef314a337c2cad359f8ea0c",
+    "pocEmail": "h7ahmed@ucsd.edu",
+    "pocName": "Hena Ahmed",
+    "publisherEmail": "h7ahmed@ucsd.edu",
+    "publisherName": "Hena Ahmed",
+    "purpose": "<p>This code was created to replicate the steps for ingesting satellite-based active fire data that is required by the Firemap application (<a href=\"https://firemap.sdsc.edu/\" rel=\"noopener noreferrer\" target=\"_blank\">https://firemap.sdsc.edu/</a>) to detect wildfires in real-time.</p>",
+    "status": "submitted",
+    "theme": "[]",
+    "uploadType": "code",
+    "usageInfo": "<p>Install requirements by running src/install_packages.sh via command line in the main directory. Replace example map key with personal map key at the top of the notebook, and run the IPython notebook from top to bottom to retrieve satellite detection data in CSV format from the NASA FIRMS API.</p>"
+  }
+}

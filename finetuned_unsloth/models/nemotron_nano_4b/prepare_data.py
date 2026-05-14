@@ -59,12 +59,23 @@ def cot_to_convo(row: dict) -> list[dict] | None:
     ]
 
 
+ANTI_HALLUCINATION_SYSTEM = (
+    "Tool-call discipline:\n"
+    "- ONLY include parameters that you are actually setting to a value.\n"
+    "- NEVER include parameters whose value would be None, null, empty string, or unset.\n"
+    "- NEVER invent parameter names that are not in the tool's schema.\n"
+    "- If a parameter is optional and you're not using it, OMIT IT ENTIRELY (do not emit it with a None placeholder)."
+)
+
+
 def tool_to_convo(ex: dict, catalog_tools: list[dict]) -> tuple[list[dict], list[dict]] | None:
     """Convert a generator tool-use example to (conversations, tools) for apply_chat_template.
 
     Output conversations include user/assistant-with-tool_calls/tool/final-assistant.
     The `tools` list is the JSON-schema form for each catalog tool — apply_chat_template
     will render it inside the system message according to Nemotron's tool-calling format.
+
+    A leading system message enforces tool-call discipline (no phantom None params).
     """
     instr = (ex.get("instruction") or "").strip()
     sol = ex.get("solution") or {}
@@ -72,7 +83,10 @@ def tool_to_convo(ex: dict, catalog_tools: list[dict]) -> tuple[list[dict], list
     if not (instr and steps):
         return None
 
-    msgs: list[dict] = [{"role": "user", "content": instr}]
+    msgs: list[dict] = [
+        {"role": "system", "content": ANTI_HALLUCINATION_SYSTEM},
+        {"role": "user", "content": instr},
+    ]
     for step in steps:
         tool = step.get("tool")
         if not tool:

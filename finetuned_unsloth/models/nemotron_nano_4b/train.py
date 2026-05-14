@@ -32,8 +32,13 @@ MAX_SEQ_LENGTH   = 4096                                   # cell 6: bumped from 
                                                           # tool schemas + reasoning chains);
                                                           # 2048 truncated 100% of assistant
                                                           # turns → all labels became -100.
-LORA_R           = 8                                      # cell 8
-LORA_ALPHA       = 16                                     # cell 8
+LORA_R           = 8                                      # cell 8: reverted to notebook default
+LORA_ALPHA       = 16                                     # cell 8: 2*r convention
+                                                          # r=32 made hallucination WORSE
+                                                          # (model invented param names beyond
+                                                          # the schema). Anti-hallucination
+                                                          # signal now lives in the system
+                                                          # message (see prepare_data.py).
 LORA_DROPOUT     = 0                                      # cell 8
 TARGET_MODULES   = [                                      # cell 8 — Mamba+Attention
     "q_proj", "k_proj", "v_proj", "o_proj",

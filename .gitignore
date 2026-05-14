@@ -61,6 +61,12 @@ finetuned_unsloth/models/*/.venv-*/
 # Per-model prepared data + trained artifacts (regeneratable)
 finetuned_unsloth/models/*/data/
 finetuned_unsloth/models/*/artifacts/
+# Archived training runs (r8_3ep, r32_3ep, etc.) — large model weights
+finetuned_unsloth/models/*/artifacts_*/
+finetuned_unsloth/models/*/unsloth_compiled_cache/
+
+# Misc archives (large SLURM stdout history, kept locally only)
+misc/finetuned_unsloth_archive/logs/
 
 # Legacy Jarvis-era data + caches (kept under finetuned_unsloth/legacy/ for reference)
 finetuned_unsloth/legacy/data/v7_10k_clean/
