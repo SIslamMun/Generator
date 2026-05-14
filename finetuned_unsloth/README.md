@@ -1,97 +1,128 @@
-# finetuned_unsloth
+# Universal Fine-Tuning Pipeline (Unsloth)
 
-Fine-tunes `unsloth/functiongemma-270m-it` on the Jarvis-CD tool-use dataset and
-serves the trained model via HF transformers **or** Ollama. The model emits
-FunctionGemma's `<start_function_call>call:<tool>{...}<end_function_call>`
-format and is wired into the real Jarvis MCP server through `inference/` at
-the repo root.
+Model-agnostic training infrastructure. Each model has its own folder
+under `models/` containing config + data prep + training code. The
+top-level `train.py` dispatches based on which model you pick.
 
-## Layout
+## Architecture
 
 ```
 finetuned_unsloth/
-├── data/                # dataset prep + training corpus
-│   ├── convert_to_functiongemma.py   # v7 raw → FunctionGemma chat-template JSONL
-│   ├── validate_dataset.py           # sanity-check conversions
-│   └── v7_10k_clean/                 # 6977 training examples
-├── train/               # LoRA fine-tune on a GH200
-│   ├── train.py
-│   ├── submit_delta.sbatch
-│   └── train_jarvis_functiongemma.ipynb
-├── test/                # held-out evaluation harnesses
-│   ├── test_model.py / test_model.sbatch           # HF transformers backend
-│   ├── ollama_test_model.py / ollama_test.sbatch   # Ollama backend
-│   └── debug_inference.py / debug_inference.sbatch # single-prompt diagnostics
-├── artifacts/           # trained weights + ollama assets
-│   ├── model_merged_16bit/           # HF-format fp16 (load via transformers)
-│   ├── jarvis_v7_fp16.gguf           # standalone GGUF (llama.cpp / LM Studio / koboldcpp)
-│   └── Modelfile                     # ollama Modelfile (FROM the .gguf above)
-├── references/          # upstream Unsloth reference notebooks
-└── logs/                # slurm output
+├── train.py                 ← dispatcher: pick model + data, runs prep+validate(+submit)
+├── _common/
+│   └── registry.py          ← discovers all models/<name>/ subfolders
+└── models/
+    └── <model_name>/        ← one folder per model (self-contained)
+        ├── config.yaml          (LoRA r, batch, lr, save targets, install deps)
+        ├── prepare_data.py      (generator JSON → JSONL with this model's chat template)
+        ├── validate_data.py     (sanity-check the prepared JSONL)
+        ├── train.py             (Unsloth + TRL training)
+        ├── install.sh           (one-time venv setup, model-specific deps)
+        ├── submit.sbatch        (SLURM wrapper)
+        ├── data/                (prepared JSONL lands here)
+        ├── artifacts/           (lora / merged_16bit / gguf land here)
+        └── .venv-<model>/       (dedicated venv, isolated from generator's .venv-delta)
 ```
 
-## Quick start
+Each model is its own folder because **chat templates, tool-call formats,
+target_modules, and dependency versions differ per model family**. We
+keep these differences localized so adding a model never modifies global
+code — just drop a new folder.
 
-**Build the dataset** (from an existing v7 raw JSON with `reasoning_path`):
+## Flow
+
+```
+[generator output: tool/QA/CoT JSON]
+            │
+            ▼
+   finetuned_unsloth/train.py --model X --types ...
+            │
+            ├──► models/X/prepare_data.py  ──► models/X/data/train.jsonl
+            │
+            ├──► models/X/validate_data.py
+            │
+            └──► sbatch models/X/submit.sbatch
+                         │
+                         └──► models/X/train.py
+                                      │
+                                      └──► models/X/artifacts/{lora,merged_16bit,gguf}
+```
+
+## Currently supported
 
 ```bash
-python data/convert_to_functiongemma.py \
-    --input  path/to/v7_raw.json \
-    --output data/v7_10k_clean/jarvis_v7_functiongemma.jsonl
-python data/validate_dataset.py data/v7_10k_clean/jarvis_v7_functiongemma.jsonl
+python finetuned_unsloth/train.py --list
 ```
 
-**Train** (GH200, Delta-AI):
+| model | family | use case | notes |
+|---|---|---|---|
+| `nemotron_nano_4b` | nemotron-3-nano | tool-use / QA / CoT | Hybrid Mamba+Attention, needs `mamba_ssm` |
+
+## How to use
 
 ```bash
-sbatch train/submit_delta.sbatch      # ~14 min, 3000 steps, merged fp16 saved to $SCRATCH_OUT
+# 1. Pick a model and prepare data (no training yet)
+python finetuned_unsloth/train.py \
+    --model nemotron_nano_4b \
+    --types tool \
+    --in-tool runs/<topic>/data/<file>.json \
+    --tool-catalog configs/tools/<topic>_tools.json
+
+# 2. Same command + --submit to actually queue the training job
+python finetuned_unsloth/train.py ... --submit
 ```
 
-**Evaluate via HF transformers**:
+`--types` accepts any subset of `{qa, cot, tool}`:
+- `qa` — plain question/answer pairs
+- `cot` — question / `<think>reasoning</think>` / answer
+- `tool` — full tool-use traces (user / assistant-with-tool_calls / tool-result / final)
+- combinations: `qa,cot` | `qa,cot,tool` | `tool,cot` | ...
+
+Unsloth recommends ~75% reasoning / 25% non-reasoning when mixing — the
+prepare step prints the actual ratio it produced for inspection.
+
+## Adding a new model
 
 ```bash
-sbatch test/test_model.sbatch         # runs test/test_model.py on the 10 held-out prompts
+cp -r finetuned_unsloth/models/nemotron_nano_4b finetuned_unsloth/models/<new>
+# edit <new>/config.yaml
+#   - hf_model_id
+#   - lora.target_modules            (architecture-dependent)
+#   - masking.{instruction,response} (from the model's chat template)
+#   - venv.install_deps              (drop mamba_ssm if not hybrid)
 ```
 
-**Evaluate via Ollama** (same 10 prompts, routed through Ollama's `/api/generate`):
+The dispatcher auto-discovers the new folder. No changes to global code.
 
-```bash
-ollama create jarvis-v7 -f artifacts/Modelfile     # one-time import (GGUF → ollama blob)
-sbatch test/ollama_test.sbatch
+---
+
+# Legacy Jarvis pipeline (pre-dispatcher)
+
+All pre-`models/` code lives under `legacy/`. It still runs (the
+universal `generator train-chat` / `train-tool` commands route through
+`legacy/{data,train,test}/`), but new model work should use the
+`models/` architecture above.
+
+```
+finetuned_unsloth/legacy/
+├── data/        FunctionGemma dataset prep (convert_to_functiongemma.py, schema_filter.py, …)
+├── train/       Legacy training scripts (train.py for FunctionGemma, train_qa.py for Gemma3)
+├── test/        Legacy eval harnesses
+├── references/  Upstream Unsloth reference notebooks
+└── QA_Train/    Gemma3 QA reference notebook
 ```
 
-## Reproducing the model locally
+The big Jarvis-era trained artifacts (`qa_v1/`, `v10/`) and run logs
+moved to `misc/finetuned_unsloth_archive/`. Reproduce v10:
 
-The merged fp16 weights and a standalone GGUF are both in `artifacts/`:
+- HF: `AutoModelForCausalLM.from_pretrained("misc/finetuned_unsloth_archive/artifacts/v10/model_merged_16bit")`
+- Ollama: `ollama create jarvis-v10 -f misc/finetuned_unsloth_archive/artifacts/v10/Modelfile`
 
-- **HF transformers** — `AutoModelForCausalLM.from_pretrained("finetuned_unsloth/artifacts/model_merged_16bit")`
-- **Ollama** — `ollama create jarvis-v7 -f finetuned_unsloth/artifacts/Modelfile`
-- **llama.cpp** — `./main -m finetuned_unsloth/artifacts/jarvis_v7_fp16.gguf …`
+Git history: `856e8fb` (jarvis-qa-v1), `5340802` (v10 tool-use model).
 
-## Benchmark results
+### Delta-AI environment notes
 
-| Backend | Tool selection | Args correct | Avg latency |
-|---------|----------------|--------------|-------------|
-| HF transformers (GH200) | 10/10 (100%) | 9/10 (90%) | — |
-| Ollama (GH200)          | 10/10 (100%) | 9/10 (90%) | 0.6 s/query |
-
-The remaining arg miss is `destroy_pipeline("old_deprecated_test")` instead of
-`destroy_pipeline("deprecated_test")` — the model picked up the adjective
-"old" from the user's phrasing. That's a training-data coverage gap, not a
-runtime issue.
-
-## Delta-AI environment notes
-
-- **Do NOT `module purge`** — it removes compilers that `python/anaconda3/2.10.0`
-  depends on.
-- **Use `--system-site-packages` on the venv** so it inherits the module's
-  CUDA-enabled `torch 2.10.0+cu129` instead of resolving a fresh CPU wheel.
-- **Keep Ollama's model store on scratch** — NFS-backed `$HOME` is far too
-  slow for the safetensors→GGUF conversion (~6 hours vs. a few seconds).
-  Set `OLLAMA_MODELS=/work/hdd/bekn/$USER/ollama_models`.
-
-## Configuration referenced
-
-- Tool catalog: `../configs/tools/jarvis_tools.yaml` (29 Jarvis tools)
-- Real MCP harness: `../inference/run.py` (wires the trained model + real
-  `jarvis-mcp` server — see `../inference/README.md`)
+- **Do NOT `module purge`** — it removes compilers that `python/anaconda3/2.10.0` depends on.
+- **Keep Ollama's model store on shared `/work/hdd`** so the whole `delta_bekn` group reuses it:
+  `OLLAMA_MODELS=/work/hdd/bekn/ollama/models`.
+- **Use `uv`** (`~/.local/bin/uv`) for all per-model venvs — that's what each model's `install.sh` does.

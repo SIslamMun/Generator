@@ -1,0 +1,108 @@
+# ─────────────────────────────────────────────────────────────────────
+# NEMOTRON-3 NANO 4B — fine-tune config (user-editable)
+#
+# All other models live alongside this one under finetuned_unsloth/models/.
+# To train a different model: copy this folder, swap hf_model_id, edit
+# masking markers + lora.target_modules for the new architecture, and
+# (if needed) adjust install_deps.
+# ─────────────────────────────────────────────────────────────────────
+
+display_name: "Nemotron-3 Nano 4B"
+hf_model_id:  "unsloth/NVIDIA-Nemotron-3-Nano-4B"
+family:       "nemotron-3-nano"     # informational; informs install/masking quirks
+architecture: "hybrid-mamba-attention"
+
+# ── Model loading (FastLanguageModel.from_pretrained) ──────────────
+load:
+  max_seq_length: 2048              # bump for long CoT / tool chains (Nemotron supports up to 1M)
+  load_in_4bit:   false             # 4-bit saves VRAM (~3 GB total) at small accuracy cost
+  load_in_8bit:   false             # 8-bit balanced (~5 GB total)
+  full_finetuning: false            # true = full FT (>>VRAM); false = LoRA only
+  trust_remote_code: true           # required for Nemotron's custom architecture
+
+# ── LoRA adapter (FastLanguageModel.get_peft_model) ────────────────
+lora:
+  r: 16                             # rank — 8/16/32/64 typical; higher = more capacity, more VRAM
+  alpha: 32                         # usually 2*r
+  dropout: 0.0
+  bias: "none"
+  use_gradient_checkpointing: "unsloth"   # "unsloth" = 30% less VRAM
+  use_rslora: false
+  # target_modules — these are Nemotron-3 Nano specific (Mamba + Attention).
+  # For a pure-attention model, drop `in_proj` and `out_proj`.
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+    - in_proj                       # Mamba block input projection
+    - out_proj                      # Mamba block output projection
+
+# ── train_on_responses_only — model-specific markers ──────────────
+# These come from the chat template's literal turn separators.
+# Nemotron uses ChatML-style; Gemma uses <start_of_turn>; Llama uses
+# <|begin_of_text|>...<|start_header_id|>; etc.
+masking:
+  instruction_part: "<|im_start|>user\n"
+  response_part:    "<|im_start|>assistant\n"
+
+# ── Trainer (TRL SFTTrainer / SFTConfig) ───────────────────────────
+train:
+  # one of these MUST be set; max_steps wins if both are set.
+  epochs: 2
+  max_steps: 0                      # 0 = use epochs
+  batch_size: 4
+  grad_accum: 2                     # effective batch = batch_size * grad_accum
+  warmup_steps: 30
+  lr: 2.0e-4                        # drop to 2e-5 for >1 epoch training
+  weight_decay: 0.001
+  scheduler: "linear"               # linear | cosine | constant
+  optim: "adamw_8bit"               # 8-bit AdamW saves VRAM
+  seed: 3407
+  logging_steps: 5
+  save_steps: 0                     # 0 = no intermediate checkpoints
+  report_to: "none"                 # "none" | "tensorboard" | "wandb"
+  packing: false
+
+# ── Inference defaults (used by smoke-eval in train.py) ────────────
+inference:
+  # Per Unsloth docs:
+  general_chat:   { temperature: 1.0, top_p: 1.0,  top_k: 0 }
+  tool_calling:   { temperature: 0.6, top_p: 0.95, top_k: 0 }
+  max_new_tokens: 1024
+
+# ── Save targets (what to emit after training) ────────────────────
+save:
+  lora: true                        # always — small, fast, composable
+  merged_16bit: true                # full model in bf16; useful for vLLM / Ollama import
+  merged_4bit:  false               # smaller but lossy
+  gguf:
+    enabled: false                  # set true to also write GGUF (slow conversion)
+    quantizations: ["q8_0", "q4_k_m"]
+
+# ── Python environment ─────────────────────────────────────────────
+# Nemotron-3 Nano needs Mamba kernels and a pinned torch. We use a
+# dedicated venv at .venv-nemotron/ inside this folder so it doesn't
+# pollute the generator's .venv-delta.
+venv:
+  path: ".venv-nemotron"
+  python: "python3"
+  # `install.sh` installs these; do NOT edit unless you've verified
+  # a Nemotron build supports a different combination.
+  install_deps:
+    - "torch==2.7.1"
+    - "triton>=3.3.0"
+    - "transformers==4.56.2"
+    - "tokenizers>=0.22.0,<=0.23.0"
+    - "trl==0.22.2"
+    - "bitsandbytes"
+    - "torchao>=0.16.0"
+    - "torchvision"
+    - "unsloth_zoo[base] @ git+https://github.com/unslothai/unsloth-zoo"
+    - "unsloth[base] @ git+https://github.com/unslothai/unsloth"
+    # Mamba kernels — must match torch==2.7.1
+    - "mamba_ssm==2.2.5"
+    - "causal_conv1d==1.5.2"

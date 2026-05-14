@@ -23,7 +23,7 @@ def run_train_tool(cfg: dict) -> None:
     part["lora"].parent.mkdir(parents=True, exist_ok=True)
 
     script = Path(__file__).resolve().parent.parent.parent.parent.parent / \
-             "finetuned_unsloth" / "train" / "train.py"
+             "finetuned_unsloth" / "legacy" / "train" / "train.py"
     if not script.exists():
         raise FileNotFoundError(f"train.py missing: {script}")
 

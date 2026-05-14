@@ -1110,6 +1110,122 @@ def tool_parse(input_path, output, fmt):
     console.print(f"\n[bold green]✨ Parsed {len(tools)} tools → {output}[/bold green]\n")
 
 
+@main.command("tool-lint")
+@click.argument("tools_path", type=click.Path(exists=True))
+@click.option("--min-examples", type=int, default=1,
+              help="Minimum number of examples required per tool (default: 1)")
+@click.option("--strict", is_flag=True,
+              help="Exit non-zero on any warning, not just errors")
+def tool_lint(tools_path, min_examples, strict):
+    """
+    Check whether a tools.json catalog is ready for tool-generate-full.
+
+    Prompts ground hard on the catalog's parameters + examples. Thin or
+    malformed catalogs produce hallucinated training data regardless of
+    how good the prompts are. This command flags those issues before you
+    spend GPU hours generating against a broken catalog.
+
+    \b
+    Checks per tool:
+      - description is non-empty and >= 20 chars
+      - every parameter has a typed `type` field (string|integer|number|boolean|array|object)
+      - parameter descriptions are non-empty
+      - at least --min-examples real examples
+      - each example has BOTH input and output, both non-empty
+      - example inputs parse as JSON
+      - example outputs are either valid JSON or a clearly-prefixed error string
+        ('404:', '500:', '422:', 'ToolError:', 'Exception:', etc.)
+
+    Exits 0 if all checks pass, 1 if any error, 2 in --strict mode if warnings.
+    """
+    import json
+    from .tool.tool_schemas import load_tools
+
+    console.print(f"\n[bold]🔍 Linting tool catalog:[/bold] {tools_path}\n")
+
+    tools = load_tools(tools_path)
+    if not tools:
+        console.print("[red]✗ No tools loaded.[/red]")
+        raise click.exceptions.Exit(1)
+
+    valid_types = {"string", "integer", "number", "boolean", "array", "object"}
+    err_prefixes = ("404:", "500:", "422:", "502:", "403:", "400:",
+                    "ToolError:", "Exception:", "Error:")
+
+    errors = 0
+    warnings = 0
+
+    for t in tools:
+        issues_err: list[str] = []
+        issues_warn: list[str] = []
+
+        # description
+        if not t.description or len(t.description) < 20:
+            issues_err.append(f"description too short ({len(t.description or '')} chars)")
+        elif len(t.description) < 60:
+            issues_warn.append(f"description is brief ({len(t.description)} chars) — "
+                               "consider naming the actual return keys")
+
+        # parameters
+        if not t.parameters:
+            issues_warn.append("no parameters declared (ok for nullary tools)")
+        for p in t.parameters:
+            if p.type not in valid_types:
+                issues_err.append(f"param '{p.name}' has invalid type '{p.type}'")
+            if not p.description or len(p.description) < 5:
+                issues_warn.append(f"param '{p.name}' has empty/short description")
+
+        # examples
+        if len(t.examples) < min_examples:
+            issues_err.append(f"only {len(t.examples)} examples (need >= {min_examples})")
+        for i, ex in enumerate(t.examples):
+            label = f"example[{i}]"
+            if not isinstance(ex, dict):
+                issues_err.append(f"{label} is not an object")
+                continue
+            inp = ex.get("input")
+            out = ex.get("output")
+            if not inp:
+                issues_err.append(f"{label} missing/empty `input`")
+            else:
+                try:
+                    json.loads(inp) if isinstance(inp, str) else inp
+                except (json.JSONDecodeError, TypeError):
+                    issues_err.append(f"{label}.input is not valid JSON: {str(inp)[:60]}")
+            if out in (None, "", {}, []):
+                issues_err.append(f"{label} missing/empty `output`")
+            elif isinstance(out, str):
+                # accept JSON-string output OR a clearly-labelled error string
+                try:
+                    json.loads(out)
+                except json.JSONDecodeError:
+                    if not out.lstrip().startswith(err_prefixes):
+                        issues_warn.append(
+                            f"{label}.output isn't JSON and doesn't look like a "
+                            "labelled error string (404:/500:/ToolError:/etc.)"
+                        )
+
+        # Report
+        status = "[red]✗[/red]" if issues_err else ("[yellow]![/yellow]" if issues_warn else "[green]✓[/green]")
+        console.print(f"  {status} {t.name}")
+        for msg in issues_err:
+            console.print(f"      [red]ERROR[/red] {msg}")
+        for msg in issues_warn:
+            console.print(f"      [yellow]warn [/yellow] {msg}")
+        errors += len(issues_err)
+        warnings += len(issues_warn)
+
+    console.print("")
+    if errors:
+        console.print(f"[bold red]✗ {errors} errors, {warnings} warnings across {len(tools)} tools.[/bold red]")
+        console.print("[dim]Catalog is not ready for tool-generate-full. Fix errors above.[/dim]")
+        raise click.exceptions.Exit(1)
+    if warnings and strict:
+        console.print(f"[bold yellow]! {warnings} warnings (strict mode).[/bold yellow]")
+        raise click.exceptions.Exit(2)
+    console.print(f"[bold green]✓ {len(tools)} tools, {errors} errors, {warnings} warnings — catalog ready.[/bold green]\n")
+
+
 @main.command("tool-deps")
 @click.argument("tools_path", type=click.Path(exists=True))
 @click.option("-o", "--output", help="Output JSON file path for graph data")

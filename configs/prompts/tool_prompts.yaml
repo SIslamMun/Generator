@@ -57,25 +57,18 @@ tool_instruction_generation: |
     3. Mix difficulty: ~40% simple (one obvious parameter), ~40% medium
        (parameter buried in natural prose), ~20% complex (implicit naming
        or multiple distractors).
-    4. Mix success vs error-triggering: roughly ~80% of requests should
-       succeed cleanly. The remaining ~20% should be ERROR-TRIGGERING —
-       requests that LOOK normal but point at a resource/config that
-       doesn't exist OR use an invalid value for a parameter. Mark these
-       with difficulty="complex" and phrase them so they sound like a real
-       user making an honest mistake. Examples of error-triggering patterns:
-         - reference a pipeline/package/repo name that probably doesn't
-           exist yet ("Show me the config of the hermes package in the
-           gromacs_bench pipeline" — hermes may not have been appended)
-         - use an invalid value ("Add the 'pandas_v99' package to my
-           pipeline" — pandas_v99 is not a known package type)
-         - skip a prerequisite ("Configure the lammps package in my new
-           pipeline md_sim" — user forgot to append lammps first)
-       Do NOT flag these as errors in the instruction text — the user
-       still sounds confident. The failure will happen when the downstream
-       tool is invoked.
+    4. ALL requests must be SUCCESS cases — values that fit the tool's
+       schema (correct enum members, well-formed identifiers, in-range
+       parameters). Do NOT generate error-triggering instructions here.
+       Failure scenarios are produced separately by the error-recovery
+       generator, which annotates them with proper failure status, real
+       error payloads, and recovery steps. Mixing failure cases into
+       single-step success generation creates training rows where the
+       model is taught to lie about bad inputs.
     5. Use CONCRETE, PLAUSIBLE parameter values appropriate to the tool's
        domain — draw inspiration from real_examples_of_usage. Never use
-       placeholders like "test", "foo", "my_thing", "value1".
+       placeholders like "test", "foo", "my_thing", "value1". When the
+       schema declares an enum, pick from that enum only.
     6. Every request is distinct — no near-duplicates.
 
   Output: ONE JSON array, no markdown fences, no prose.
@@ -84,13 +77,16 @@ tool_instruction_generation: |
   ]
 
   Anti-examples (do NOT produce these):
-    "Use the tool"                    → FAIL: no parameter value
-    "Create a pipeline called test"   → FAIL: "test" is a placeholder
-    "Do X and then do Y"              → FAIL: requires multiple tools
-    "Add a nonexistent package"       → FAIL: user wouldn't phrase it this
-                                         way; instead name a plausible-sounding
-                                         but unknown package ("Add the
-                                         hdf5-ng package")
+    "Use the tool"                       → FAIL: no parameter value
+    "Create a <thing> called test"       → FAIL: "test" is a placeholder
+    "Do X and then do Y"                 → FAIL: requires multiple tools
+    "Use a nonexistent <thing>"          → FAIL: don't TELL the user it's
+                                            nonexistent — name a plausible-
+                                            sounding but unknown identifier
+                                            instead (a value that fits the
+                                            naming convention of
+                                            real_examples_of_usage but
+                                            doesn't actually exist)
 
   Return ONLY the JSON array.
 
@@ -230,25 +226,28 @@ tool_solution_multi: |
     7. ERROR-RECOVERY HANDLING (important for training data balance):
 
        Before writing step 1, decide whether this instruction is likely to
-       fail. Signals that it WILL fail:
-         - the instruction references a resource by name that was never
-           created/appended in prior context
-         - the instruction uses an unusual-looking parameter value that
-           probably isn't a real known type (e.g. a package name like
-           "hdf5-ng" that doesn't match known types)
-         - the instruction skips a normal prerequisite (configure before
-           append, run before build_env, etc.)
+       fail. Signals that it WILL fail (domain-agnostic):
+         - the instruction references a resource by name/id that was
+           never created/registered earlier in this conversation
+         - the instruction uses a parameter value that looks plausible
+           but probably isn't a valid enum member or known identifier
+         - the instruction skips a prerequisite that the tool's contract
+           implies (acting on a resource before it was initialized)
+         - the instruction violates a parameter constraint (out-of-range,
+           wrong format, malformed identifier)
 
        If ANY of the above apply, you MUST produce a FAILING step 1:
          - set `status` to "failure"
          - put the real error payload in `actual_result` — use realistic
-           error shapes like "404: <thing> not found" or "500: Could not
-           find pkg: <value>" or "500: <reason>"
+           error shapes like "404: <thing> not found",
+           "500: <operation> failed: <specific reason>", or
+           "422: validation error: <param> must be one of [...]"
          - put a short human-readable error summary in `error_message`
          - then in step 2's thought, quote the error verbatim and justify
-           a concrete recovery action (retry with corrected args, append
-           the missing prerequisite, destroy+recreate, or give up
-           gracefully via final_answer if no recovery is possible)
+           a concrete recovery action (retry with corrected args, create
+           the missing prerequisite first, fall back to a related tool,
+           or give up gracefully via final_answer if no recovery is
+           possible)
          - the recovery step itself should use `status: "success"` unless
            it also fails (in which case continue the chain)
 
@@ -313,8 +312,9 @@ chain_generation: |
        resolve each value to a literal string/integer/bool.
     4. Steps must be executable in order — tool N-1's effect makes tool N
        valid (you can't run something before creating it, etc.).
-    5. All steps should share a common context (same resource id, same
-       pipeline, same dataset) unless the task genuinely spans multiple.
+    5. All steps should share a common context (e.g. same resource ID,
+       same workspace, same dataset) unless the task genuinely spans
+       multiple contexts.
     6. `expected_result` per step is a short string describing what the
        tool returns — this is a chain sketch, not a full solution.
 
@@ -394,21 +394,24 @@ tool_error_recovery_full: |
 
   Your task (ONE output):
     1. Pick ONE realistic FAILURE scenario that a real user would stumble
-       into. Good scenarios:
-         - Asking for config/info about a resource they haven't created yet
-           ("Show me config of X in pipeline Y" where X was never added)
-         - Running/operating on a resource before it was built
-           ("Run pipeline Z" before build_env was called)
-         - Using a value that sounds plausible but isn't real
-           (pkg_type "hdf5-ng" instead of "hdf5", hostname that doesn't exist)
-         - Acting on a resource with a slightly-wrong name (typo)
-         - Skipping a prerequisite (configure before append)
+       into. Domain-agnostic scenario patterns:
+         - Asking for info about a resource they haven't created/
+           registered yet (any get-by-id call where the id is unknown)
+         - Operating on a resource before it was initialized (running
+           something that requires a prior setup step)
+         - Using an enum/parameter VALUE that sounds plausible but isn't
+           in the schema's allowed list
+         - Acting on a resource with a slightly-wrong identifier (typo
+           in a name slug, off-by-one in a UUID, wrong server/namespace)
+         - Skipping a prerequisite that the tool's contract implies
+         - Violating a parameter constraint subtly (out-of-range, wrong
+           format, value that hits an upstream rate-limit or 502)
     2. Write a natural USER INSTRUCTION that leads to the failing call.
        The user is confident — they do NOT know the call will fail.
     3. Produce the full reasoning_path: step 1 fails with a realistic
        error payload, subsequent steps RECOVER (retry with corrected args,
-       add the missing prerequisite, destroy+recreate, or gracefully
-       report what went wrong via final_answer).
+       create the missing prerequisite first, fall back to a related tool,
+       or gracefully report what went wrong via final_answer).
 
   Rules for the failure step (step 1):
     - `status` MUST be "failure"
@@ -416,7 +419,8 @@ tool_error_recovery_full: |
       these shapes (pick the one that fits the tool's likely failure):
         "404: <resource> not found"
         "500: <operation> failed: <specific reason>"
-        "500: <operation> failed: Could not find pkg: <value>"
+        "422: validation error: <param> must be one of [<allowed>]"
+        "502: upstream timeout"
         "500: <operation> failed: 'NoneType' object is not iterable"
     - `error_message` = short human-readable summary
     - `expected_result` = the OPTIMISTIC shape the caller expected
@@ -438,7 +442,7 @@ tool_error_recovery_full: |
   {{
     "instruction": "<natural language user request>",
     "metadata": {{
-      "error_category": "<short_tag_like 'missing_resource' or 'invalid_pkg_type'>",
+      "error_category": "<short_tag_like 'missing_resource', 'invalid_value', 'missing_prerequisite', 'typo', 'upstream_failure'>",
       "difficulty": "complex"
     }},
     "reasoning_path": [
@@ -496,44 +500,44 @@ tool_simulation: |
   HARD RULES — violating these produces garbage training data:
 
     1. MATCH THE REAL SHAPE. The tool's description tells you the exact
-       return shape (e.g. "Returns {{pipeline_id, status='destroyed'}}").
-       Produce ONLY those keys. Do NOT add "message", "details", "success",
-       "timestamp", "metadata", "resources_released", or any other field
-       the description does not mention.
+       return shape. Produce ONLY the keys the description / examples
+       mention. Do NOT add "message", "details", "success", "timestamp",
+       "metadata", or any other field the description does not declare.
 
-    2. STATUS LITERALS ARE EXACT. If the description says `status='created'`
-       use exactly "created", not "success", not "ok", not "Pipeline
-       created successfully".
+    2. STATUS LITERALS ARE EXACT. If the description says a status field
+       has a specific value (e.g. `status='created'`), use exactly that
+       literal — not "success", not "ok", not a natural-language sentence.
 
     3. NO INVENTED ENRICHMENT. Do not add fake execution metadata like
        timestamps, byte counts, duration, or URLs unless the tool's
        description literally says it returns them.
 
-    4. CONFIGURATION-READ tools (e.g. get-config style) return the actual
+    4. READ-style tools (get-by-id, fetch, describe) return only the
        known keys for that resource. Do not invent new keys.
 
-    5. If prior context shows a state change (configure call happened),
-       reflect it in subsequent reads.
+    5. If prior context shows a state change (a prior write/configure
+       call happened), reflect it in subsequent reads.
 
     6. REALISTIC VALUES ONLY. Never "foo", "bar", "test".
 
     7. If the call would realistically fail given inputs and context,
        return the error as a JSON STRING with a status code and message
-       (e.g. "404: <name> not found", "500: <specific reason>"). Use
-       realistic error messages that tie back to the args — not generic
-       "An error occurred".
+       (e.g. "404: <name> not found", "500: <specific reason>",
+       "422: validation error: <reason>"). Use realistic error messages
+       that tie back to the args — not generic "An error occurred".
 
   Output: ONE JSON value (object, array, string, or primitive), nothing
   else. No prose. No fences. No explanation. No markdown.
 
-  Anti-examples (do NOT produce these):
-    Call: destroy_pipeline({{"pipeline_id": "foo"}})
-      BAD:  {{"status":"success", "message":"destroyed", "details": {{...}}}}
-      GOOD: {{"pipeline_id":"foo", "status":"destroyed"}}
+  Anti-examples (do NOT produce these — the lesson is about SHAPE,
+  applies to any tool):
+    Call: <write_tool>({{"<id>": "x"}})
+      BAD:  {{"status":"success", "message":"done", "details": {{...}}}}   ← invented wrapper
+      GOOD: {{"<id>":"x", "<state>":"<literal-from-description>"}}         ← only declared keys
 
-    Call: append_pkg({{"pipeline_id":"p","pkg_type":"ior"}})
-      BAD:  {{"status":"success", "pkg_id":"ior","configured":true}}
-      GOOD: {{"pipeline_id":"p","appended":"ior"}}
+    Call: <list_tool>({{"<filter>": "y"}})
+      BAD:  {{"status":"ok", "items":[...], "total_count":3, "elapsed_ms":47}}  ← invented metadata
+      GOOD: {{"items":[...], "count":3}}                                         ← matches description shape
 
 
 # ==============================================================================

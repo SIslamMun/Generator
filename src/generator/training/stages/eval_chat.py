@@ -22,7 +22,7 @@ def run_eval_chat(cfg: dict) -> None:
         raise FileNotFoundError(f"merged model not found: {part['merged']}")
 
     eval_script = Path(__file__).resolve().parent.parent.parent.parent.parent / \
-                  "finetuned_unsloth" / "test" / "eval_qa.py"
+                  "finetuned_unsloth" / "legacy" / "test" / "eval_qa.py"
     if not eval_script.exists():
         raise FileNotFoundError(f"chat eval script missing: {eval_script}")
 

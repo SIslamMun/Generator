@@ -11,7 +11,7 @@ from .gen_tool import tool_data_paths
 def run_schema_filter(cfg: dict) -> None:
     p = tool_data_paths(cfg)
     script = Path(__file__).resolve().parent.parent.parent.parent.parent / \
-             "finetuned_unsloth" / "data" / "schema_filter.py"
+             "finetuned_unsloth" / "legacy" / "data" / "schema_filter.py"
     if not script.exists():
         raise FileNotFoundError(f"schema_filter.py missing: {script}")
 

@@ -23,7 +23,7 @@ def run_train_chat(cfg: dict) -> None:
     part["lora"].parent.mkdir(parents=True, exist_ok=True)
 
     train_script = Path(__file__).resolve().parent.parent.parent.parent.parent / \
-                   "finetuned_unsloth" / "train" / "train_qa.py"
+                   "finetuned_unsloth" / "legacy" / "train" / "train_qa.py"
     if not train_script.exists():
         raise FileNotFoundError(f"chat trainer missing: {train_script}")
 

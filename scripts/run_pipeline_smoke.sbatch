@@ -7,8 +7,8 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=120G
 #SBATCH --time=02:00:00
-#SBATCH --output=/u/sislam3/Generator/finetuned_unsloth/logs/%x-%j.out
-#SBATCH --error=/u/sislam3/Generator/finetuned_unsloth/logs/%x-%j.err
+#SBATCH --output=/u/sislam3/Generator/slurm/logs/%x-%j.out
+#SBATCH --error=/u/sislam3/Generator/slurm/logs/%x-%j.err
 
 # End-to-end smoke test of `generator train-chat` + `generator train-tool`
 # at target=100 each. Verifies the autonomous pipeline works.
@@ -33,13 +33,13 @@ export HF_DATASETS_CACHE="$HF_HOME/datasets"
 export TOKENIZERS_PARALLELISM=false
 
 cd $REPO
-mkdir -p $REPO/finetuned_unsloth/logs
+mkdir -p $REPO/slurm/logs
 
 echo "=== HW ==="
 nvidia-smi | head -15
 
 echo ""; echo "=== start ollama ==="
-nohup ollama serve > $REPO/finetuned_unsloth/logs/smoke-ollama-$SLURM_JOB_ID.log 2>&1 &
+nohup ollama serve > $REPO/slurm/logs/smoke-ollama-$SLURM_JOB_ID.log 2>&1 &
 trap "kill $! 2>/dev/null || true" EXIT
 for i in $(seq 1 30); do ollama list >/dev/null 2>&1 && break; sleep 1; done
 
