@@ -95,8 +95,12 @@ venv:
   install_deps:
     - "torch==2.7.1"
     - "triton>=3.3.0"
-    - "transformers==4.56.2"
-    - "tokenizers>=0.22.0,<=0.23.0"
+    # NOTE: Nemotron-3 Nano 4B tokenizer requires transformers >= 5.3
+    # (TokenizersBackend class). But unsloth-zoo caps transformers at
+    # <=5.5.0 — so the working range is [5.3, 5.5.0]. The notebook's pin
+    # of 4.56.2 was for the 30B-A3B variant which doesn't need v5.
+    - "transformers>=5.3,<=5.5.0"
+    - "tokenizers"
     - "trl==0.22.2"
     - "bitsandbytes"
     - "torchao>=0.16.0"

@@ -28,6 +28,9 @@
 
 set -eu
 
+# Force line-buffered stdout/stderr in this script + every Python child.
+export PYTHONUNBUFFERED=1
+
 MODEL_DIR=/u/sislam3/Generator/finetuned_unsloth/models/nemotron_nano_4b
 TYPES="${TYPES:?TYPES=qa|cot|tool[,...] is required}"
 OUTPUT="${OUTPUT:-$MODEL_DIR/artifacts}"
@@ -51,10 +54,33 @@ cd $MODEL_DIR
 # uv on PATH
 export PATH="$HOME/.local/bin:$PATH"
 
+# Load modules BEFORE the venv check.
+#   - python/miniforge3_pytorch/2.7.0 → torch 2.7+cu126 prebuilt for aarch64
+#   - cuda/12.9 → nvcc for mamba_ssm build
+module load python/miniforge3_pytorch/2.7.0 || true
+module load cuda/12.9 || true
+echo "=== python3 = $(which python3 || echo NOT_FOUND)"
+echo "=== nvcc    = $(which nvcc    || echo NOT_FOUND)"
+
+# CRITICAL: the miniforge3_pytorch module sets HF_HOME=/projects/bekn/hf
+# (a shared 500G cache that is currently 100% FULL). Override AFTER the
+# module load so our exports actually win. /work/nvme is the local NVMe
+# scratch — fast and has space.
+export HF_HOME=/work/nvme/bekn/sislam3/hf_cache
+export HF_HUB_CACHE=$HF_HOME/hub
+export HF_DATASETS_CACHE=$HF_HOME/datasets
+export HF_ASSETS_CACHE=$HF_HOME/assets
+unset HUGGINGFACE_HUB_CACHE     # legacy, can override the above
+unset TRANSFORMERS_CACHE        # legacy, can override the above
+export HF_HUB_ENABLE_HF_TRANSFER=0
+export TMPDIR=/work/nvme/bekn/sislam3/tmp
+mkdir -p "$HF_HOME" "$HF_HUB_CACHE" "$HF_DATASETS_CACHE" "$HF_ASSETS_CACHE" "$TMPDIR"
+echo "=== HF_HOME      = $HF_HOME"
+echo "=== HF_HUB_CACHE = $HF_HUB_CACHE"
+
 # Build venv on first run; subsequent runs skip the install step.
 if [ ! -x "$MODEL_DIR/.venv-nemotron/bin/python" ]; then
     echo ""; echo "=== first run: building venv with uv ==="
-    module load python/anaconda3/2.10.0 || true
     bash install.sh
 fi
 
