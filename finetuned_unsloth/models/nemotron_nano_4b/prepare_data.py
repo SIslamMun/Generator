@@ -68,20 +68,87 @@ ANTI_HALLUCINATION_SYSTEM = (
 )
 
 
-def tool_to_convo(ex: dict, catalog_tools: list[dict]) -> tuple[list[dict], list[dict]] | None:
-    """Convert a generator tool-use example to (conversations, tools) for apply_chat_template.
+# ─────────────────────────── tool-call arg sanitizer ────────────────
+# The ANTI_HALLUCINATION_SYSTEM prompt above *tells* the model not to emit
+# phantom params — but that only sticks if the training TARGETS obey it too.
+# The generator's `reasoning_path` steps frequently carry args that are
+# None-valued or that don't belong to the called tool; left unsanitized,
+# every SFT target teaches the model exactly the behaviour we forbid.
+# (Confirmed downstream: the fine-tuned model floods calls with the union
+# of all tools' params set to "None", which strict validators — e.g. the
+# LM Studio MCP client — reject outright.)
+#
+# This mirrors test_inference.parse_tool_call's inference-time cleanup, but
+# applied to the data so the model never learns the pattern.
+
+def _is_phantom_value(v) -> bool:
+    """True if an arg value is a None-placeholder that must be dropped."""
+    if v is None:
+        return True
+    if isinstance(v, str) and v.strip().lower() in ("", "none", "null"):
+        return True
+    return False
+
+
+def _catalog_param_names(catalog_tools: list[dict]) -> dict[str, set]:
+    """Map each tool name → the set of parameter names in its schema."""
+    names: dict[str, set] = {}
+    for t in catalog_tools:
+        fn = t.get("function", t)
+        props = (fn.get("parameters") or {}).get("properties") or {}
+        names[fn.get("name", "")] = set(props)
+    return names
+
+
+def sanitize_tool_args(
+    tool_name: str, args: dict, param_names: dict[str, set]
+) -> tuple[dict, int]:
+    """Strip phantom args from a training target's tool call.
+
+    Drops an arg when either:
+      - its value is a None placeholder (None / "None" / "null" / ""), or
+      - its name is not in the called tool's schema (cross-tool leakage).
+
+    Returns (clean_args, n_dropped).
+    """
+    if not isinstance(args, dict):
+        return {}, 0
+    schema = param_names.get(tool_name)
+    clean: dict = {}
+    dropped = 0
+    for k, v in args.items():
+        if _is_phantom_value(v):
+            dropped += 1
+            continue
+        if schema is not None and k not in schema:
+            dropped += 1
+            continue
+        clean[k] = v
+    return clean, dropped
+
+
+def tool_to_convo(
+    ex: dict, catalog_tools: list[dict]
+) -> tuple[list[dict], list[dict], int] | None:
+    """Convert a generator tool-use example to (conversations, tools, n_dropped).
 
     Output conversations include user/assistant-with-tool_calls/tool/final-assistant.
     The `tools` list is the JSON-schema form for each catalog tool — apply_chat_template
     will render it inside the system message according to Nemotron's tool-calling format.
 
-    A leading system message enforces tool-call discipline (no phantom None params).
+    A leading system message enforces tool-call discipline (no phantom None params),
+    and every tool call's args are run through `sanitize_tool_args` so the SFT
+    targets actually obey that discipline. `n_dropped` is the count of phantom
+    args removed across this example (for the run summary).
     """
     instr = (ex.get("instruction") or "").strip()
     sol = ex.get("solution") or {}
     steps = sol.get("reasoning_path") or []
     if not (instr and steps):
         return None
+
+    param_names = _catalog_param_names(catalog_tools)
+    n_dropped = 0
 
     msgs: list[dict] = [
         {"role": "system", "content": ANTI_HALLUCINATION_SYSTEM},
@@ -93,6 +160,8 @@ def tool_to_convo(ex: dict, catalog_tools: list[dict]) -> tuple[list[dict], list
             continue
         thought = (step.get("thought") or "").strip()
         args = step.get("args") or {}
+        args, dropped = sanitize_tool_args(tool, args, param_names)
+        n_dropped += dropped
         actual = step.get("actual_result")
         expected = step.get("expected_result")
         # Assistant turn: <think>thought</think> + a tool call.
@@ -114,7 +183,7 @@ def tool_to_convo(ex: dict, catalog_tools: list[dict]) -> tuple[list[dict], list
     if final:
         msgs.append({"role": "assistant", "content": final})
 
-    return msgs, catalog_tools
+    return msgs, catalog_tools, n_dropped
 
 
 # ─────────────────────────── loaders ────────────────────────────────
@@ -212,7 +281,8 @@ def main():
 
     # Build conversation rows
     rows: list[dict] = []
-    counts = {"qa": 0, "cot": 0, "tool": 0, "skipped_qa": 0, "skipped_cot": 0, "skipped_tool": 0}
+    counts = {"qa": 0, "cot": 0, "tool": 0, "skipped_qa": 0, "skipped_cot": 0,
+              "skipped_tool": 0, "dropped_tool_args": 0}
 
     def _render(convo, tools=None):
         """Apply the chat template if tokenizer is loaded; else return empty string."""
@@ -259,7 +329,8 @@ def main():
             if result is None:
                 counts["skipped_tool"] += 1
                 continue
-            convo, tools = result
+            convo, tools, dropped = result
+            counts["dropped_tool_args"] += dropped
             rows.append({
                 "conversations": convo,
                 "tools": tools,
@@ -286,6 +357,8 @@ def main():
     print(f"[prepare] wrote {len(rows)} rows → {args.out}")
     print(f"[prepare]   kept    : qa={counts['qa']}  cot={counts['cot']}  tool={counts['tool']}")
     print(f"[prepare]   skipped : qa={counts['skipped_qa']}  cot={counts['skipped_cot']}  tool={counts['skipped_tool']}")
+    if "tool" in types_req:
+        print(f"[prepare]   sanitized: dropped {counts['dropped_tool_args']} phantom tool-call arg(s) from targets")
     # Mix-ratio hint per Unsloth's Nemotron docs (75% reasoning / 25% non-reasoning ideal)
     reasoning_n = counts["cot"] + counts["tool"]    # tool traces contain <think> reasoning
     plain_n = counts["qa"]
