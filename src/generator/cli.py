@@ -66,6 +66,56 @@ def _extract_llm_config(cfg, provider=None, model=None):
     return llm_config
 
 
+def _resolve_prompts(config_path, prompts):
+    """Load prompt templates.
+
+    If ``prompts`` is given it overrides the default location — it may be a
+    directory of prompt files or a single prompts.yaml (its parent dir is
+    used). Otherwise prompts load from alongside the config file.
+    """
+    if prompts:
+        p = Path(prompts)
+        return load_prompts(p if p.is_dir() else p.parent)
+    return load_prompts(Path(config_path).parent)
+
+
+def _select_chunk_ids(lancedb_path, table_name, sampling, limit):
+    """Pick up to ``limit`` chunk IDs from a LanceDB table by strategy.
+
+      sequential  -> None (caller keeps the default first-N paging)
+      random      -> uniform random sample
+      stratified  -> spread evenly across distinct source files, so the
+                     QA set covers every document rather than just the
+                     first few
+
+    Returns a list of chunk IDs, or None to fall back to default paging.
+    """
+    if sampling == "sequential" or not limit:
+        return None
+    import random as _random
+
+    import lancedb  # type: ignore[import-untyped]
+
+    df = lancedb.connect(lancedb_path).open_table(table_name).to_pandas()
+    if "id" not in df.columns or len(df) <= limit:
+        return None
+    if sampling == "random":
+        return list(df["id"].sample(n=limit, random_state=3407))
+    # stratified — round-robin across source files
+    src = "source_file" if "source_file" in df.columns else None
+    if src is None:
+        return list(df["id"].sample(n=limit, random_state=3407))
+    rng = _random.Random(3407)
+    buckets = {k: rng.sample(list(g["id"]), len(g)) for k, g in df.groupby(src)}
+    keys, picked, i = list(buckets), [], 0
+    while len(picked) < limit and any(buckets.values()):
+        b = buckets[keys[i % len(keys)]]
+        if b:
+            picked.append(b.pop())
+        i += 1
+    return picked[:limit]
+
+
 @click.group()
 @click.version_option(version="0.1.0")
 def main():
@@ -151,7 +201,13 @@ def list_providers():
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
 @click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential). For Ollama: match to OLLAMA_NUM_PARALLEL (20-24 optimal)")
-def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, chunk_ids, provider, model, workers):
+@click.option("--sampling", type=click.Choice(["sequential", "random", "stratified"]),
+              default="sequential",
+              help="Chunk selection when --max-chunks caps the count: "
+                   "sequential (first N), random, or stratified (even spread across source files)")
+@click.option("--prompts", "prompts_dir", type=click.Path(exists=True),
+              help="Custom prompt-templates directory (default: alongside the config file)")
+def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_size, max_chunks, chunk_ids, provider, model, workers, sampling, prompts_dir):
     """Generate QA pairs from LanceDB chunks."""
     console.print("\n[bold]🚀 Generating QA pairs from LanceDB[/bold]\n")
 
@@ -160,8 +216,8 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Load prompts from individual files
-    prompts = load_prompts(Path(config_path).parent)
+    # Load prompt templates (custom dir via --prompts, else alongside config)
+    prompts = _resolve_prompts(config_path, prompts_dir)
 
     # Extract LLM config
     llm_config = _extract_llm_config(cfg, provider, model)
@@ -189,14 +245,28 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
     
     for table_name in tables:
         console.print(f"\n[bold cyan]📊 Processing table: {table_name}[/bold cyan]")
-        
+
         if workers > 1:
             console.print(f"[yellow]⚡ Parallel mode: {workers} workers[/yellow]")
-        
+
+        # Resolve which chunks to process. An explicit --chunk-ids wins;
+        # otherwise --sampling random/stratified picks a subset of size
+        # --max-chunks (sequential keeps the generator's default paging).
+        effective_chunk_ids = chunk_id_list
+        if effective_chunk_ids is None and sampling != "sequential":
+            effective_chunk_ids = _select_chunk_ids(
+                lancedb_path, table_name, sampling, max_chunks
+            )
+            if effective_chunk_ids:
+                console.print(
+                    f"[cyan]→ {sampling} sampling: selected "
+                    f"{len(effective_chunk_ids)} of {table_name}'s chunks[/cyan]"
+                )
+
         # Use table-specific output path for intermediate files
         # This prevents cross-table contamination when resuming
         table_output = output_path_obj.parent / f"{output_path_obj.stem}_{table_name}.json"
-        
+
         # Generate QA pairs from this table
         qa_pairs = generate_qa_from_lancedb(
             db_path=lancedb_path,
@@ -208,7 +278,7 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
             target_pairs=target_pairs // len(tables) if target_pairs else None,  # Split target across tables
             batch_size=batch_size,
             max_chunks=max_chunks,
-            chunk_ids=chunk_id_list,
+            chunk_ids=effective_chunk_ids,
             workers=workers,  # Pass workers parameter
         )
         
@@ -237,10 +307,17 @@ def generate(lancedb_path, output, config, table, n_pairs, target_pairs, batch_s
 @click.option("--provider", help="LLM provider (override config)")
 @click.option("--model", help="LLM model (override config)")
 @click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended)")
-def curate(input_file, output, config, threshold, batch_size, topic, provider, model, workers):
+@click.option("-f", "--format", "out_format",
+              type=click.Choice(["json", "chatml", "alpaca", "sharegpt", "jsonl"]),
+              default="json",
+              help="Output format: json (raw QA, default), or a training format "
+                   "(chatml / alpaca / sharegpt / jsonl)")
+@click.option("--prompts", "prompts_dir", type=click.Path(exists=True),
+              help="Custom prompt-templates directory (default: alongside the config file)")
+def curate(input_file, output, config, threshold, batch_size, topic, provider, model, workers, out_format, prompts_dir):
     """
     Filter QA pairs or CoT examples by quality using LLM-as-Judge.
-    
+
     Automatically detects input format (QA or CoT), converts to conversation
     format for rating, and restores to original format after curation.
     """
@@ -251,8 +328,8 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    # Load prompts from individual files
-    prompts = load_prompts(Path(config_path).parent)
+    # Load prompt templates (custom dir via --prompts, else alongside config)
+    prompts = _resolve_prompts(config_path, prompts_dir)
 
     # Extract LLM config - CLI flag takes precedence over config file
     curate_config = cfg.get("curate", {})
@@ -284,6 +361,17 @@ def curate(input_file, output, config, threshold, batch_size, topic, provider, m
         f"[bold green]✨ Success! Filtered {metrics['filtered_pairs']} / "
         f"{metrics['total_pairs']} pairs ({metrics['retention_rate']:.1%})[/bold green]\n"
     )
+
+    # Optional: convert the curated JSON to a training format in place.
+    if out_format != "json":
+        count = export_to_format(
+            input_path=output, output_path=output,
+            format_type=out_format, system_prompt=None,
+        )
+        console.print(
+            f"[bold green]✓ Exported {count} examples to "
+            f"'{out_format}' format → {output}[/bold green]\n"
+        )
 
 
 @main.command("select-coverage")
@@ -632,7 +720,9 @@ def generate_cot(lancedb_path, output, config, table, n_pairs, target_pairs, bat
 @click.option("--model", help="LLM model (override config)")
 @click.option("--batch-size", type=int, default=5, help="Pairs to enhance per batch")
 @click.option("--workers", type=int, default=1, help="Number of parallel workers (1=sequential, 4+ recommended for Ollama)")
-def enhance_cot(input_file, output, config, provider, model, batch_size, workers):
+@click.option("--prompts", "prompts_dir", type=click.Path(exists=True),
+              help="Custom prompt-templates directory (default: bundled configs/)")
+def enhance_cot(input_file, output, config, provider, model, batch_size, workers, prompts_dir):
     """
     Add CoT reasoning to existing QA pairs.
     
@@ -659,6 +749,7 @@ def enhance_cot(input_file, output, config, provider, model, batch_size, workers
         llm_config=llm_config,
         batch_size=batch_size,
         workers=workers,
+        prompts_dir=prompts_dir,
     )
 
     console.print(f"[bold green]✨ Success! Enhanced {result['enhanced_pairs']} pairs with CoT reasoning[/bold green]\n")
