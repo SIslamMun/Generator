@@ -29,13 +29,14 @@ def enhance_with_cot(
     workers: int = 1,
     prepend_pairs: List = None,
     intermediate_path: str = None,
+    prompts_dir: str = None,
 ) -> Dict:
     """
     Add chain-of-thought reasoning to existing QA pairs.
-    
+
     Converts QA pairs to conversation format, adds reasoning steps,
     and outputs enhanced conversations.
-    
+
     Args:
         input_path: Path to input JSON file (QA pairs)
         output_path: Path to save enhanced pairs
@@ -44,14 +45,19 @@ def enhance_with_cot(
         workers: Number of parallel workers (1=sequential, 4+ recommended for Ollama)
         prepend_pairs: Optional list of already-processed pairs to include in intermediate saves
         intermediate_path: Optional path for intermediate saves (defaults to output_path_intermediate.json)
-    
+        prompts_dir: Optional custom prompt-templates directory (default: bundled configs/)
+
     Returns:
         Dict with summary statistics
     """
     from ..clients import get_client
 
-    # Load prompt template - use correct path relative to project root
-    config_dir = Path(__file__).parent.parent.parent.parent / "configs"
+    # Load prompt template — custom dir via prompts_dir, else bundled configs/.
+    if prompts_dir:
+        _p = Path(prompts_dir)
+        config_dir = _p if _p.is_dir() else _p.parent
+    else:
+        config_dir = Path(__file__).parent.parent.parent.parent / "configs"
     prompts = load_prompts(config_dir)
     cot_enhance_prompt = prompts.get("cot_enhancement")
     if not cot_enhance_prompt:
