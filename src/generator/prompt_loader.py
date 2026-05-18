@@ -25,10 +25,16 @@ def load_prompts(config_dir: Path) -> Dict[str, str]:
     Returns:
         Dict mapping prompt name to prompt template string
     """
+    config_dir = Path(config_dir)
     prompts_dir = config_dir / "prompts"
 
+    # Accept either a config dir (with a `prompts/` subdir) or the prompts
+    # directory itself (the *.yaml files directly inside it).
     if not prompts_dir.exists():
-        raise FileNotFoundError(f"Prompts directory not found: {prompts_dir}")
+        if config_dir.is_dir() and any(config_dir.glob("*.yaml")):
+            prompts_dir = config_dir
+        else:
+            raise FileNotFoundError(f"Prompts directory not found: {prompts_dir}")
 
     prompts = {}
 
