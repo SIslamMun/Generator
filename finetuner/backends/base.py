@@ -38,13 +38,16 @@ def load_conversations(dataset_path: str) -> list[dict]:
     if not path.exists():
         raise FileNotFoundError(f"dataset not found: {dataset_path}")
 
+    # Content-based, not extension-based: a `.json` file can hold JSONL
+    # (e.g. a ChatML export written to a .json path), so try a whole-file
+    # JSON parse first and fall back to line-by-line JSONL.
     raw: list[dict]
     text = path.read_text()
-    if path.suffix == ".jsonl":
-        raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()]
-    else:
+    try:
         loaded = json.loads(text)
         raw = loaded if isinstance(loaded, list) else loaded.get("examples", [])
+    except json.JSONDecodeError:
+        raw = [json.loads(ln) for ln in text.splitlines() if ln.strip()]
 
     rows: list[dict] = []
     for r in raw:
