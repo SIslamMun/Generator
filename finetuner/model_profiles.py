@@ -36,27 +36,40 @@ _MARKERS = {
     "mistral": ("[INST]", "[/INST]"),
 }
 
-# model_type → (loader, target-kind, marker-family).
-#   loader      : "language" (FastLanguageModel) | "general" (FastModel)
-#   target-kind : "std" | "mamba"
+# model_type → per-family deltas.
+#   loader       : "language" (FastLanguageModel) | "general" (FastModel)
+#   targets      : "std" | "mamba" | "granite_h" (adds shared_mlp.* for H-hybrids)
+#   markers      : key into _MARKERS (response-only masking)
+#   chat_template: unsloth.chat_templates name to install via get_chat_template,
+#                  or None to use the tokenizer's built-in template
+#   multimodal   : if True, LoRA via finetune_*_layers flags (Gemma 3/4 style)
+#                  instead of target_modules — the official notebook recipe.
 _FAMILY = {
-    "llama":       ("language", "std",   "llama3"),
-    "mistral":     ("language", "std",   "mistral"),
-    "qwen2":       ("language", "std",   "chatml"),
-    "qwen3":       ("language", "std",   "chatml"),
-    "qwen2_moe":   ("language", "std",   "chatml"),
-    "qwen3_moe":   ("language", "std",   "chatml"),
-    "phi3":        ("language", "std",   "chatml"),
-    "gemma":       ("language", "std",   "gemma"),
-    "gemma2":      ("language", "std",   "gemma"),
-    "gemma3":      ("general",  "std",   "gemma"),
-    "gemma3_text": ("language", "std",   "gemma"),
-    "gemma3n":     ("general",  "std",   "gemma"),
-    "gemma4":      ("general",  "std",   "gemma4"),
-    "granite":     ("language", "std",   "granite"),
-    "granitemoe":  ("language", "std",   "granite"),
-    "nemotron_h":  ("language", "mamba", "chatml"),
+    "llama":       {"loader":"language", "targets":"std",       "markers":"llama3",  "chat_template": None,      "multimodal": False},
+    "mistral":     {"loader":"language", "targets":"std",       "markers":"mistral", "chat_template": None,      "multimodal": False},
+    "qwen2":       {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "qwen3":       {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": "qwen3-instruct", "multimodal": False},
+    "qwen2_moe":   {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "qwen3_moe":   {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "phi3":        {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "phi4":        {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "mixtral":     {"loader":"language", "targets":"std",       "markers":"mistral", "chat_template": None,      "multimodal": False},
+    "deepseek_v2": {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "deepseek_v3": {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "yi":          {"loader":"language", "targets":"std",       "markers":"chatml",  "chat_template": None,      "multimodal": False},
+    "gemma":       {"loader":"language", "targets":"std",       "markers":"gemma",   "chat_template": None,      "multimodal": False},
+    "gemma2":      {"loader":"language", "targets":"std",       "markers":"gemma",   "chat_template": None,      "multimodal": False},
+    "gemma3":      {"loader":"general",  "targets":"std",       "markers":"gemma",   "chat_template": "gemma-3", "multimodal": True},
+    "gemma3_text": {"loader":"language", "targets":"std",       "markers":"gemma",   "chat_template": None,      "multimodal": False},
+    "gemma3n":     {"loader":"general",  "targets":"std",       "markers":"gemma",   "chat_template": "gemma-3", "multimodal": True},
+    "gemma4":      {"loader":"general",  "targets":"std",       "markers":"gemma4",  "chat_template": "gemma-4", "multimodal": True},
+    "granite":     {"loader":"language", "targets":"std",       "markers":"granite", "chat_template": None,      "multimodal": False},
+    "granitemoe":  {"loader":"language", "targets":"granite_h", "markers":"granite", "chat_template": None,      "multimodal": False},
+    "granitehybrid":{"loader":"language","targets":"granite_h", "markers":"granite", "chat_template": None,      "multimodal": False},
+    "granitemoehybrid":{"loader":"language","targets":"granite_h","markers":"granite","chat_template": None,    "multimodal": False},
+    "nemotron_h":  {"loader":"language", "targets":"mamba",     "markers":"chatml",  "chat_template": None,      "multimodal": False},
 }
+_GRANITE_H_EXTRA = ["shared_mlp.input_linear", "shared_mlp.output_linear"]
 # Vision-language model_types → the vision-capable loader.
 _VISION = {"qwen2_vl", "qwen2_5_vl", "mllama", "llava", "idefics3"}
 
@@ -71,14 +84,19 @@ class ModelProfile:
     instruction_part: str | None      # None → skip response-only masking
     response_part: str | None
     trust_remote_code: bool
+    chat_template_name: str | None    # get_chat_template(tok, this); None → built-in
+    multimodal: bool                  # True → LoRA via finetune_*_layers flags
     source: str                       # how each field was decided (for logs)
 
     def summary(self) -> str:
         masking = (f"{self.instruction_part!r} / {self.response_part!r}"
                    if self.instruction_part else "(none — full-sequence)")
+        lora_path = ("finetune_*_layers flags (multimodal)" if self.multimodal
+                     else f"target_modules={self.target_modules}")
         return (f"  model_type     : {self.model_type}\n"
                 f"  loader         : {self.loader}\n"
-                f"  target_modules : {self.target_modules}\n"
+                f"  lora           : {lora_path}\n"
+                f"  chat_template  : {self.chat_template_name or '(built-in)'}\n"
                 f"  masking        : {masking}\n"
                 f"  resolved by    : {self.source}")
 
@@ -122,17 +140,20 @@ def resolve(base_model: str, cfg=None) -> ModelProfile:
         pass
 
     if model_type in _VISION:
-        loader, tkind, fam = "vision", "std", None
+        entry = {"loader": "vision", "targets": "std", "markers": None,
+                 "chat_template": None, "multimodal": True}
         source = f"family table ({model_type}: vision)"
     elif model_type in _FAMILY:
-        loader, tkind, fam = _FAMILY[model_type]
+        entry = _FAMILY[model_type]
         source = f"family table ({model_type})"
     else:
-        loader, tkind, fam = "language", "std", None
+        entry = {"loader": "language", "targets": "std", "markers": None,
+                 "chat_template": None, "multimodal": False}
         source = f"DEFAULTS — unknown model_type '{model_type}'"
         warnings.warn(f"[profiles] unknown model_type '{model_type}' for "
                       f"{base_model}; using language loader + standard targets")
 
+    fam = entry["markers"]
     # Markers: family table first; else sniff the chat template.
     if fam is None:
         fam = _marker_family_from_template(chat_template)
@@ -140,12 +161,23 @@ def resolve(base_model: str, cfg=None) -> ModelProfile:
             source += f" + template-detected markers ({fam})"
     instruction_part, response_part = _MARKERS.get(fam, (None, None))
 
-    target_modules = list(_STD_TARGETS) + (_MAMBA_EXTRA if tkind == "mamba" else [])
+    tkind = entry["targets"]
+    target_modules = list(_STD_TARGETS)
+    if tkind == "mamba":
+        target_modules += _MAMBA_EXTRA
+    elif tkind == "granite_h":
+        target_modules += _GRANITE_H_EXTRA
 
     profile = ModelProfile(
-        model_type=model_type, loader=loader, target_modules=target_modules,
-        instruction_part=instruction_part, response_part=response_part,
-        trust_remote_code=True, source=source,
+        model_type=model_type,
+        loader=entry["loader"],
+        target_modules=target_modules,
+        instruction_part=instruction_part,
+        response_part=response_part,
+        trust_remote_code=True,
+        chat_template_name=entry["chat_template"],
+        multimodal=entry["multimodal"],
+        source=source,
     )
 
     # Developer overrides (the UI never sets these).

@@ -65,16 +65,23 @@ class HFBackend(Backend):
         print(f"[hf] dataset: {len(rows)} conversations "
               f"({n_with_tools} carry a tool catalog)")
         render_tools = cfg.render_tools
+        # strip a leading BOS so SFTTrainer's re-tokenization doesn't double it
+        bos = getattr(tokenizer, "bos_token", None) or ""
 
         def _render(r):
             kw = {"tokenize": False, "add_generation_prompt": False}
+            text = None
             if r.get("tools") and render_tools:
                 try:
-                    return tokenizer.apply_chat_template(
+                    text = tokenizer.apply_chat_template(
                         r["conversations"], tools=r["tools"], **kw)
                 except Exception:
-                    pass
-            return tokenizer.apply_chat_template(r["conversations"], **kw)
+                    text = None
+            if text is None:
+                text = tokenizer.apply_chat_template(r["conversations"], **kw)
+            if bos and text.startswith(bos):
+                text = text[len(bos):]
+            return text
 
         dataset = Dataset.from_list([{"text": _render(r)} for r in rows])
 

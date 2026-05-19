@@ -33,7 +33,7 @@ class UnslothBackend(Backend):
         # Import unsloth FIRST so its patches apply to trl/transformers.
         import unsloth  # noqa: F401
         from unsloth import FastLanguageModel, FastModel
-        from unsloth.chat_templates import train_on_responses_only
+        from unsloth.chat_templates import train_on_responses_only, get_chat_template
 
         from datasets import Dataset
         from transformers import AutoTokenizer
@@ -58,16 +58,49 @@ class UnslothBackend(Backend):
         tokenizer = AutoTokenizer.from_pretrained(
             cfg.base_model, trust_remote_code=profile.trust_remote_code)
 
-        model = Loader.get_peft_model(
-            model,
-            r=cfg.lora_rank,
-            lora_alpha=cfg.lora_alpha,
-            lora_dropout=cfg.lora_dropout,
-            target_modules=profile.target_modules,
-            bias="none",
-            use_gradient_checkpointing="unsloth",
-            random_state=cfg.seed,
-        )
+        # FIX 1: install the model's canonical chat template (e.g. "gemma-4")
+        # when the family has a known-good one. This matches the official
+        # Unsloth notebook recipe and avoids template-quirk bugs.
+        if profile.chat_template_name:
+            try:
+                tokenizer = get_chat_template(
+                    tokenizer, chat_template=profile.chat_template_name)
+                print(f"[unsloth] installed chat template "
+                      f"'{profile.chat_template_name}'")
+            except Exception as e:                       # noqa: BLE001
+                print(f"[unsloth] WARN: get_chat_template "
+                      f"'{profile.chat_template_name}' failed ({e}); "
+                      f"using the tokenizer's built-in template")
+
+        # FIX 2: LoRA via finetune_*_layers flags for multimodal models
+        # (Gemma 3/4), via target_modules for everything else. This is what
+        # Unsloth's notebooks do; mis-using target_modules on a multimodal
+        # model is what broke our Gemma 4 merge.
+        if profile.multimodal:
+            print("[unsloth] LoRA via finetune_*_layers flags (multimodal)")
+            model = Loader.get_peft_model(
+                model,
+                finetune_vision_layers     = False,
+                finetune_language_layers   = True,
+                finetune_attention_modules = True,
+                finetune_mlp_modules       = True,
+                r=cfg.lora_rank,
+                lora_alpha=cfg.lora_alpha,
+                lora_dropout=cfg.lora_dropout,
+                bias="none",
+                random_state=cfg.seed,
+            )
+        else:
+            model = Loader.get_peft_model(
+                model,
+                r=cfg.lora_rank,
+                lora_alpha=cfg.lora_alpha,
+                lora_dropout=cfg.lora_dropout,
+                target_modules=profile.target_modules,
+                bias="none",
+                use_gradient_checkpointing="unsloth",
+                random_state=cfg.seed,
+            )
 
         # ── dataset → chat-template text ────────────────────────────────
         rows = load_conversations(cfg.dataset)
@@ -76,6 +109,10 @@ class UnslothBackend(Backend):
               f"({n_with_tools} carry a tool catalog)")
         dataset = Dataset.from_list(rows)
         render_tools = cfg.render_tools
+        # FIX 3: strip the tokenizer's BOS token from rendered text so the
+        # SFTTrainer's tokenizer (which adds BOS again) doesn't produce a
+        # double-BOS sequence — Unsloth's notebooks do .removeprefix('<bos>').
+        bos = getattr(tokenizer, "bos_token", None) or ""
 
         def _format(batch):
             convos = batch["conversations"]
@@ -95,6 +132,8 @@ class UnslothBackend(Backend):
                         rendered = tokenizer.apply_chat_template(convo, **kw)
                     except Exception:               # unrenderable — dropped below
                         rendered = ""
+                if bos and rendered.startswith(bos):
+                    rendered = rendered[len(bos):]
                 texts.append(rendered)
             return {"text": texts}
 

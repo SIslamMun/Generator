@@ -62,6 +62,13 @@ finetuned_unsloth/models/*/.venv-*/
 # Shared bake-off venv (built by finetuned_unsloth/install_bakeoff.sbatch)
 finetuned_unsloth/.venv-bakeoff/
 
+# Reference notebooks clone (a fetch of github.com/unslothai/notebooks; large)
+finetuned_unsloth/reference/notebooks/
+finetuned_unsloth/reference/*.out
+finetuned_unsloth/reference/*.err
+finetuned_unsloth/reference/gemma_4_lora/
+finetuned_unsloth/reference/outputs/
+
 # Per-model prepared data + trained artifacts (regeneratable)
 finetuned_unsloth/models/*/data/
 finetuned_unsloth/models/*/artifacts/
@@ -94,6 +101,11 @@ google/
 # System files
 .DS_Store
 Thumbs.db
+
+# Node tooling (not a project dep; produced by incidental local tools)
+node_modules/
+package.json
+package-lock.json
 
 # Lock files (optional - keep uv.lock for reproducibility)
 # uv.lock
