@@ -236,6 +236,57 @@ def convert_to_gguf_via_llamacpp(quant: str) -> Path | None:
     return final_path
 
 
+def patch_chat_template(merged_dir: Path) -> int:
+    """Null-guard the Nemotron chat template so it survives minja (the strict
+    Jinja engine in llama.cpp / LM Studio).
+
+    Stock template applies `| string` to fields that can be JSON null
+    (content, message.content, extra-key values, param type). Python Jinja
+    renders `none | string` as 'None'; minja raises. We wrap each with an
+    `(X if X is not none else '')` guard — correct for ALL value types
+    (unlike `default('', true)`, this never corrupts a legit 0 / false).
+
+    Patches both chat_template.jinja and the chat_template field embedded
+    in tokenizer_config.json. Returns the number of substitutions made.
+    """
+    # (stock fragment) -> (null-guarded fragment)
+    REPLACEMENTS = [
+        ("(json_dict[json_key] | string)",
+         "((json_dict[json_key] if json_dict[json_key] is not none else '') | string)"),
+        ("(param_fields.type | string)",
+         "((param_fields.type if param_fields.type is not none else '') | string)"),
+        ("(content | string)",
+         "((content if content is not none else '') | string)"),
+        ("message.content | string",
+         "(message.content if message.content is not none else '') | string"),
+    ]
+    total = 0
+
+    jinja = merged_dir / "chat_template.jinja"
+    if jinja.exists():
+        txt = jinja.read_text()
+        for old, new in REPLACEMENTS:
+            if old in txt and new not in txt:
+                txt = txt.replace(old, new)
+                total += 1
+        jinja.write_text(txt)
+
+    # tokenizer_config.json may embed the same template under "chat_template"
+    tcfg = merged_dir / "tokenizer_config.json"
+    if tcfg.exists():
+        cfg = json.loads(tcfg.read_text())
+        ct = cfg.get("chat_template")
+        if isinstance(ct, str):
+            for old, new in REPLACEMENTS:
+                if old in ct and new not in ct:
+                    ct = ct.replace(old, new)
+                    total += 1
+            cfg["chat_template"] = ct
+            tcfg.write_text(json.dumps(cfg, indent=2, ensure_ascii=False))
+
+    return total
+
+
 def main():
     if not MERGED_DIR.exists():
         sys.exit(f"ERROR: {MERGED_DIR} missing")
@@ -262,6 +313,25 @@ def main():
     card_path = HERE / "artifacts" / "README.md"
     card_path.write_text(card)
     print(f"=== model card → {card_path}")
+
+    # ── 1b. Copy dynamic remote-code files (Unsloth's save_pretrained_merged
+    #        omits them; transformers' trust_remote_code load needs them) ──
+    import glob, shutil
+    snap_glob = glob.glob(str(Path(os.environ.get(
+        "HF_HUB_CACHE", Path.home() / ".cache/huggingface/hub"))
+        / "models--unsloth--NVIDIA-Nemotron-3-Nano-4B" / "snapshots" / "*"))
+    if snap_glob:
+        snap = Path(snap_glob[0])
+        for f in ("modeling_nemotron_h.py", "configuration_nemotron_h.py",
+                  "generation_config.json", "special_tokens_map.json"):
+            src, dst = snap / f, MERGED_DIR / f
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+                print(f"=== copied dynamic-code file: {f}")
+
+    # ── 1c. Null-guard the chat template (LM Studio / minja compatibility) ──
+    n_patched = patch_chat_template(MERGED_DIR)
+    print(f"=== chat-template null-guards applied: {n_patched}")
 
     # ── 2. Convert GGUF (q8_0, q4_k_m) using locally-built llama.cpp ──
     gguf_files: list[Path] = []

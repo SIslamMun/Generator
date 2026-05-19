@@ -8,7 +8,7 @@ output dir) — see issue grc-iit/Phagocyte#4.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 BACKENDS = ("unsloth", "hf", "ollama")
 
@@ -45,6 +45,18 @@ class FinetuneConfig:
 
     # ── ollama backend ────────────────────────────────────────────────
     model_name: str = "phagocyte-finetuned"   # name for `ollama create`
+
+    # ── per-model deltas — AUTO-RESOLVED from base_model ──────────────
+    # The web UI never sets these. `model_profiles.resolve()` derives the
+    # loader class, LoRA target modules, and response-masking markers from
+    # the chosen model, so switching models in the UI needs no other input.
+    # They exist here only as a developer escape hatch.
+    loader: str = ""               # "" → auto: language | general | vision
+    target_modules: list = field(default_factory=list)   # [] → auto
+    instruction_part: str = ""     # "" → auto (train_on_responses_only marker)
+    response_part: str = ""        # "" → auto
+    trust_remote_code: bool = True
+    render_tools: bool = True      # render `tools=` when a dataset row has them
 
     def validate(self) -> None:
         """Raise ValueError on an unusable config."""

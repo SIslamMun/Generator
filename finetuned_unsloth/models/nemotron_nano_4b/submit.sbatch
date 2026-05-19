@@ -103,7 +103,8 @@ time python prepare_data.py "${PREP_ARGS[@]}"
 
 # ── STEP 2: validate ───────────────────────────────────────────
 echo ""; echo "=== STEP 2: validate_data.py ==="
-time python validate_data.py --jsonl "$DATASET"
+# report truncation against the real training seq length (train.py uses 4096)
+time python validate_data.py --jsonl "$DATASET" --max-seq-length 4096
 
 # ── STEP 3: train ──────────────────────────────────────────────
 TRAIN_ARGS=(--dataset "$DATASET" --output "$OUTPUT")

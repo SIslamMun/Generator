@@ -1,0 +1,65 @@
+# ─────────────────────────────────────────────────────────────────────
+# GEMMA 3 4B IT — fine-tune config (NDP tool-calling bake-off entry).
+#
+# Standard transformer (no Mamba) — reuses the shared .venv-nemotron,
+# which already carries Unsloth / TRL / transformers. No dedicated install.
+# ─────────────────────────────────────────────────────────────────────
+
+display_name: "Granite 4.1 8B"
+hf_model_id:  "unsloth/granite-4.1-8b"
+family:       "granite-4.1"
+architecture: "transformer"
+
+load:
+  max_seq_length: 4096
+  load_in_4bit:   false
+  load_in_8bit:   false
+  full_finetuning: false
+  trust_remote_code: true
+
+lora:
+  r: 32
+  alpha: 64
+  dropout: 0.0
+  bias: "none"
+  use_gradient_checkpointing: "unsloth"
+  use_rslora: false
+  # Gemma 3 is a pure-attention transformer — standard target set.
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+# Gemma 3 chat template turn separators (assistant turns render as `model`).
+masking:
+  instruction_part: "<|start_of_role|>user<|end_of_role|>"
+  response_part:    "<|start_of_role|>assistant<|end_of_role|>"
+
+train:
+  epochs: 3
+  max_steps: 0
+  batch_size: 4
+  grad_accum: 2
+  warmup_steps: 30
+  lr: 2.0e-4
+  weight_decay: 0.001
+  scheduler: "linear"
+  optim: "adamw_8bit"
+  seed: 3407
+  logging_steps: 5
+  report_to: "none"
+
+save:
+  lora: true
+  merged_16bit: true
+  gguf:
+    enabled: false
+
+# Reuses the Nemotron venv — Gemma 3 needs no Mamba kernels.
+venv:
+  path: "../nemotron_nano_4b/.venv-nemotron"
+  shared: true

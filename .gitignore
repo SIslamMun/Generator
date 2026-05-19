@@ -54,9 +54,13 @@ output/*.jsonl
 # Slurm stdout/stderr only — not worth versioning
 slurm/logs/
 finetuned_unsloth/models/*/logs/
+finetuned_unsloth/logs/
+finetuner/logs/
 
 # Per-model dedicated venvs (built by each model's install.sh)
 finetuned_unsloth/models/*/.venv-*/
+# Shared bake-off venv (built by finetuned_unsloth/install_bakeoff.sbatch)
+finetuned_unsloth/.venv-bakeoff/
 
 # Per-model prepared data + trained artifacts (regeneratable)
 finetuned_unsloth/models/*/data/

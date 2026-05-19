@@ -249,7 +249,7 @@ def main():
     ap.add_argument("--tool-catalog", type=Path,
                     default=Path("configs/tools/ndp_tools.json"),
                     help="Tool catalog (only used when types includes 'tool')")
-    ap.add_argument("--hf-model-id", default="unsloth/NVIDIA-Nemotron-3-Nano-4B",
+    ap.add_argument("--hf-model-id", default="unsloth/gemma-4-e4b-it",
                     help="HF model whose tokenizer renders the chat template.")
     ap.add_argument("--out", type=Path, required=True, help="Output JSONL")
     ap.add_argument("--shuffle", action="store_true", help="Shuffle rows after concat")

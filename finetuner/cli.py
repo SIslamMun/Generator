@@ -60,9 +60,21 @@ def list_backends():
 @click.option("--export-gguf", is_flag=True, help="Also export a GGUF (unsloth only)")
 @click.option("--model-name", default="phagocyte-finetuned", show_default=True,
               help="Name for the Ollama model (ollama backend)")
+@click.option("--no-render-tools", is_flag=True,
+              help="Do not render a tool catalog even if the dataset carries one")
+# ── developer overrides — normally auto-resolved from the model; the UI
+#    never sets these (see finetuner/model_profiles.py) ──────────────────
+@click.option("--loader", default="", help="[override] language | general | vision")
+@click.option("--target-modules", default="",
+              help="[override] comma-separated LoRA target modules")
+@click.option("--instruction-part", default="",
+              help="[override] response-masking instruction marker")
+@click.option("--response-part", default="",
+              help="[override] response-masking response marker")
 def run(backend, base_model, dataset, output_dir, lora_rank, lora_alpha,
         lora_dropout, epochs, learning_rate, batch_size, grad_accum,
-        max_seq_length, max_steps, bf16, save_merged, export_gguf, model_name):
+        max_seq_length, max_steps, bf16, save_merged, export_gguf, model_name,
+        no_render_tools, loader, target_modules, instruction_part, response_part):
     """Run a fine-tune job."""
     cfg = FinetuneConfig(
         backend=backend, base_model=base_model, dataset=dataset,
@@ -71,6 +83,10 @@ def run(backend, base_model, dataset, output_dir, lora_rank, lora_alpha,
         batch_size=batch_size, grad_accum=grad_accum,
         max_seq_length=max_seq_length, max_steps=max_steps, bf16=bf16,
         save_merged=save_merged, export_gguf=export_gguf, model_name=model_name,
+        render_tools=not no_render_tools,
+        loader=loader,
+        target_modules=[m.strip() for m in target_modules.split(",") if m.strip()],
+        instruction_part=instruction_part, response_part=response_part,
     )
     try:
         cfg.validate()
@@ -85,6 +101,8 @@ def run(backend, base_model, dataset, output_dir, lora_rank, lora_alpha,
     try:
         result = backend_impl.run(cfg)
     except Exception as e:  # noqa: BLE001 — surface any backend failure cleanly
+        import traceback
+        traceback.print_exc()
         raise click.ClickException(f"{backend} backend failed: {e}") from e
 
     click.echo(f"\n[done] {result}")

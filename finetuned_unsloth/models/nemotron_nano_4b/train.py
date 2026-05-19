@@ -32,13 +32,19 @@ MAX_SEQ_LENGTH   = 4096                                   # cell 6: bumped from 
                                                           # tool schemas + reasoning chains);
                                                           # 2048 truncated 100% of assistant
                                                           # turns → all labels became -100.
-LORA_R           = 8                                      # cell 8: reverted to notebook default
-LORA_ALPHA       = 16                                     # cell 8: 2*r convention
-                                                          # r=32 made hallucination WORSE
-                                                          # (model invented param names beyond
-                                                          # the schema). Anti-hallucination
-                                                          # signal now lives in the system
-                                                          # message (see prepare_data.py).
+LORA_R           = 32                                     # cell 8: raised from 8.
+LORA_ALPHA       = 64                                     # cell 8: 2*r convention.
+                                                          # An earlier r=32 run "made
+                                                          # hallucination worse" — but that
+                                                          # was on data whose own targets
+                                                          # CONTAINED phantom None params, so
+                                                          # capacity just learned the bad
+                                                          # pattern faster. The dataset is now
+                                                          # 100% schema-clean (every call
+                                                          # validated), so r=32 gives the LoRA
+                                                          # the capacity to OVERRIDE the base
+                                                          # model's param-flooding tic that
+                                                          # r=8 (train loss 0.07) could not.
 LORA_DROPOUT     = 0                                      # cell 8
 TARGET_MODULES   = [                                      # cell 8 — Mamba+Attention
     "q_proj", "k_proj", "v_proj", "o_proj",
